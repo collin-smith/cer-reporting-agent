@@ -1,0 +1,252 @@
+<title>CER Pipeline Incidents Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: survey-sheet header, one filter row, then map + side ledger (stacks on phones). */
+:root {
+  --bg: #f6f8f9;
+  --surface: #ffffff;
+  --land: #e7ecee;
+  --border: #c9d3d8;
+  --ink: #12202a;
+  --ink-2: #4a5a65;
+  --ink-3: #6f7f89;
+  --accent: #1d5f86;
+  --s-release: #2a78d6;
+  --s-fire: #eb6834;
+  --s-limits: #1baf7a;
+  --s-people: #12202a;
+  --ring: #ffffff;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f171c; --surface: #152027; --land: #1f2c34; --border: #33444f;
+    --ink: #e8eef1; --ink-2: #b4c2ca; --ink-3: #8a9aa4; --accent: #7cc0e8;
+    --s-release: #3987e5; --s-fire: #d95926; --s-limits: #199e70; --s-people: #e8eef1; --ring: #152027;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f171c; --surface: #152027; --land: #1f2c34; --border: #33444f;
+  --ink: #e8eef1; --ink-2: #b4c2ca; --ink-3: #8a9aa4; --accent: #7cc0e8;
+  --s-release: #3987e5; --s-fire: #d95926; --s-limits: #199e70; --s-people: #e8eef1; --ring: #152027;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 16px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 4vw, 36px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--ink-2); max-width: 68ch; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 24px; font-family: var(--font-data); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 500; font-size: 18px; margin-right: 4px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--font-body); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.chip[aria-pressed="false"] { color: var(--ink-3); background: transparent; }
+.chip[aria-pressed="false"] .sw { opacity: .25; }
+.chip:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.ctl input[type=number] { width: 4.5em; font: 13px var(--font-data); color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 3px 4px; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.mapbox { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; min-width: 0; }
+svg#map { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; max-width: 100%; touch-action: none; cursor: grab; }
+.land { fill: var(--land); stroke: var(--border); stroke-width: .6; vector-effect: non-scaling-stroke; }
+.pt { stroke: var(--ring); }
+.zoombar { position: absolute; top: 10px; right: 10px; display: grid; gap: 4px; }
+.zoombar button { width: 30px; height: 30px; font: 600 16px var(--font-data); color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
+.zoombar button.wide { width: auto; padding: 0 8px; font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px; font-size: 13px; line-height: 1.4; max-width: 260px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+.tip .id { font-family: var(--font-data); font-size: 12px; color: var(--ink-3); }
+.tip .t { font-weight: 600; }
+.legend-note { position: absolute; left: 10px; bottom: 8px; font-size: 12px; color: var(--ink-3); background: var(--surface); padding: 2px 6px; border-radius: 4px; }
+aside { display: grid; gap: 16px; min-width: 0; }
+aside h2 { font-family: var(--font-display); font-weight: 600; font-size: 17px; margin: 0 0 6px; }
+.ledger { display: grid; gap: 5px; font-size: 13px; }
+.row { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3.2em; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.row .n { font-family: var(--font-data); text-align: right; color: var(--ink); }
+.row .nm { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 10px; background: var(--land); border-radius: 0 4px 4px 0; position: relative; overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 0 4px 4px 0; }
+.bar i.sig { background: var(--s-fire); }
+.small { font-size: 12px; color: var(--ink-3); margin: 6px 0 0; }
+.notes { font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
+.notes p { margin: 0; }
+.notes b { color: var(--ink); }
+footer { font-size: 12px; color: var(--ink-3); max-width: 90ch; }
+footer a { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Draft · Canada Energy Regulator open data · 2008 – 2026</div>
+    <h1>Where federally regulated pipelines report incidents</h1>
+    <p class="lede">Every incident reported to the CER, one dot each. Colour shows the most serious incident type; larger ringed dots were classed as Significant. Drag to pan, scroll or use the buttons to zoom, hover a dot for details.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="controls">
+    <div class="chips" id="chips" role="group" aria-label="Incident types"></div>
+    <label class="ctl"><input type="checkbox" id="sigOnly"> Significant only</label>
+    <span class="ctl">Years <input type="number" id="y0" min="2008" max="2026" value="2008" aria-label="From year"> – <input type="number" id="y1" min="2008" max="2026" value="2026" aria-label="To year"></span>
+  </div>
+
+  <div class="main">
+    <div class="mapbox" id="mapbox">
+      <svg id="map" viewBox="0 0 960 600" role="img" aria-label="Map of Canada with pipeline incident locations"></svg>
+      <div class="zoombar">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zwest" class="wide" aria-label="Zoom to Alberta and BC">AB/BC</button>
+        <button id="zreset" class="wide" aria-label="Reset view">Reset</button>
+      </div>
+      <div class="legend-note">Dots mostly trace the pipeline network itself.</div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <aside>
+      <section>
+        <h2>By province</h2>
+        <div class="ledger" id="ledger"></div>
+        <p class="small">Bar = incidents shown. Orange = of those, Significant.</p>
+      </section>
+      <section class="notes">
+        <h2>Read with care</h2>
+        <p><b>Federal pipelines only.</b> The CER regulates interprovincial and international lines. Most of Alberta's provincially regulated pipelines report to the AER and are not here.</p>
+        <p><b>More pipe, more dots.</b> Clusters follow where the network is densest (NOVA in Alberta, Westcoast and Trans Mountain in BC), not necessarily where risk is highest.</p>
+        <p><b>Approximate locations.</b> Coordinates are as reported; treat them as nearby, not exact.</p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>Source: Canada Energy Regulator, Pipeline Incident Data (comprehensive), Open Government Licence – Canada, downloaded 2026-10-28. Province outlines: Code for Germany “click that hood” Canada GeoJSON. Draft for a portfolio series; not affiliated with or endorsed by the CER.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const GEO = /*__GEO__*/null;
+
+const GROUPS = [
+  { key: 0, label: "Release or environmental", cssVar: "--s-release" },
+  { key: 1, label: "Fire or explosion", cssVar: "--s-fire" },
+  { key: 2, label: "Beyond design limits", cssVar: "--s-limits" },
+  { key: 3, label: "Injury or fatality", cssVar: "--s-people" },
+];
+const TYPE_NAMES = [[1,"Release"],[2,"Beyond design limits"],[4,"Fire"],[8,"Explosion"],[16,"Serious injury"],[32,"Fatality"],[64,"Environmental effects"]];
+const on = new Set([0,1,2,3]);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const recs = DATA.recs.map(r => ({ lon:r[0], lat:r[1], year:r[2], g:r[3], sig:r[4], bits:r[5], prov:DATA.prov[r[6]],
+  subst:DATA.subst[r[7]], vol:r[8], centre:DATA.centre[r[9]], what:DATA.what[r[10]], why:DATA.why[r[11]], id:r[12], date:r[13] }));
+
+const W = 960, H = 600;
+const proj = d3.geoConicConformal().rotate([96, 0]).parallels([49, 77]);
+proj.fitExtent([[24, 24], [W - 24, H - 24]], { type: "MultiPoint", coordinates: recs.map(d => [d.lon, d.lat]) });
+const path = d3.geoPath(proj);
+recs.forEach(d => { const p = proj([d.lon, d.lat]); d.x = p[0]; d.y = p[1]; });
+// Draw significant dots last so they sit on top.
+recs.sort((a, b) => a.sig - b.sig || (a.g === 3) - (b.g === 3));
+
+const svg = d3.select("#map");
+const root = svg.append("g");
+root.append("g").selectAll("path").data(GEO.features).join("path").attr("class", "land").attr("d", path);
+const ptsG = root.append("g");
+const circles = ptsG.selectAll("circle").data(recs).join("circle").attr("class", "pt")
+  .attr("cx", d => d.x).attr("cy", d => d.y);
+
+let k = 1, visible = recs, delaunay = null;
+function styleDots() {
+  const colors = GROUPS.map(g => css(g.cssVar));
+  circles.attr("r", d => (d.sig ? 4.6 : 2.6) / Math.sqrt(k))
+    .attr("stroke-width", d => (d.sig ? 1.4 : 0.5) / Math.sqrt(k))
+    .attr("fill", d => colors[d.g])
+    .attr("fill-opacity", d => d.sig ? 0.95 : 0.7);
+}
+
+function render() {
+  const sigOnly = document.getElementById("sigOnly").checked;
+  const y0 = +document.getElementById("y0").value || 2008, y1 = +document.getElementById("y1").value || 2026;
+  const keep = d => on.has(d.g) && (!sigOnly || d.sig) && d.year >= y0 && d.year <= y1;
+  visible = recs.filter(keep);
+  circles.attr("display", d => keep(d) ? null : "none");
+  delaunay = d3.Delaunay.from(visible, d => d.x, d => d.y);
+  const sig = visible.filter(d => d.sig).length;
+  const provs = new Set(visible.map(d => d.prov)).size;
+  document.getElementById("stats").innerHTML =
+    `<span><b>${visible.length.toLocaleString()}</b>incidents shown</span><span><b>${sig}</b>Significant</span><span><b>${provs}</b>provinces</span><span><b>${y0}–${y1}</b></span>`;
+  const counts = d3.rollups(visible, v => [v.length, v.filter(d => d.sig).length], d => d.prov).sort((a, b) => b[1][0] - a[1][0]);
+  const max = counts.length ? counts[0][1][0] : 1;
+  document.getElementById("ledger").innerHTML = counts.map(([p, [n, s]]) =>
+    `<div class="row"><span class="nm" title="${p}">${p}</span><span class="bar"><i style="width:${n / max * 100}%"></i><i class="sig" style="width:${s / max * 100}%"></i></span><span class="n">${n}</span></div>`).join("")
+    || `<p class="small">No incidents match these filters.</p>`;
+  styleDots();
+}
+
+// Type chips
+const chips = d3.select("#chips");
+GROUPS.forEach(g => {
+  const n = recs.filter(d => d.g === g.key).length;
+  chips.append("button").attr("class", "chip").attr("aria-pressed", "true")
+    .html(`<span class="sw" style="background:var(${g.cssVar})"></span>${g.label} <span style="font-family:var(--font-data);color:var(--ink-3);font-weight:400">${n}</span>`)
+    .on("click", function () {
+      on.has(g.key) ? on.delete(g.key) : on.add(g.key);
+      this.setAttribute("aria-pressed", on.has(g.key));
+      render();
+    });
+});
+["sigOnly", "y0", "y1"].forEach(id => document.getElementById(id).addEventListener("input", render));
+
+// Zoom
+const zoom = d3.zoom().scaleExtent([1, 14]).translateExtent([[0, 0], [W, H]])
+  .on("zoom", e => { root.attr("transform", e.transform); k = e.transform.k; styleDots(); hideTip(); });
+svg.call(zoom);
+document.getElementById("zin").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1.8);
+document.getElementById("zout").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1 / 1.8);
+document.getElementById("zreset").onclick = () => svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+document.getElementById("zwest").onclick = () => {
+  const a = proj([-126, 59.5]), b = proj([-110, 49]);
+  const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), yA = Math.min(a[1], b[1]), yB = Math.max(a[1], b[1]);
+  const s = Math.min(W / (x1 - x0), H / (yB - yA)) * 0.9;
+  svg.transition().duration(400).call(zoom.transform,
+    d3.zoomIdentity.translate(W / 2, H / 2).scale(s).translate(-(x0 + x1) / 2, -(yA + yB) / 2));
+};
+
+// Tooltip via nearest visible dot
+const tip = document.getElementById("tip"), box = document.getElementById("mapbox");
+function hideTip() { tip.hidden = true; }
+svg.on("pointermove", e => {
+  if (!delaunay || !visible.length) return;
+  const [mx, my] = d3.pointer(e, root.node());
+  const d = visible[delaunay.find(mx, my)];
+  const px = d3.pointer(e, svg.node());
+  const scale = svg.node().getBoundingClientRect().width / W;
+  if (Math.hypot(d.x - mx, d.y - my) * k * scale > 14) return hideTip();
+  const types = TYPE_NAMES.filter(([b]) => d.bits & b).map(([, n]) => n).join(", ");
+  const vol = d.vol != null ? `${d.vol.toLocaleString(undefined, { maximumFractionDigits: 1 })} m³` : "not recorded";
+  const subst = d.subst && d.subst !== "Not Applicable" ? `${d.subst}, ${vol}` : "No substance released";
+  tip.innerHTML = `<div class="id">${d.id} · reported ${d.date}</div><div class="t">${types}${d.sig ? " · Significant" : ""}</div>
+    <div>${subst}</div><div>Near ${d.centre || "unknown"}, ${d.prov}</div><div style="color:var(--ink-3)">${d.what || "Cause not coded"}</div>`;
+  tip.hidden = false;
+  const r = box.getBoundingClientRect(), sr = svg.node().getBoundingClientRect();
+  let left = px[0] * scale + (sr.left - r.left) + 14, top = px[1] * scale + (sr.top - r.top) + 14;
+  if (left + 270 > r.width) left -= 290;
+  if (top + 130 > r.height) top -= 150;
+  tip.style.left = Math.max(4, left) + "px"; tip.style.top = Math.max(4, top) + "px";
+});
+svg.on("pointerleave", hideTip);
+
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", styleDots);
+new MutationObserver(styleDots).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+render();
+</script>

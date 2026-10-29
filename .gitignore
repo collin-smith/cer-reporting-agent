@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.terraform/
+*.tfstate*
+*.tfvars
+.env
+node_modules/
+dist/
+*.drawio.bkp
