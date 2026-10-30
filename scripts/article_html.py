@@ -7,6 +7,7 @@ level), tables, images, fenced code, block quotes, rules, bold/italic/code/links
 --table-images renders each table as a PNG (table_gen.py, needs cairosvg) into output/assets/<draft>-table-NN.png
 and puts the image in the page instead, the way it will appear on Medium.
 """
+
 import html
 import pathlib
 import re
@@ -78,9 +79,15 @@ def render_table(lines):
             size = f' width="{struct.unpack(">I", img.read_bytes()[16:20])[0] // 2}"'
         return [f'<figure><img src="assets/{img.name}" alt="Table: {alt}"{size}></figure>']
     numeric = [all(is_number(r[i]) for r in body if i < len(r)) for i in range(len(head))]
-    cls = lambda i: ' class="n"' if numeric[i] else ""
-    out = ["<table>", "<thead><tr>" + "".join(f"<th{cls(i)}>{inline(c)}</th>" for i, c in enumerate(head)) +
-           "</tr></thead>", "<tbody>"]
+
+    def cls(i):
+        return ' class="n"' if numeric[i] else ""
+
+    out = [
+        "<table>",
+        "<thead><tr>" + "".join(f"<th{cls(i)}>{inline(c)}</th>" for i, c in enumerate(head)) + "</tr></thead>",
+        "<tbody>",
+    ]
     out += ["<tr>" + "".join(f"<td{cls(i)}>{inline(c)}</td>" for i, c in enumerate(r)) + "</tr>" for r in body]
     return out + ["</tbody>", "</table>"]
 
@@ -88,7 +95,7 @@ def render_table(lines):
 def render_list(lines):
     ordered = bool(re.match(r"\d+\.", lines[0].strip()))
     tag = "ol" if ordered else "ul"
-    out, open_child = [f"<{tag}>"], False
+    out = [f"<{tag}>"]
     item = None
     items = []
     for ln in lines:
@@ -121,7 +128,7 @@ def convert(md):
             j = i + 1
             while j < len(lines) and not lines[j].startswith("```"):
                 j += 1
-            out.append("<pre><code>" + html.escape("\n".join(lines[i + 1:j])) + "</code></pre>")
+            out.append("<pre><code>" + html.escape("\n".join(lines[i + 1 : j])) + "</code></pre>")
             i = j + 1
         elif m := re.match(r"(#{1,3})\s+(.*)", ln):
             level = len(m.group(1))
@@ -142,8 +149,11 @@ def convert(md):
             i = j
         elif re.match(r"(?:[-*]|\d+\.)\s+", ln):
             j = i + 1
-            while j < len(lines) and lines[j].strip() and (lines[j].startswith(" ") or
-                                                           re.match(r"(?:[-*]|\d+\.)\s+", lines[j])):
+            while (
+                j < len(lines)
+                and lines[j].strip()
+                and (lines[j].startswith(" ") or re.match(r"(?:[-*]|\d+\.)\s+", lines[j]))
+            ):
                 j += 1
             out += render_list(lines[i:j])
             i = j
@@ -151,14 +161,15 @@ def convert(md):
             j = i
             while j < len(lines) and lines[j].startswith(">"):
                 j += 1
-            out.append("<blockquote>" + inline(" ".join(l.lstrip("> ") for l in lines[i:j])) + "</blockquote>")
+            out.append("<blockquote>" + inline(" ".join(q.lstrip("> ") for q in lines[i:j])) + "</blockquote>")
             i = j
         else:
             j = i
-            while j < len(lines) and lines[j].strip() and not re.match(r"(#{1,3}\s|\||```|>|(?:[-*]|\d+\.)\s)",
-                                                                         lines[j]):
+            while (
+                j < len(lines) and lines[j].strip() and not re.match(r"(#{1,3}\s|\||```|>|(?:[-*]|\d+\.)\s)", lines[j])
+            ):
                 j += 1
-            text = inline(" ".join(l.strip() for l in lines[i:j]))
+            text = inline(" ".join(p.strip() for p in lines[i:j]))
             cls = ' class="note"' if text.startswith("<em>") and text.endswith("</em>") else ""
             out.append(f"<p{cls}>{text}</p>")
             i = j
@@ -169,10 +180,12 @@ def main():
     src = pathlib.Path(sys.argv[1])
     TABLE_IMAGES.update(on="--table-images" in sys.argv[2:], stem=src.stem)
     title, body = convert(src.read_text(encoding="utf-8"))
-    page = (f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
-            f'<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            f"<title>{html.escape(re.sub(r'[*`]', '', title))}</title>\n<style>{CSS}</style>\n</head>\n"
-            f"<body>\n<main>\n{body}\n</main>\n</body>\n</html>\n")
+    page = (
+        f'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+        f'<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        f"<title>{html.escape(re.sub(r'[*`]', '', title))}</title>\n<style>{CSS}</style>\n</head>\n"
+        f"<body>\n<main>\n{body}\n</main>\n</body>\n</html>\n"
+    )
     dst = src.with_suffix(".html")
     dst.write_text(page, encoding="utf-8")
     print(f"wrote {dst}")

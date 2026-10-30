@@ -8,3 +8,8 @@ __pycache__/
 node_modules/
 dist/
 *.drawio.bkp
+.ruff_cache/
+.pytest_cache/
+infra/backend.hcl
+infra/terraform.tfvars
+*.plan

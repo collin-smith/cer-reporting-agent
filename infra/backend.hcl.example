@@ -1,0 +1,7 @@
+# Copy to backend.hcl (git-ignored) and set the account ID. The bucket is created once by hand (see README).
+# Then: terraform init -backend-config=backend.hcl
+bucket       = "agentic-ai-tfstate-<account-id>"
+key          = "base/terraform.tfstate"
+region       = "ca-central-1"
+encrypt      = true
+use_lockfile = true

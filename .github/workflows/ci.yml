@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  cost-guardrails:
+    # Fails on anything that bills while idle and that this series never uses (D6, D11).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No OpenSearch Serverless (the Knowledge Base uses S3 Vectors)
+        run: |
+          if grep -rnI 'aws_opensearchserverless\|OPENSEARCH_SERVERLESS' --include='*.tf' --include='*.py' .; then
+            echo "::error::OpenSearch Serverless bills ~\$175+/month idle; use S3 Vectors"
+            exit 1
+          fi
+      - name: No provisioned throughput or provisioned concurrency
+        run: |
+          if grep -rnI 'aws_bedrock_provisioned_model_throughput\|ProvisionedConcurrency\|provisioned_concurrent_executions' \
+            --include='*.tf' --include='*.py' --include='*.json' .; then
+            echo "::error::provisioned capacity bills while idle"
+            exit 1
+          fi
+      - name: No NAT gateway outside the Stage 6 VPC file
+        run: |
+          if grep -rnI 'aws_nat_gateway' --include='*.tf' . | grep -v 'vpc.tf'; then
+            echo "::error::NAT gateways bill ~\$1/day; only the Stage 6 hardening run (vpc.tf) may add one"
+            exit 1
+          fi
+
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --extra dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q
+
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
+
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh

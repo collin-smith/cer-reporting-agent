@@ -4,6 +4,7 @@ Usage: python3 -I code/scripts/build_map.py
 Reads input/cer/pipeline-incidents-comprehensive-data.csv + input/cer/canada.geojson,
 writes output/cer-incident-map.html (data embedded; no external tiles).
 """
+
 import csv
 import json
 import pathlib
@@ -48,7 +49,7 @@ class Lookup:
 
 
 def simplify_geo(path):
-    g = json.load(open(path))
+    g = json.loads(pathlib.Path(path).read_text())
     out = []
     for f in g["features"]:
         polys = f["geometry"]["coordinates"]
@@ -68,13 +69,19 @@ def simplify_geo(path):
                     rings.append(pts)
             if rings:
                 keep.append(rings)
-        out.append({"type": "Feature", "properties": {"name": f["properties"]["name"]},
-                    "geometry": {"type": "MultiPolygon", "coordinates": keep}})
+        out.append(
+            {
+                "type": "Feature",
+                "properties": {"name": f["properties"]["name"]},
+                "geometry": {"type": "MultiPolygon", "coordinates": keep},
+            }
+        )
     return {"type": "FeatureCollection", "features": out}
 
 
 def main():
-    rows = list(csv.DictReader(open(RAW / "pipeline-incidents-comprehensive-data.csv", encoding="latin-1")))
+    with open(RAW / "pipeline-incidents-comprehensive-data.csv", encoding="latin-1") as f:
+        rows = list(csv.DictReader(f))
     prov, subst, centre, what, why = Lookup(), Lookup(), Lookup(), Lookup(), Lookup()
     recs = []
     for r in rows:
@@ -85,19 +92,37 @@ def main():
             vol = float(r["Approximate Volume Released (m3)"])
         except ValueError:
             vol = None
-        recs.append([
-            round(float(r["Longitude"]), 3), round(float(r["Latitude"]), 3),
-            int(r["Year"]), group(bits), 1 if r["Significant"] == "Yes" else 0, bits,
-            prov(r["Province"]), subst(r["Substance"]), vol, centre(r["Nearest Populated Centre"]),
-            what(r["What happened category"]), why(r["Why it happened category"]),
-            r["Incident Number"], r["Reported Date"],
-        ])
-    data = {"recs": recs, "prov": prov.items, "subst": subst.items, "centre": centre.items,
-            "what": what.items, "why": why.items}
+        recs.append(
+            [
+                round(float(r["Longitude"]), 3),
+                round(float(r["Latitude"]), 3),
+                int(r["Year"]),
+                group(bits),
+                1 if r["Significant"] == "Yes" else 0,
+                bits,
+                prov(r["Province"]),
+                subst(r["Substance"]),
+                vol,
+                centre(r["Nearest Populated Centre"]),
+                what(r["What happened category"]),
+                why(r["Why it happened category"]),
+                r["Incident Number"],
+                r["Reported Date"],
+            ]
+        )
+    data = {
+        "recs": recs,
+        "prov": prov.items,
+        "subst": subst.items,
+        "centre": centre.items,
+        "what": what.items,
+        "why": why.items,
+    }
     geo = simplify_geo(RAW / "canada.geojson")
     tpl = (HERE / "map-template.html").read_text()
-    html = (tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
-               .replace("/*__GEO__*/null", json.dumps(geo, separators=(",", ":"))))
+    html = tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":"))).replace(
+        "/*__GEO__*/null", json.dumps(geo, separators=(",", ":"))
+    )
     (OUT / "cer-incident-map.html").write_text(html)
     print(len(recs), "incidents;", len(html) // 1024, "KB")
 

@@ -9,16 +9,50 @@ deadline, lists what's missing, and drafts the notice. A person approves every d
 The running question: **when does an AI agent earn its cost over a fixed workflow, and when do multiple agents earn
 theirs over one?** Every result is reported with accuracy, cost and latency.
 
-> **Status: design stage.** The architecture is settled and the build has not started. So far this repo holds the
-> scripts for the CER incident map and the architecture diagrams.
+> **Status: build started.** The rules spec and decisions are settled; the infrastructure scaffold (budgets,
+> alerts, a tagged model profile, the teardown check) and CI are in place. The rules engine comes next.
 
 ## What's here now
 
 | Path | What it does |
 | --- | --- |
+| `infra/` | Terraform: tag-filtered budgets (monthly alerts at $50/$75/$100, $300 series cap), an SNS alert topic, and a tagged Bedrock inference profile so model spend is tracked |
+| `scripts/nuke.sh` | Stops anything of this project's that bills while idle; `--check` reports only and exits 1 if anything is found |
+| `scripts/companion_analysis.py` | The companion piece's analysis of the CER incident data (tables and charts) |
+| `scripts/article_html.py`, `table_gen.py`, `chart_gen.py` | Render article drafts as HTML, with tables and charts as images for Medium |
 | `scripts/build_map.py` + `scripts/map-template.html` | Builds an interactive map of the CER's public pipeline-incident data |
-| `scripts/make_architecture_diagram.py` | Generates the AWS architecture diagram (draw.io, AWS4 icons) |
-| `scripts/make_agent_workflow_diagram.py` | Generates the agentic workflow diagram: supervisor, specialists, MCP tools, path to human approval |
+| `scripts/make_architecture_diagram.py`, `make_agent_workflow_diagram.py` | Generate the architecture and agent-workflow diagrams (draw.io, AWS4 icons) |
+| `src/cer_agent/` | The application package (rules engine, workflow, agents, evals), filled in stage by stage |
+
+## Setup
+
+Python 3.12 and [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --extra dev
+uv run ruff check . && uv run pytest -q
+```
+
+Infrastructure (Terraform >= 1.10, region `ca-central-1`). Create the state bucket once, by hand, so `terraform
+destroy` can never delete its own state:
+
+```bash
+ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+aws s3api create-bucket --bucket agentic-ai-tfstate-$ACCOUNT --region ca-central-1 \
+  --create-bucket-configuration LocationConstraint=ca-central-1
+aws s3api put-bucket-versioning --bucket agentic-ai-tfstate-$ACCOUNT --versioning-configuration Status=Enabled
+aws s3api put-public-access-block --bucket agentic-ai-tfstate-$ACCOUNT --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+aws s3api put-bucket-tagging --bucket agentic-ai-tfstate-$ACCOUNT --tagging 'TagSet=[{Key=project,Value=agentic-ai}]'
+
+cd infra
+cp backend.hcl.example backend.hcl            # set the account ID
+cp terraform.tfvars.example terraform.tfvars  # set alert_email
+terraform init -backend-config=backend.hcl
+terraform plan -out=base.plan && terraform apply base.plan
+```
+
+Confirm the SNS subscription email, then run `./scripts/nuke.sh --check` before every pause.
 
 ## Planned stack
 
