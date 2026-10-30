@@ -30,3 +30,18 @@ provider "aws" {
     }
   }
 }
+
+# The report-writing models for the synthetic test set (Llama, Mistral) run only in US regions. Synthetic data with
+# fictional operators only; the system under test stays in ca-central-1 (D27).
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+
+  default_tags {
+    tags = {
+      project   = var.project
+      managedby = "terraform"
+      series    = "cer-reporting-agent"
+    }
+  }
+}

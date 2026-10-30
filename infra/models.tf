@@ -15,3 +15,26 @@ resource "aws_bedrock_inference_profile" "nova_lite" {
     copy_from = "arn:aws:bedrock:${var.region}:${local.account_id}:inference-profile/ca.amazon.nova-lite-v1:0"
   }
 }
+
+# Test-set report writers (D27): two model families other than the ones under test (Nova, Claude), about half the
+# reports each. Llama 4 Maverick via its US cross-region profile; Mistral Large 3 on-demand in us-east-1.
+resource "aws_bedrock_inference_profile" "writer_llama" {
+  provider    = aws.us_east_1
+  name        = "${local.name}-writer-llama4-maverick"
+  description = "Llama 4 Maverick for writing synthetic field reports"
+
+  model_source {
+    copy_from = "arn:aws:bedrock:us-east-1:${local.account_id}:inference-profile/us.meta.llama4-maverick-17b-instruct-v1:0"
+  }
+}
+
+resource "aws_bedrock_inference_profile" "writer_mistral" {
+  provider    = aws.us_east_1
+  name        = "${local.name}-writer-mistral-large3"
+  description = "Mistral Large 3 for writing synthetic field reports"
+
+  model_source {
+    copy_from = "arn:aws:bedrock:us-east-1::foundation-model/mistral.mistral-large-3-675b-instruct"
+  }
+}
+

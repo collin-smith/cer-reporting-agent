@@ -10,3 +10,12 @@ output "nova_lite_profile_arn" {
   description = "Call Nova Lite through this ARN so the spend is tagged."
   value       = aws_bedrock_inference_profile.nova_lite.arn
 }
+
+output "writer_profile_arns" {
+  description = "Synthetic-report writers (D27); call them through these ARNs so the spend is tagged."
+  value = {
+    llama   = aws_bedrock_inference_profile.writer_llama.arn
+    mistral = aws_bedrock_inference_profile.writer_mistral.arn
+  }
+}
+
