@@ -2,7 +2,7 @@
 
 Usage: python3 -I code/scripts/article_html.py output/companion-draft.md [--table-images]
 Writes the .html next to the .md. Handles the subset the drafts use: headings, paragraphs, lists (one nesting
-level), tables, fenced code, block quotes, rules, bold/italic/code/links. No dependencies.
+level), tables, images, fenced code, block quotes, rules, bold/italic/code/links. No dependencies.
 
 --table-images renders each table as a PNG (table_gen.py, needs cairosvg) into output/assets/<draft>-table-NN.png
 and puts the image in the page instead, the way it will appear on Medium.
@@ -127,6 +127,9 @@ def convert(md):
             level = len(m.group(1))
             title = title or (m.group(2) if level == 1 else None)
             out.append(f"<h{level}>{inline(m.group(2))}</h{level}>")
+            i += 1
+        elif m := re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", ln.strip()):
+            out.append(f'<figure><img src="{html.escape(m.group(2))}" alt="{html.escape(m.group(1))}"></figure>')
             i += 1
         elif re.fullmatch(r"-{3,}", ln.strip()):
             out.append("<hr>")

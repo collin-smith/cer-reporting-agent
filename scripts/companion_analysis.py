@@ -9,11 +9,17 @@ import csv
 import datetime as dt
 import pathlib
 import statistics
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))  # -I drops the script dir
+import chart_gen  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 CSV = PROJECT / "input" / "cer" / "pipeline-incidents-comprehensive-data.csv"
 OUT = PROJECT / "output" / "companion-findings.md"
+ASSETS = PROJECT / "output" / "assets"
+SOURCE = "Source: Canada Energy Regulator, Pipeline Incident Data (snapshot 2026-10-28). Open Government Licence – Canada."
 
 LATE_DAYS = 30
 BATCH_DAYS = 14
@@ -258,6 +264,33 @@ def section_quality(rows):
     return out
 
 
+def make_charts(rows):
+    lagged = [r for r in rows if r["_lag"] is not None and r["_lag"] >= 0]
+    labels, shares = [], []
+    for a, b in PERIODS:
+        p = [r["_lag"] for r in lagged if r["_year"] and a <= r["_year"] <= b]
+        labels.append(f"{a}–{b}")
+        shares.append(100 * sum(1 for x in p if x <= 1) / len(p))
+    chart_gen.column_chart(
+        ASSETS / "companion-chart-01-next-day", "Most incidents are reported by the next day",
+        "Share of incidents reported the same day or the day after discovery, by period", labels, shares, SOURCE)
+
+    late = [r for r in lagged if r["_lag"] > LATE_DAYS]
+
+    def in_batch(r):
+        return any(o is not r and o["Company"] == r["Company"] and abs((o["_rep"] - r["_rep"]).days) <= BATCH_DAYS
+                   for o in late)
+
+    split = {True: [0, 0], False: [0, 0]}
+    for r in late:
+        split[in_batch(r)][0 if r["_lag"] > 365 else 1] += 1
+    chart_gen.stacked_bars(
+        ASSETS / "companion-chart-02-batches", f"Most of the longest delays were filed in batches",
+        f"The {len(late)} incidents reported more than {LATE_DAYS} days after discovery, by how they were filed",
+        [("Filed in a batch", split[True]), ("Filed alone", split[False])],
+        ["More than a year", f"{LATE_DAYS + 1} days to a year"], SOURCE)
+
+
 def main():
     rows = load()
     enrich(rows)
@@ -266,6 +299,7 @@ def main():
              f"`{CSV.name}` (snapshot 2026-10-28). Categories only, no company names.*", ""]
     for section in (section_overview, section_lag, section_significant, section_causes, section_quality):
         parts += section(rows)
+    make_charts(rows)
     OUT.write_text("\n".join(parts) + "\n", encoding="utf-8")
     print(f"wrote {OUT}")
 
