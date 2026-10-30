@@ -9,8 +9,8 @@ deadline, lists what's missing, and drafts the notice. A person approves every d
 The running question: **when does an AI agent earn its cost over a fixed workflow, and when do multiple agents earn
 theirs over one?** Every result is reported with accuracy, cost and latency.
 
-> **Status: build started.** The rules spec and decisions are settled; the infrastructure scaffold (budgets,
-> alerts, a tagged model profile, the teardown check) and CI are in place. The rules engine comes next.
+> **Status: baseline built.** The rules engine, the 162-case test set, the fixed workflow (Nova Lite reads the
+> report, the rules engine decides) and the tier-1 eval harness are in place. The agents come next.
 
 ## What's here now
 
@@ -22,7 +22,11 @@ theirs over one?** Every result is reported with accuracy, cost and latency.
 | `scripts/article_html.py`, `table_gen.py`, `chart_gen.py` | Render article drafts as HTML, with tables and charts as images for Medium |
 | `scripts/build_map.py` + `scripts/map-template.html` | Builds an interactive map of the CER's public pipeline-incident data |
 | `scripts/make_architecture_diagram.py`, `make_agent_workflow_diagram.py` | Generate the architecture and agent-workflow diagrams (draw.io, AWS4 icons) |
-| `src/cer_agent/` | The application package (rules engine, workflow, agents, evals), filled in stage by stage |
+| `src/cer_agent/rules.py`, `backtest.py` | The CER reporting rules as code, and the back-test against the CER's own records |
+| `src/cer_agent/cases.py`, `writer.py` | Build the test-set specs from real records, and write them up as messy field reports (checked for leaks) |
+| `src/cer_agent/extract.py`, `workflow.py` | The fixed workflow: one forced tool call reads the report, plain code converts units and the rules decide |
+| `src/cer_agent/evals.py`, `evals/config.toml` | Tier-1 eval harness: decision, deadline, route, missing facts and per-field extraction, with 95% intervals, cost and latency; results in `evals/runs/` |
+| `evals/cases/` | The test set: 162 synthetic field reports with expected answers (dev / test / held-out splits) |
 
 ## Setup
 
@@ -54,6 +58,15 @@ terraform plan -out=base.plan && terraform apply base.plan
 
 Confirm the SNS subscription email, then run `./scripts/nuke.sh --check` before every pause.
 
+Evals (from `code/`). The oracle arm is free and also runs in CI; the workflow arm calls Nova Lite (about $0.0002
+a case) through the tagged profile:
+
+```bash
+PYTHONPATH=src python -m cer_agent.evals --arm oracle --splits dev test heldout
+NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHONPATH=src python -m cer_agent.evals
+PYTHONPATH=src python -m cer_agent.evals --rescore RUN_ID   # re-score saved output after a scorer change, $0
+```
+
 ## Planned stack
 
 Strands Agents (supervisor with specialist agents; one specialist also built in LangGraph for comparison), Amazon
@@ -68,5 +81,6 @@ published under the Open Government Licence – Canada. The data is not stored i
 
 ## Disclaimer
 
-A demonstration on public CER data. Not regulatory advice. Not affiliated with or endorsed by the Canada Energy
+A demonstration on public CER data. Not regulatory advice. The field reports in `evals/cases/` are synthetic:
+the operators named in them are fictional, places are generalized to the nearest town, and dates are moved to 2026. Not affiliated with or endorsed by the Canada Energy
 Regulator or any pipeline operator.

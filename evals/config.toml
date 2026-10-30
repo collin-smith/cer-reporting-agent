@@ -1,0 +1,27 @@
+# Eval harness config (D3). Change the test set, splits, arm or targets here, not in code.
+# Targets marked proposed = true are drafts in output/engagement-brief.md, still to be confirmed.
+
+[run]
+cases = "evals/cases/cases.jsonl"
+splits = ["dev"]          # dev | test | heldout; targets are scored on heldout
+arm = "workflow-nova"     # workflow-nova (live, Bedrock) | oracle (case facts straight to the rules, $0)
+runs_dir = "evals/runs"
+
+[models.nova-lite]
+env = "NOVA_LITE_ARN"     # terraform output nova_lite_profile_arn (tagged profile)
+region = "ca-central-1"
+# USD per 1M tokens. Nova Lite on-demand list price; check against the AWS Price List before quoting costs.
+price_in = 0.06
+price_out = 0.24
+
+[targets]
+missed_reports = { max = 0, proposed = false }          # reportable cases called "not reportable"
+late_deadlines = { max = 0, proposed = false }          # 3 h cases given 24 h (or none)
+deadline_correct = { min = 0.95, proposed = true }
+over_notify = { max = 0.30, proposed = true }           # not-reportable cases sent as reportable or precautionary
+missing_recall = { min = 0.90, proposed = true }
+extraction_accuracy = { min = 0.95, proposed = true }
+latency_p95_s = { max = 300, proposed = true }
+
+[assumptions]
+manual_triage_minutes = 30   # proposed, not measured (engagement brief)

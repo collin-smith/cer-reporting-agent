@@ -35,3 +35,9 @@ def test_trailing_zero_numbers_match_and_injection_is_appended():
 def test_rejects_speculation_about_conduct():
     problems = check({"stated": [], "withheld": []}, f"He fell. Might've been distracted, no sign of drinking. {BODY}")
     assert "speculates about someone's conduct or condition" in problems
+
+
+def test_rejects_a_year_other_than_the_spec_year():
+    spec = {"stated": [], "withheld": [], "discovered_at": "2026-07-11T16:15"}
+    assert "wrong year 2024" in check(spec, f"Found it 2024-07-11 at 16:15. {BODY}")
+    assert check(spec, f"Found it 2026-07-11 at 16:15. {BODY}") == []

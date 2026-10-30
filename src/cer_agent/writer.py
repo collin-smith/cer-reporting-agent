@@ -109,6 +109,9 @@ def check(spec: dict, report: str) -> list[str]:
         problems.append("talks about reporting rules")
     if any(re.search(rf"\b{re.escape(w)}", text) for w in CONDUCT_WORDS):
         problems.append("speculates about someone's conduct or condition")
+    years = set(re.findall(r"\b(20\d\d)\b", report)) - {spec.get("discovered_at", "")[:4]}
+    if years:
+        problems.append(f"wrong year {', '.join(sorted(years))}")  # the writers drift to their own era (2024)
     words = len(report.split())
     if not 40 <= words <= 260:
         problems.append(f"length {words} words")
