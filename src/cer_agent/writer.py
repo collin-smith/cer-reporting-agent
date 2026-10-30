@@ -74,6 +74,11 @@ def prompt(spec: dict) -> str:
 
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 VOLUME = re.compile(r"\d[\d,.]*\s*(?:m3|m³|cubic|litres?|liters?|bbls?|barrels?|L\b)", re.IGNORECASE)
+# A figure with a deciding unit must come from the spec: an invented pressure or volume can change the answer.
+QUANTITY = re.compile(
+    r"(\d[\d,]*(?:\.\d+)?)\s*(?:m3|m³|cubic|litres?|liters?|bbls?|barrels?|L\b|kpa|mpa|psi|bar\b|kg/[smh])",
+    re.IGNORECASE,
+)
 LAND_WORDS = ("fence", "right of way", "right-of-way", "ditch", "off site", "off-site", "neighbour", "neighbor",
               "landowner", "road")  # fmt: skip
 PRODUCT_WORDS = ("crude", "oil", "condensate", "propane", "butane", "diesel", "gasoline", "gas", "ngl", "liquids",
@@ -98,6 +103,12 @@ def check(spec: dict, report: str) -> list[str]:
             variants = {n, n.rstrip("0").rstrip(".") if "." in n else n}
             if not variants & have:
                 problems.append(f"missing number {n} (from: {phrase})")
+    given = {n for phrase in spec["stated"] for n in numbers_in(phrase)}
+    given |= {n.rstrip("0").rstrip(".") for n in given if "." in n}
+    for q in QUANTITY.findall(report):
+        n = q.replace(",", "").rstrip(".")
+        if n not in given and n.rstrip("0").rstrip(".") not in given:
+            problems.append(f"adds a figure not in the spec: {q}")
     withheld = " ".join(spec["withheld"])
     if "volume" in withheld and VOLUME.search(report):
         problems.append("mentions a volume, which is withheld")
@@ -158,6 +169,22 @@ def save(specs: list[dict], done: dict) -> None:
     CASES.write_text("".join(json.dumps(done[i], ensure_ascii=False) + "\n" for i in order), encoding="utf-8")
 
 
+def sync(specs: list[dict], cases) -> dict:
+    """Keep a written report only if its writer prompt is unchanged and it still passes the checker; refresh its spec
+    fields (labels, facts) from the current spec. Everything else is (re)written."""
+    by_id = {s["id"]: s for s in specs}
+    keep = {}
+    for c in cases:
+        spec = by_id.get(c["id"])
+        if spec is None or prompt(spec) != prompt(c) or spec.get("injection") != c.get("injection"):
+            continue
+        body = c["report"].removesuffix(f"\n\nPS: {c['injection']}") if c.get("injection") else c["report"]
+        if check(spec, body):
+            continue
+        keep[c["id"]] = {**c, **spec}
+    return keep
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Write the synthetic field reports.")
     ap.add_argument("--only", nargs="*", help="case IDs to (re)write")
@@ -171,9 +198,8 @@ def main(argv=None) -> int:
     client = boto3.client("bedrock-runtime", region_name=REGION,
                           config=Config(retries={"max_attempts": 10, "mode": "adaptive"}))  # fmt: skip
     specs = [json.loads(line) for line in SPECS.read_text(encoding="utf-8").splitlines()]
-    done = {}
-    if CASES.exists():
-        done = {c["id"]: c for c in map(json.loads, CASES.read_text(encoding="utf-8").splitlines())}
+    old = [json.loads(line) for line in CASES.read_text(encoding="utf-8").splitlines()] if CASES.exists() else []
+    done = sync(specs, old)
     todo = [s for s in specs if (args.only and s["id"] in args.only) or (not args.only and s["id"] not in done)]
     todo = todo[: args.limit] if args.limit else todo
     tokens = {w: [0, 0] for w in PRICES}

@@ -362,6 +362,20 @@ def context_of(r: dict) -> dict:
     }
 
 
+def near_zero(r: dict) -> bool:
+    f = record_to_facts(r)
+    return bool(f.release) and f.volume_m3 is not None and f.volume_m3 < 0.05  # written as "0.0 m³" (fmt_volume)
+
+
+def parses(r: dict) -> bool:
+    """Whether the record's discovery time parses (shift_to_2026 draws a random time when it doesn't)."""
+    try:
+        dt.datetime.strptime(r["Discovered Date and Time"].strip()[:22], "%Y/%m/%d %I:%M:%S %p")
+        return True
+    except ValueError:
+        return False
+
+
 def deciding_class(f: Facts) -> str:
     d = decide(f)
     first = d.incident_types[0] if d.incident_types else "none"
@@ -372,6 +386,7 @@ def build() -> tuple[list[CaseSpec], list[tuple[str, str]]]:
     rnd = random.Random(SEED)
     records = load_records()
     pseudonym: dict[str, str] = {}
+    alias: dict[int, str] = {}  # swapped-in record -> the company of the record it replaced (keeps pseudonyms stable)
 
     def operator_for(company: str) -> str:
         if company not in pseudonym:
@@ -379,9 +394,11 @@ def build() -> tuple[list[CaseSpec], list[tuple[str, str]]]:
         return pseudonym[company]
 
     def spec(kind, variant, r, f, label_source, rationale, stated=None, withheld=()):
-        f = dataclasses.replace(f, discovered_at=shift_to_2026(r, rnd))
+        # The record's own finding that a gas release qualified isn't something a field report can carry; the label
+        # must follow from what the report states (rate, pipe body), or PREC asks for it.
+        f = dataclasses.replace(f, discovered_at=shift_to_2026(r, rnd), gas_release_qualifies=None)
         return CaseSpec(
-            id="", kind=kind, variant=variant, operator=operator_for(r["Company"]),
+            id="", kind=kind, variant=variant, operator=operator_for(alias.get(id(r), r["Company"])),
             town=r["Nearest Populated Centre"].strip(), province=r["Province"].strip(),
             discovered_at=f.discovered_at.isoformat(timespec="minutes"), style=rnd.choice(STYLES),
             reporter=rnd.choice(REPORTERS), context=context_of(r),
@@ -408,6 +425,15 @@ def build() -> tuple[list[CaseSpec], list[tuple[str, str]]]:
         for k in order:
             if strata[k] and len(picks) < 75:
                 picks.append(strata[k].pop(rnd.randrange(len(strata[k]))))
+    # A record of about 0 m³ reads as "nothing got out" to any reader; swap it for another record from the same
+    # stratum. A separate random stream, so every other case stays exactly as it was.
+    swap = random.Random(SEED + 2)
+    for i, r in enumerate(picks):
+        if near_zero(r):
+            k = deciding_class(record_to_facts(r))
+            ok = [c for c in strata[k] if not near_zero(c) and parses(c)] if parses(r) else []
+            picks[i] = strata[k].pop(strata[k].index(swap.choice(ok)))
+            alias[id(picks[i])] = r["Company"]
     withheld_left = 30  # of 75, one deciding fact withheld; only releases have volume, location and product
     for r in picks:
         f = record_to_facts(r)

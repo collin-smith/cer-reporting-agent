@@ -41,3 +41,9 @@ def test_rejects_a_year_other_than_the_spec_year():
     spec = {"stated": [], "withheld": [], "discovered_at": "2026-07-11T16:15"}
     assert "wrong year 2024" in check(spec, f"Found it 2024-07-11 at 16:15. {BODY}")
     assert check(spec, f"Found it 2026-07-11 at 16:15. {BODY}") == []
+
+
+def test_rejects_an_invented_pressure():
+    spec = {"stated": ["the pipeline was operated outside its design limits"], "withheld": []}
+    assert any("adds a figure" in p for p in check(spec, f"Hit 1,120 psi against MOP. {BODY}"))
+    assert check(SPEC, f"Crude leak, metered 1,200 m3. {BODY}") == []
