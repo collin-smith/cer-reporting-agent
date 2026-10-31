@@ -43,16 +43,17 @@ TOOL = {
                 "injury": {
                     "type": "string",
                     "enum": ["none", "serious", "not_serious", "unclear", "unknown"],
-                    "description": "serious = on the SERIOUS INJURY list; not_serious = cuts, bruises, sprains; "
-                    "unclear = any other fracture or injury not clearly on the list (e.g. a broken finger); "
-                    "unknown = someone was hurt but how badly isn't said",
+                    "description": "serious = on the SERIOUS INJURY list; not_serious = cuts, bruises, sprains, or a "
+                    "broken finger or toe; unclear = a fracture of any other bone not on the list (collarbone, "
+                    "kneecap, hand, wrist, foot, ankle); unknown = someone was hurt but how badly isn't said",
                 },
                 "env_effect": {
                     "type": "string",
                     "enum": ["none", "minor", "significant", "unclear", "unknown"],
-                    "description": "harm to water, wildlife or vegetation; none if nothing is said. "
-                    "unclear = something reached a sensitive "
-                    "place but the extent is still being assessed; unknown = an effect is mentioned but not described",
+                    "description": "harm to water, wildlife or vegetation; none if nothing is said. significant "
+                    "includes drilling fluid, sediment or product seen in a creek, river or wetland, and dead fish or "
+                    "vegetation; unclear = it reached the edge of water or a wetland but nobody has confirmed any got "
+                    "in, or the extent is still being assessed; unknown = an effect is mentioned but not described",
                 },
                 "historical_contamination": {"type": "boolean", "description": "old or accumulated contamination"},
                 "fire_or_explosion": YES_NO_UNKNOWN,
