@@ -61,3 +61,9 @@ def test_an_unknown_date_keeps_the_time_and_odd_time_formats_parse():
 
 def test_a_zero_rate_is_a_blank():
     assert to_facts({"release": "yes", "rate": 0.0, "rate_unit": "kg/s"}).rate_kg_s is None
+
+
+def test_a_rupture_without_a_quote_stays_a_rupture():
+    # A missed rupture is a late 3 h notice: the evidence field steers the model but never overrides a yes.
+    assert to_facts({**BASE, "rupture": "yes"}).rupture is True
+    assert to_facts({**BASE, "rupture": "yes", "rupture_quote": "line ruptured"}).rupture is True

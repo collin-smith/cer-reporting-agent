@@ -98,10 +98,16 @@ TOOL = {
                     "items": LANDS_LIST,
                     "description": "only if sources disagree about where it went: one list per account",
                 },
+                "rupture_quote": {
+                    "type": "string",
+                    "description": "the report's own words saying the pipe itself ruptured, burst or broke open, or "
+                    "that the line couldn't hold pressure; empty if it says no such thing",
+                },
                 "rupture": {
                     **YES_NO,
-                    "description": "the pipe itself broke open and the line couldn't hold pressure; a leak at a "
-                    "fitting, flange, valve or seal is not a rupture",
+                    "description": "yes if the pipe itself ruptured, burst or broke open, or the line couldn't hold "
+                    "pressure. A leak at a fitting, flange, valve, seal or gasket is not a rupture, even if it 'let "
+                    "go', blew, sheared off or sprayed",
                 },
                 "toxic_plume": {**YES_NO, "description": "people evacuated or sheltered because of fumes"},
                 "pressure": _num("highest operating pressure reached"),
@@ -152,6 +158,8 @@ Answering:
   *_alternatives field with every account and don't pick one.
 - lands: company_property = inside the station fence or on company site; right_of_way = the pipeline right of way;
   off_right_of_way = neighbouring land, roads, ditches, water off the right of way.
+- rupture: a rupture is the pipe itself breaking open so the segment can't hold pressure. Quote the words that say so
+  in rupture_quote. Leaks at fittings, flanges, valves or gaskets, however sudden, are not ruptures.
 - SERIOUS INJURY: fracture of the skull, mandible, spine, scapula, sternum, rib, pelvis, femur, humerus, fibula, tibia,
   radius or ulna; amputation; loss of sight; internal bleeding; third degree burns; unconsciousness; loss of a body
   part or its function.
@@ -273,6 +281,7 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
     f.lands = stated or (lands_alts[0] if lands_alts else None)
     if f.release is False and not stated:
         f.lands = {COMPANY_PROPERTY}  # nothing released, so nothing went anywhere
+    # rupture_quote only steers the model; a "yes" without a quote stays yes, since a missed rupture is a late notice.
     f.rupture = _tri(x.get("rupture"))
     f.toxic_plume = _tri(x.get("toxic_plume"))
     pf = PRESSURE_UNITS.get(x.get("pressure_unit") or "kPa", 1.0)
