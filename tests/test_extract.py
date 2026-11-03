@@ -76,3 +76,11 @@ def test_h2s_detected_on_a_sweet_line_is_a_conflict():
     assert f.conflicts["substance"] == ["natural gas - sour", "natural gas - sweet"]
     assert (decide(f).deadline, decide(f).route) == ("T3", "judgment")
     assert "substance" not in to_facts({**gas, "h2s_detected": "no"}).conflicts
+
+
+def test_a_location_conflict_counts_the_stated_account():
+    # JU-128: inside the fence in lands, the road ditch only in lands_alternatives.
+    f = to_facts({**BASE, "release": "yes", "substance": "crude oil - sweet", "volume": 2.5, "volume_basis": "metered",
+                  "lands": ["company_property"], "lands_alternatives": [["off_right_of_way"]]})  # fmt: skip
+    assert sorted(map(sorted, f.conflicts["lands"])) == [["company_property"], ["off_right_of_way"]]
+    assert (decide(f).deadline, decide(f).route) == ("T3", "judgment")

@@ -1,0 +1,842 @@
+{
+  "run": {
+    "cases": "evals/cases/cases.jsonl",
+    "splits": [
+      "test"
+    ],
+    "arm": "workflow-nova",
+    "runs_dir": "evals/runs",
+    "repeats": 3,
+    "extractor": "4968c49f"
+  },
+  "summary": {
+    "cases": 240,
+    "status": {
+      "k": 204,
+      "n": 240,
+      "rate": 0.85,
+      "ci95": [
+        0.7993295067318531,
+        0.8896423504081918
+      ]
+    },
+    "missed_reports": {
+      "k": 3,
+      "n": 210,
+      "rate": 0.014285714285714285,
+      "ci95": [
+        0.0048700271563653155,
+        0.041152823402178955
+      ]
+    },
+    "late_deadlines": {
+      "k": 3,
+      "n": 114,
+      "rate": 0.02631578947368421,
+      "ci95": [
+        0.008989398451945727,
+        0.07452610031928616
+      ]
+    },
+    "deadline_correct": {
+      "k": 197,
+      "n": 240,
+      "rate": 0.8208333333333333,
+      "ci95": [
+        0.7673794084441969,
+        0.8641781272675109
+      ]
+    },
+    "over_notify": {
+      "k": 11,
+      "n": 30,
+      "rate": 0.36666666666666664,
+      "ci95": [
+        0.21873702204017678,
+        0.5448675356639506
+      ]
+    },
+    "route": {
+      "k": 222,
+      "n": 240,
+      "rate": 0.925,
+      "ci95": [
+        0.8845730571258335,
+        0.9520356265442214
+      ]
+    },
+    "incident_types": {
+      "k": 146,
+      "n": 240,
+      "rate": 0.6083333333333333,
+      "ci95": [
+        0.54533517048802,
+        0.6679180233886604
+      ]
+    },
+    "missing_recall": {
+      "k": 73,
+      "n": 78,
+      "rate": 0.9358974358974359,
+      "ci95": [
+        0.8585622037936654,
+        0.9723110929160764
+      ]
+    },
+    "extraction_accuracy": {
+      "k": 3431,
+      "n": 3658,
+      "rate": 0.937944231820667,
+      "ci95": [
+        0.929657069661309,
+        0.9453125084875657
+      ]
+    },
+    "per_field": {
+      "death": {
+        "k": 225,
+        "n": 240,
+        "rate": 0.9375,
+        "ci95": [
+          0.8994525968982753,
+          0.9617622245267808
+        ]
+      },
+      "discovered_at": {
+        "k": 237,
+        "n": 240,
+        "rate": 0.9875,
+        "ci95": [
+          0.9638993626332216,
+          0.9957400098118411
+        ]
+      },
+      "env_effect": {
+        "k": 197,
+        "n": 234,
+        "rate": 0.8418803418803419,
+        "ci95": [
+          0.7896613974256661,
+          0.8830552341476163
+        ]
+      },
+      "fire_linked_to_pipeline": {
+        "k": 49,
+        "n": 54,
+        "rate": 0.9074074074074074,
+        "ci95": [
+          0.8008987246934547,
+          0.9597994579294327
+        ]
+      },
+      "fire_or_explosion": {
+        "k": 232,
+        "n": 240,
+        "rate": 0.9666666666666667,
+        "ci95": [
+          0.9356144031625503,
+          0.983014739690843
+        ]
+      },
+      "lands": {
+        "k": 95,
+        "n": 123,
+        "rate": 0.7723577235772358,
+        "ci95": [
+          0.6906714122559265,
+          0.8375464594833135
+        ]
+      },
+      "limit_kpa": {
+        "k": 237,
+        "n": 240,
+        "rate": 0.9875,
+        "ci95": [
+          0.9638993626332216,
+          0.9957400098118411
+        ]
+      },
+      "other_beyond_design": {
+        "k": 222,
+        "n": 240,
+        "rate": 0.925,
+        "ci95": [
+          0.8845730571258335,
+          0.9520356265442214
+        ]
+      },
+      "planned_venting": {
+        "k": 138,
+        "n": 138,
+        "rate": 1.0,
+        "ci95": [
+          0.9729162671599869,
+          1.0
+        ]
+      },
+      "point:env_effect": {
+        "k": 6,
+        "n": 12,
+        "rate": 0.5,
+        "ci95": [
+          0.2537781703934222,
+          0.7462218296065778
+        ]
+      },
+      "point:fire_linked_to_pipeline": {
+        "k": 0,
+        "n": 1,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7934567085261071
+        ]
+      },
+      "point:lands": {
+        "k": 9,
+        "n": 15,
+        "rate": 0.6,
+        "ci95": [
+          0.357464427565077,
+          0.8017577191740534
+        ]
+      },
+      "point:serious_injury": {
+        "k": 3,
+        "n": 3,
+        "rate": 1.0,
+        "ci95": [
+          0.43849391955098227,
+          1.0
+        ]
+      },
+      "point:substance": {
+        "k": 9,
+        "n": 9,
+        "rate": 1.0,
+        "ci95": [
+          0.7008472464490407,
+          1.0
+        ]
+      },
+      "point:volume_m3": {
+        "k": 8,
+        "n": 9,
+        "rate": 0.8888888888888888,
+        "ci95": [
+          0.5649937852319399,
+          0.9801096286728695
+        ]
+      },
+      "pressure_kpa": {
+        "k": 237,
+        "n": 240,
+        "rate": 0.9875,
+        "ci95": [
+          0.9638993626332216,
+          0.9957400098118411
+        ]
+      },
+      "rate_estimated": {
+        "k": 9,
+        "n": 9,
+        "rate": 1.0,
+        "ci95": [
+          0.7008472464490407,
+          1.0
+        ]
+      },
+      "rate_kg_s": {
+        "k": 138,
+        "n": 138,
+        "rate": 1.0,
+        "ci95": [
+          0.9729162671599869,
+          1.0
+        ]
+      },
+      "release": {
+        "k": 185,
+        "n": 240,
+        "rate": 0.7708333333333334,
+        "ci95": [
+          0.7136398864226179,
+          0.8194930982690836
+        ]
+      },
+      "rupture": {
+        "k": 240,
+        "n": 240,
+        "rate": 1.0,
+        "ci95": [
+          0.9842455102000642,
+          1.0
+        ]
+      },
+      "serious_injury": {
+        "k": 220,
+        "n": 237,
+        "rate": 0.9282700421940928,
+        "ci95": [
+          0.8881410514856571,
+          0.9547365909149912
+        ]
+      },
+      "substance": {
+        "k": 129,
+        "n": 129,
+        "rate": 1.0,
+        "ci95": [
+          0.9710813480114663,
+          0.9999999999999999
+        ]
+      },
+      "through_pipe_body_or_weld": {
+        "k": 132,
+        "n": 138,
+        "rate": 0.9565217391304348,
+        "ci95": [
+          0.9083910754985426,
+          0.9799237771257933
+        ]
+      },
+      "toxic_plume": {
+        "k": 234,
+        "n": 240,
+        "rate": 0.975,
+        "ci95": [
+          0.9465400421995467,
+          0.9884931924905143
+        ]
+      },
+      "volume_estimated": {
+        "k": 111,
+        "n": 120,
+        "rate": 0.925,
+        "ci95": [
+          0.8635894316089088,
+          0.9600433379935513
+        ]
+      },
+      "volume_m3": {
+        "k": 129,
+        "n": 129,
+        "rate": 1.0,
+        "ci95": [
+          0.9710813480114663,
+          0.9999999999999999
+        ]
+      }
+    },
+    "injection_flagged": {
+      "k": 11,
+      "n": 30,
+      "rate": 0.36666666666666664,
+      "ci95": [
+        0.21873702204017678,
+        0.5448675356639506
+      ]
+    },
+    "cost_usd": 0.048253739999999996,
+    "cost_per_case_usd": 0.00020105725,
+    "latency_p50_s": 0.8303504915002122,
+    "latency_p95_s": 0.9706505530011782
+  },
+  "spread": {
+    "passes": 3,
+    "metrics": {
+      "status": {
+        "per_pass": [
+          0.85,
+          0.8625,
+          0.8375
+        ],
+        "min": 0.8375,
+        "max": 0.8625
+      },
+      "deadline_correct": {
+        "per_pass": [
+          0.8375,
+          0.8125,
+          0.8125
+        ],
+        "min": 0.8125,
+        "max": 0.8375
+      },
+      "route": {
+        "per_pass": [
+          0.925,
+          0.925,
+          0.925
+        ],
+        "min": 0.925,
+        "max": 0.925
+      },
+      "missed_reports": {
+        "per_pass": [
+          1,
+          1,
+          1
+        ],
+        "min": 1,
+        "max": 1
+      },
+      "late_deadlines": {
+        "per_pass": [
+          1,
+          1,
+          1
+        ],
+        "min": 1,
+        "max": 1
+      },
+      "over_notify": {
+        "per_pass": [
+          0.3,
+          0.4,
+          0.4
+        ],
+        "min": 0.3,
+        "max": 0.4
+      },
+      "missing_recall": {
+        "per_pass": [
+          0.9615384615384616,
+          0.9230769230769231,
+          0.9230769230769231
+        ],
+        "min": 0.9230769230769231,
+        "max": 0.9615384615384616
+      },
+      "extraction_accuracy": {
+        "per_pass": [
+          0.9417555373256767,
+          0.9384236453201971,
+          0.9336609336609336
+        ],
+        "min": 0.9336609336609336,
+        "max": 0.9417555373256767
+      }
+    },
+    "unstable": [
+      {
+        "id": "CL-001",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T24 clear-cut",
+          "reportable T3 clear-cut",
+          "reportable T3 clear-cut"
+        ],
+        "right": 1,
+        "passes": 3
+      },
+      {
+        "id": "CL-011",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T3 clear-cut",
+          "reportable T3 clear-cut",
+          "precautionary T3 clear-cut"
+        ],
+        "right": 0,
+        "passes": 3
+      },
+      {
+        "id": "CL-027",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T3 clear-cut",
+          "precautionary T3 clear-cut",
+          "precautionary T3 clear-cut"
+        ],
+        "right": 2,
+        "passes": 3
+      },
+      {
+        "id": "CL-028",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T3 clear-cut",
+          "reportable T24 clear-cut",
+          "reportable T24 clear-cut"
+        ],
+        "right": 2,
+        "passes": 3
+      },
+      {
+        "id": "CL-029",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T24 clear-cut",
+          "not reportable None clear-cut",
+          "not reportable None clear-cut"
+        ],
+        "right": 1,
+        "passes": 3
+      },
+      {
+        "id": "CL-047",
+        "kind": "clear-cut",
+        "answers": [
+          "precautionary T3 clear-cut",
+          "reportable T3 clear-cut",
+          "precautionary T3 clear-cut"
+        ],
+        "right": 0,
+        "passes": 3
+      },
+      {
+        "id": "CL-074",
+        "kind": "clear-cut",
+        "answers": [
+          "reportable T24 clear-cut",
+          "reportable T3 clear-cut",
+          "reportable T3 clear-cut"
+        ],
+        "right": 1,
+        "passes": 3
+      },
+      {
+        "id": "JU-099",
+        "kind": "judgment",
+        "answers": [
+          "precautionary T3 judgment",
+          "precautionary T3 clear-cut",
+          "precautionary T3 clear-cut"
+        ],
+        "right": 1,
+        "passes": 3
+      },
+      {
+        "id": "JU-137",
+        "kind": "judgment",
+        "answers": [
+          "not reportable None clear-cut",
+          "precautionary T24 judgment",
+          "precautionary T24 judgment"
+        ],
+        "right": 2,
+        "passes": 3
+      },
+      {
+        "id": "NO-164",
+        "kind": "not-reportable",
+        "answers": [
+          "not reportable None clear-cut",
+          "reportable T24 clear-cut",
+          "reportable T24 clear-cut"
+        ],
+        "right": 1,
+        "passes": 3
+      }
+    ]
+  },
+  "by": {
+    "kind": {
+      "adversarial": {
+        "cases": 30,
+        "status": {
+          "k": 27,
+          "n": 30,
+          "rate": 0.9,
+          "ci95": [
+            0.7437855868473339,
+            0.9654007400402839
+          ]
+        },
+        "deadline": {
+          "k": 24,
+          "n": 30,
+          "rate": 0.8,
+          "ci95": [
+            0.6269395261897256,
+            0.9049502189759876
+          ]
+        }
+      },
+      "clear-cut": {
+        "cases": 102,
+        "status": {
+          "k": 90,
+          "n": 102,
+          "rate": 0.8823529411764706,
+          "ci95": [
+            0.8055441009473682,
+            0.9314062097055321
+          ]
+        },
+        "deadline": {
+          "k": 80,
+          "n": 102,
+          "rate": 0.7843137254901961,
+          "ci95": [
+            0.6949596365633389,
+            0.8530290559734329
+          ]
+        }
+      },
+      "judgment": {
+        "cases": 78,
+        "status": {
+          "k": 68,
+          "n": 78,
+          "rate": 0.8717948717948718,
+          "ci95": [
+            0.7798385083935379,
+            0.9288475388000653
+          ]
+        },
+        "deadline": {
+          "k": 74,
+          "n": 78,
+          "rate": 0.9487179487179487,
+          "ci95": [
+            0.8754314334594728,
+            0.9798793131534966
+          ]
+        }
+      },
+      "not-reportable": {
+        "cases": 30,
+        "status": {
+          "k": 19,
+          "n": 30,
+          "rate": 0.6333333333333333,
+          "ci95": [
+            0.45513246433604937,
+            0.7812629779598231
+          ]
+        },
+        "deadline": {
+          "k": 19,
+          "n": 30,
+          "rate": 0.6333333333333333,
+          "ci95": [
+            0.45513246433604937,
+            0.7812629779598231
+          ]
+        }
+      }
+    },
+    "writer": {
+      "llama": {
+        "cases": 114,
+        "status": {
+          "k": 101,
+          "n": 114,
+          "rate": 0.8859649122807017,
+          "ci95": [
+            0.8146297223884994,
+            0.9321354267608671
+          ]
+        },
+        "deadline": {
+          "k": 88,
+          "n": 114,
+          "rate": 0.7719298245614035,
+          "ci95": [
+            0.6867898547765523,
+            0.8393401366695923
+          ]
+        }
+      },
+      "mistral": {
+        "cases": 126,
+        "status": {
+          "k": 103,
+          "n": 126,
+          "rate": 0.8174603174603174,
+          "ci95": [
+            0.74096226837539,
+            0.8751730842388723
+          ]
+        },
+        "deadline": {
+          "k": 109,
+          "n": 126,
+          "rate": 0.8650793650793651,
+          "ci95": [
+            0.794528687777586,
+            0.9140269677288159
+          ]
+        }
+      }
+    },
+    "split": {
+      "test": {
+        "cases": 240,
+        "status": {
+          "k": 204,
+          "n": 240,
+          "rate": 0.85,
+          "ci95": [
+            0.7993295067318531,
+            0.8896423504081918
+          ]
+        },
+        "deadline": {
+          "k": 197,
+          "n": 240,
+          "rate": 0.8208333333333333,
+          "ci95": [
+            0.7673794084441969,
+            0.8641781272675109
+          ]
+        }
+      }
+    },
+    "label_source": {
+      "engine": {
+        "cases": 156,
+        "status": {
+          "k": 132,
+          "n": 156,
+          "rate": 0.8461538461538461,
+          "ci95": [
+            0.7812847279622355,
+            0.8943841842608653
+          ]
+        },
+        "deadline": {
+          "k": 119,
+          "n": 156,
+          "rate": 0.7628205128205128,
+          "ci95": [
+            0.6902602805404401,
+            0.8227475972585807
+          ]
+        }
+      },
+      "reviewed": {
+        "cases": 84,
+        "status": {
+          "k": 72,
+          "n": 84,
+          "rate": 0.8571428571428571,
+          "ci95": [
+            0.7666970498084034,
+            0.9163506178114942
+          ]
+        },
+        "deadline": {
+          "k": 78,
+          "n": 84,
+          "rate": 0.9285714285714286,
+          "ci95": [
+            0.8528025594745215,
+            0.9668546416693556
+          ]
+        }
+      }
+    },
+    "text_supported": {
+      "True": {
+        "cases": 240,
+        "status": {
+          "k": 204,
+          "n": 240,
+          "rate": 0.85,
+          "ci95": [
+            0.7993295067318531,
+            0.8896423504081918
+          ]
+        },
+        "deadline": {
+          "k": 197,
+          "n": 240,
+          "rate": 0.8208333333333333,
+          "ci95": [
+            0.7673794084441969,
+            0.8641781272675109
+          ]
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "target": "missed_reports",
+      "value": 3,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 3
+    },
+    {
+      "target": "late_deadlines",
+      "value": 3,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 3
+    },
+    {
+      "target": "deadline_correct",
+      "value": 0.8208333333333333,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 3
+    },
+    {
+      "target": "over_notify",
+      "value": 0.36666666666666664,
+      "limit": {
+        "max": 0.3,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 3
+    },
+    {
+      "target": "missing_recall",
+      "value": 0.9358974358974359,
+      "limit": {
+        "min": 0.9,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 3,
+      "passes": 3
+    },
+    {
+      "target": "extraction_accuracy",
+      "value": 0.937944231820667,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 3
+    },
+    {
+      "target": "latency_p95_s",
+      "value": 0.9706505530011782,
+      "limit": {
+        "max": 300,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 3,
+      "passes": 3
+    }
+  ]
+}

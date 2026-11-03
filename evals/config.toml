@@ -1,5 +1,5 @@
 # Eval harness config (D3). Change the test set, splits, arm or targets here, not in code.
-# Targets marked proposed = true are drafts in output/engagement-brief.md, still to be confirmed.
+# Targets confirmed by Collin 2026-11-03 (output/engagement-brief.md); proposed = true would mark a draft.
 
 [run]
 cases = "evals/cases/cases.jsonl"
@@ -18,11 +18,11 @@ price_out = 0.24
 [targets]
 missed_reports = { max = 0, proposed = false }          # reportable cases called "not reportable"
 late_deadlines = { max = 0, proposed = false }          # 3 h cases given 24 h (or none)
-deadline_correct = { min = 0.95, proposed = true }
-over_notify = { max = 0.30, proposed = true }           # not-reportable cases sent as reportable or precautionary
-missing_recall = { min = 0.90, proposed = true }
-extraction_accuracy = { min = 0.95, proposed = true }
-latency_p95_s = { max = 300, proposed = true }
+deadline_correct = { min = 0.95, proposed = false }
+over_notify = { max = 0.30, proposed = false }           # not-reportable cases sent as reportable or precautionary
+missing_recall = { min = 0.90, proposed = false }
+extraction_accuracy = { min = 0.95, proposed = false }
+latency_p95_s = { max = 300, proposed = false }
 
 [assumptions]
 manual_triage_minutes = 30   # proposed, not measured (engagement brief)

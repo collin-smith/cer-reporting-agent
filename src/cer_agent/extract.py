@@ -293,11 +293,13 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
     f.rate_estimated = x.get("rate_basis") == "estimated"
     f.through_pipe_body_or_weld = _tri(x.get("through_pipe_body_or_weld"))
     f.planned_venting = bool(x.get("planned_venting"))
-    lands_alts = [_lands(v) for v in x.get("lands_alternatives") or []]
-    lands_alts = [s for s in lands_alts if s]
-    if len({frozenset(s) for s in lands_alts}) > 1:
-        f.conflicts["lands"] = lands_alts
     stated = _lands(x.get("lands"))
+    # The stated account counts as one of the accounts, as for volume and substance: Nova often puts one account in
+    # lands and only the other in lands_alternatives (JU-128, test split), which used to lose the conflict.
+    lands_alts = [s for s in [stated, *(_lands(v) for v in x.get("lands_alternatives") or [])] if s]
+    lands_alts = list({frozenset(s): s for s in lands_alts}.values())
+    if len(lands_alts) > 1:
+        f.conflicts["lands"] = lands_alts
     f.lands = stated or (lands_alts[0] if lands_alts else None)
     if f.release is False and not stated:
         f.lands = {COMPANY_PROPERTY}  # nothing released, so nothing went anywhere
