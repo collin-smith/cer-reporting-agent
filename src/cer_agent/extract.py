@@ -12,6 +12,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import re
 import time
 
 from cer_agent.rules import COMPANY_PROPERTY, OFF_RIGHT_OF_WAY, RIGHT_OF_WAY, SUBSTANCE_CLASS, Facts
@@ -170,14 +171,58 @@ def _lands(values: list[str] | None) -> set[str]:
     return {LANDS[v] for v in values or [] if v in LANDS}
 
 
-def _discovered(x: dict, received: dt.date | None) -> dt.datetime | None:
-    """Date from the report, else the day it was received; time from the report. No time, no clock start."""
-    try:
-        day = dt.date.fromisoformat(x["discovered_date"]) if x.get("discovered_date") else received
-        hh, mm = (int(v) for v in x.get("discovered_time", "").replace("h", ":").split(":")[:2])
-        return dt.datetime.combine(day, dt.time(hh, mm)) if day else None
-    except (ValueError, TypeError):
+TIME = re.compile(r"^\s*(\d{1,2})\s*[:h.]?\s*(\d{2})\s*$")  # 17:30, 0845, 8:45, 08h45, 8.45
+RECENT_DAYS = 31  # a field report is about something just found
+
+
+def _parse_time(v) -> dt.time | None:
+    m = TIME.match(str(v or ""))
+    if not m or int(m[1]) > 23 or int(m[2]) > 59:
         return None
+    return dt.time(int(m[1]), int(m[2]))
+
+
+def _anchor(day: dt.date, received: dt.date) -> dt.date:
+    """Reports rarely give the year, and sometimes not the month ("on the 14th"); the model then makes one up
+    (2023-04-04 for "apr 4", received 2026-04-04). A year other than the received year or the one before can't be
+    right for a first report, so it's treated as made up: take the year from the received date, and if the day is
+    still more than RECENT_DAYS before receipt, the month too. A plausible year is kept as stated."""
+
+    def fit(year: int, month: int) -> dt.date | None:
+        try:
+            d = dt.date(year, month, day.day)
+        except ValueError:  # e.g. Feb 30
+            return None
+        return d if d <= received else None
+
+    if day.year in (received.year, received.year - 1):
+        return day
+    for year, month in ((received.year, day.month), (received.year - 1, day.month)):
+        d = fit(year, month)
+        if d and (received - d).days <= RECENT_DAYS:
+            return d
+    prev = (received.replace(day=1) - dt.timedelta(days=1)).month
+    for year, month in ((received.year, received.month), (received.year - (prev == 12), prev)):
+        d = fit(year, month)
+        if d:
+            return d
+    return day  # nothing recent fits; keep what the report said
+
+
+def _discovered(x: dict, received: dt.date | None) -> dt.datetime | None:
+    """Date from the report, anchored to the day it was received; time from the report. No time, no clock start.
+    A date given as "unknown" (or unparseable) falls back to the received date, keeping a valid time."""
+    t = _parse_time(x.get("discovered_time"))
+    if t is None:
+        return None
+    try:
+        day = dt.date.fromisoformat(str(x.get("discovered_date") or "")[:10])
+    except ValueError:
+        day = None
+    if day and received:
+        day = _anchor(day, received)
+    day = day or received
+    return dt.datetime.combine(day, t) if day else None
 
 
 def to_facts(x: dict, received: dt.date | None = None) -> Facts:
@@ -215,7 +260,7 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
     if len(vols) > 1:
         f.conflicts["volume_m3"] = [vols[0], vols[-1]]
         f.volume_m3 = f.volume_m3 if f.volume_m3 is not None else vols[-1]
-    if x.get("rate") is not None:
+    if x.get("rate"):  # a 0 is a filled-in blank, as for pressure
         f.rate_kg_s = float(x["rate"]) * RATE_UNITS.get(x.get("rate_unit") or "kg/s", 1.0)
     f.rate_estimated = x.get("rate_basis") == "estimated"
     f.through_pipe_body_or_weld = _tri(x.get("through_pipe_body_or_weld"))

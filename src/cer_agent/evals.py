@@ -1,14 +1,20 @@
 """Eval harness, tier 1: deterministic scoring of decision, deadline, route, missing facts and extraction (D3).
 
 Config in evals/config.toml (test set, splits, arm, prices, targets). Each run writes to evals/runs/<run-id>/:
-results.jsonl (one line per case, saved after every case so a crash loses nothing), summary.json and summary.md.
+results.jsonl (one line per case and pass, saved after every case so a crash loses nothing), summary.json and
+summary.md.
+
+Repeats: a live arm runs every case `repeats` times (config; --repeats overrides), one full pass after another,
+because the model isn't repeatable even at temperature 0. The metrics pool every pass; the spread section gives each
+pass's value, and the unstable-cases table lists cases whose answer changed between passes. A target counts as met
+only if every pass meets it. The oracle arm is deterministic and always runs once.
 
 Arms:
 - workflow-nova: the fixed workflow, Nova Lite through the tagged profile (costs money; printed before it starts);
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
 
 Usage (from code/, src on PYTHONPATH):
-    python3 -m cer_agent.evals [--arm oracle] [--splits dev test] [--only ID ...] [--resume RUN_ID]
+    python3 -m cer_agent.evals [--arm oracle] [--splits dev test] [--only ID ...] [--repeats N] [--resume RUN_ID]
     python3 -m cer_agent.evals --rescore RUN_ID   # $0: re-map and re-score saved model output with the current code
 """
 
@@ -25,7 +31,7 @@ import statistics
 import sys
 import tomllib
 
-from cer_agent.rules import Facts, decide
+from cer_agent.rules import Facts, decide, substance_class
 
 CODE = pathlib.Path(__file__).resolve().parents[2]
 CONFIG = CODE / "evals" / "config.toml"
@@ -93,8 +99,14 @@ def _same(field: str, want, got) -> bool:
 
 
 def _points(f: Facts) -> dict:
-    """Judgment points as comparable values: name -> sorted plausible values."""
+    """Judgment points as comparable values: name -> sorted plausible values.
+
+    A substance point is compared by rule class (SUB-CLASS): "sweet gas or hydrogen sulphide" and "sweet gas or sour
+    gas" pose the same question to the rules. The single substance field is still scored by name, since the notice
+    names the product."""
     pts = {**f.open_points, **f.conflicts}
+    if "substance" in pts:
+        pts["substance"] = sorted({substance_class(s) or "" for s in pts["substance"]})
     return {k: sorted(repr(sorted(v) if isinstance(v, set) else v) for v in vals) for k, vals in pts.items()}
 
 
@@ -217,6 +229,64 @@ def check_targets(summary: dict, targets: dict) -> list[dict]:
     return out
 
 
+# --- Repeated passes ---
+
+COUNTS = ("missed_reports", "late_deadlines")  # targets on a count of errors, not a rate
+SPREAD = ("status", "deadline_correct", "route", "missed_reports", "late_deadlines", "over_notify",
+          "missing_recall", "extraction_accuracy")  # fmt: skip
+
+
+def _rep(r: dict) -> int:
+    return r.get("rep", 1)  # runs from before repeats were added have one pass
+
+
+def by_pass(rows: list[dict]) -> dict[int, list[dict]]:
+    out: dict[int, list[dict]] = {}
+    for r in rows:
+        out.setdefault(_rep(r), []).append(r)
+    return dict(sorted(out.items()))
+
+
+def _answer(r: dict) -> tuple:
+    p = r["packet"]
+    return (p["status"], p["deadline"], p["route"])
+
+
+def spread(rows: list[dict]) -> dict | None:
+    """Each pass's headline metrics, and the cases whose answer changed between passes. None for a single pass."""
+    passes = by_pass(rows)
+    if len(passes) < 2:
+        return None
+    per = [summarize(rs) for rs in passes.values()]
+    metrics = {}
+    for m in SPREAD:
+        vals = [s[m]["k"] if m in COUNTS else s[m]["rate"] for s in per]
+        real = [v for v in vals if not (isinstance(v, float) and math.isnan(v))]
+        metrics[m] = {"per_pass": vals, "min": min(real, default=math.nan), "max": max(real, default=math.nan)}
+    by_id: dict[str, list[dict]] = {}
+    for r in rows:
+        by_id.setdefault(r["id"], []).append(r)
+    unstable = []
+    for cid, rs in sorted(by_id.items()):
+        if len({_answer(r) for r in rs}) > 1:
+            rs = sorted(rs, key=_rep)
+            right = sum(r["score"]["status"] and r["score"]["deadline"] and r["score"]["route"] for r in rs)
+            unstable.append({"id": cid, "kind": rs[0]["kind"], "answers": [" ".join(map(str, _answer(r))) for r in rs],
+                             "right": right, "passes": len(rs)})  # fmt: skip
+    return {"passes": len(passes), "metrics": metrics, "unstable": unstable}
+
+
+def check_targets_by_pass(rows: list[dict], targets: dict) -> list[dict]:
+    """Targets on the pooled metrics, met only if every pass meets them on its own."""
+    pooled = check_targets(summarize(rows), targets)
+    per = [check_targets(summarize(rs), targets) for rs in by_pass(rows).values()]
+    for i, t in enumerate(pooled):
+        t["passes_met"] = sum(p[i]["met"] for p in per)
+        t["passes"] = len(per)
+        t["met"] = t["passes_met"] == len(per)
+    return pooled
+
+
 def _pct(m: dict) -> str:
     if not m["n"]:
         return "n/a"
@@ -224,16 +294,42 @@ def _pct(m: dict) -> str:
     return f"{m['k']}/{m['n']} = {m['rate']:.1%} (95% CI {lo:.0%}–{hi:.0%})"
 
 
-def render_md(run_id: str, cfg: dict, summary: dict, parts: dict, targets: list[dict], rows: list[dict]) -> str:
-    lines = [f"# Eval run {run_id}", "", f"Arm `{cfg['arm']}`, splits {cfg['splits']}, {summary['cases']} cases. "
+def _num(v) -> str:
+    return "n/a" if isinstance(v, float) and math.isnan(v) else (str(v) if isinstance(v, int) else f"{v:.3f}")
+
+
+def render_md(run_id: str, cfg: dict, summary: dict, parts: dict, targets: list[dict], rows: list[dict],
+              sp: dict | None = None) -> str:  # fmt: skip
+    n_pass = sp["passes"] if sp else 1
+    n_ids = len({r["id"] for r in rows})
+    size = f"{n_ids} cases × {n_pass} passes = {summary['cases']} results" if sp else f"{summary['cases']} cases"
+    lines = [f"# Eval run {run_id}", "", f"Arm `{cfg['arm']}`, splits {cfg['splits']}, {size}. "
              f"Cost ${summary['cost_usd']:.4f} (${summary['cost_per_case_usd']:.5f}/case); latency p50 "
-             f"{summary['latency_p50_s']:.1f} s, p95 {summary['latency_p95_s']:.1f} s.", "", "## Targets", "",
-             "| Target | Value | Limit | Met |", "|---|---|---|---|"]  # fmt: skip
+             f"{summary['latency_p50_s']:.1f} s, p95 {summary['latency_p95_s']:.1f} s.", ""]  # fmt: skip
+    if sp:
+        lines += ["Metrics pool every pass. A target is met only if every pass meets it; counts (missed reports, "
+                  "late deadlines) are totals across passes.", ""]  # fmt: skip
+    lines += ["## Targets", "", "| Target | Value | Limit | Met |" + (" Passes met |" if sp else ""),
+              "|---|---|---|---|" + ("---|" if sp else "")]  # fmt: skip
     for t in targets:
         lim = f"≤ {t['limit']['max']}" if "max" in t["limit"] else f"≥ {t['limit']['min']}"
-        v = t["value"] if isinstance(t["value"], int) else f"{t['value']:.3f}"
-        lines.append(f"| {t['target']}{' [proposed]' if t['proposed'] else ''} | {v} | {lim} | "
-                     f"{'yes' if t['met'] else '**no**'} |")  # fmt: skip
+        lines.append(f"| {t['target']}{' [proposed]' if t['proposed'] else ''} | {_num(t['value'])} | {lim} | "
+                     f"{'yes' if t['met'] else '**no**'} |"
+                     + (f" {t['passes_met']}/{t['passes']} |" if sp else ""))  # fmt: skip
+    if sp:
+        lines += ["", "## Spread across passes", "",
+                  "| Metric | " + " | ".join(f"Pass {i}" for i in range(1, n_pass + 1)) + " | Min | Max |",
+                  "|---|" + "---|" * (n_pass + 2)]  # fmt: skip
+        for m, v in sp["metrics"].items():
+            cells = " | ".join(_num(x) for x in v["per_pass"])
+            lines.append(f"| {m} | {cells} | {_num(v['min'])} | {_num(v['max'])} |")
+        lines += ["", f"## Unstable cases ({len(sp['unstable'])}): the answer changed between passes", ""]
+        if sp["unstable"]:
+            lines += ["| Case | Kind | Answer per pass (status, deadline, route) | Right |", "|---|---|---|---|"]
+            lines += [f"| {u['id']} | {u['kind']} | {' / '.join(u['answers'])} | {u['right']}/{u['passes']} |"
+                      for u in sp["unstable"]]  # fmt: skip
+        else:
+            lines.append("None.")
     lines += ["", "## Metrics", ""]
     for k in ("status", "missed_reports", "late_deadlines", "deadline_correct", "over_notify", "route",
               "incident_types", "missing_recall", "extraction_accuracy", "injection_flagged"):  # fmt: skip
@@ -243,14 +339,20 @@ def render_md(run_id: str, cfg: dict, summary: dict, parts: dict, targets: list[
     for name, groups in parts.items():
         lines += ["", f"## By {name}", "", "| Group | Cases | Status | Deadline |", "|---|---|---|---|"]
         lines += [f"| {g} | {v['cases']} | {_pct(v['status'])} | {_pct(v['deadline'])} |" for g, v in groups.items()]
-    wrong = [r for r in rows if not (r["score"]["status"] and r["score"]["deadline"] and r["score"]["route"])]
+    wrong: dict[str, list[dict]] = {}
+    for r in rows:
+        if not (r["score"]["status"] and r["score"]["deadline"] and r["score"]["route"]):
+            wrong.setdefault(r["id"], []).append(r)
     lines += ["", "## Cases with a wrong status, deadline or route", "",
-              "| Case | Kind | Expected | Got | Wrong fields |", "|---|---|---|---|---|"]  # fmt: skip
-    for r in wrong:
+              "| Case | Kind | Expected | Got | Wrong fields |" + (" Passes wrong |" if sp else ""),
+              "|---|---|---|---|---|" + ("---|" if sp else "")]  # fmt: skip
+    for cid, rs in wrong.items():
+        r = rs[0]  # the first wrong pass
         e, p = r["expected"], r["packet"]
         bad = ", ".join(k for k, v in r["score"]["fields"].items() if not v)
-        lines.append(f"| {r['id']} | {r['kind']} | {e['status']} {e['deadline']} {e['route']} | "
-                     f"{p['status']} {p['deadline']} {p['route']} | {bad} |")  # fmt: skip
+        lines.append(f"| {cid} | {r['kind']} | {e['status']} {e['deadline']} {e['route']} | "
+                     f"{p['status']} {p['deadline']} {p['route']} | {bad} |"
+                     + (f" {len(rs)}/{n_pass} |" if sp else ""))  # fmt: skip
     return "\n".join(lines) + "\n"
 
 
@@ -292,6 +394,7 @@ def main(argv=None) -> int:
     ap.add_argument("--arm", choices=["workflow-nova", "oracle"])
     ap.add_argument("--splits", nargs="*")
     ap.add_argument("--only", nargs="*", help="case IDs (overrides --splits)")
+    ap.add_argument("--repeats", type=int, help="passes over the cases (live arm; default from config)")
     ap.add_argument("--resume", help="run ID to continue; finished cases are skipped")
     ap.add_argument("--rescore", help="run ID to re-score from its saved model output (no model calls)")
     ap.add_argument("--yes", action="store_true", help="skip the cost confirmation")
@@ -302,13 +405,15 @@ def main(argv=None) -> int:
     run_cfg = {**cfg["run"], **{k: v for k, v in {"arm": args.arm, "splits": args.splits}.items() if v}}
     cases = load_cases(cfg, run_cfg["splits"], args.only)
     model = cfg["models"]["nova-lite"] if run_cfg["arm"] == "workflow-nova" else None
+    repeats = run_cfg["repeats"] = (args.repeats or run_cfg.get("repeats", 1)) if model else 1
     client = None
     if model:
         if not os.environ.get(model["env"]):
             print(f"Set {model['env']} (terraform output nova_lite_profile_arn).")
             return 2
-        est = len(cases) * (2500 * model["price_in"] + 400 * model["price_out"]) / 1e6
-        print(f"{len(cases)} cases on Nova Lite; estimated cost ${est:.3f} (about 2,500 in / 400 out tokens a case).")
+        est = repeats * len(cases) * (2500 * model["price_in"] + 400 * model["price_out"]) / 1e6
+        print(f"{len(cases)} cases × {repeats} passes on Nova Lite; estimated cost ${est:.3f} "
+              f"(about 2,500 in / 400 out tokens a case).")  # fmt: skip
         if not args.yes and input("Run? [y/N] ").strip().lower() != "y":
             return 1
         from cer_agent.workflow import make_client
@@ -319,18 +424,19 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     results = out / "results.jsonl"
     rows = [json.loads(line) for line in results.read_text().splitlines()] if results.exists() else []
-    done = {r["id"] for r in rows}
+    done = {(r["id"], _rep(r)) for r in rows}
     with results.open("a", encoding="utf-8") as fh:
-        for case in cases:
-            if case["id"] in done:
-                continue
-            r = run_case(case, run_cfg["arm"], client, model)
-            fh.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
-            fh.flush()  # after every case, so an interruption loses nothing
-            rows.append(r)
-            ok = "ok" if r["score"]["status"] and r["score"]["deadline"] else "WRONG"
-            print(f"{case['id']} {ok:5} {r['packet']['status']} {r['packet']['deadline']} "
-                  f"{r['latency_s']:.1f}s ${r['cost_usd']:.5f}", flush=True)  # fmt: skip
+        for rep in range(1, repeats + 1):  # one full pass after another, so an interruption leaves whole passes
+            for case in cases:
+                if (case["id"], rep) in done:
+                    continue
+                r = {**run_case(case, run_cfg["arm"], client, model), "rep": rep}
+                fh.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
+                fh.flush()  # after every case, so an interruption loses nothing
+                rows.append(r)
+                ok = "ok" if r["score"]["status"] and r["score"]["deadline"] else "WRONG"
+                print(f"pass {rep} {case['id']} {ok:5} {r['packet']['status']} {r['packet']['deadline']} "
+                      f"{r['latency_s']:.1f}s ${r['cost_usd']:.5f}", flush=True)  # fmt: skip
     write_summary(cfg, {**run_cfg, "extractor": _extractor_version()}, run_id, out, rows)
     return 0
 
@@ -354,7 +460,7 @@ def rescore(cfg: dict, run_id: str) -> int:
     for r in old:
         case, raw = cases[r["id"]], r["packet"].get("extracted")
         if raw is None:  # oracle arm
-            rows.append(run_case(case, "oracle"))
+            rows.append({**run_case(case, "oracle"), "rep": _rep(r)})
             continue
         got = to_facts(raw, dt.date.fromisoformat(case["discovered_at"][:10]))
         pk = packet(got, {"raw": raw})
@@ -369,12 +475,18 @@ def rescore(cfg: dict, run_id: str) -> int:
 def write_summary(cfg: dict, run_cfg: dict, run_id: str, out: pathlib.Path, rows: list[dict]) -> None:
     summary = summarize(rows)
     parts = {name: breakdown(rows, key) for name, key in BREAKDOWNS.items()}
-    targets = check_targets(summary, cfg["targets"])
-    (out / "summary.json").write_text(json.dumps({"run": run_cfg, "summary": summary, "by": parts,
+    targets = check_targets_by_pass(rows, cfg["targets"])
+    sp = spread(rows)
+    (out / "summary.json").write_text(json.dumps({"run": run_cfg, "summary": summary, "spread": sp, "by": parts,
                                                   "targets": targets}, indent=2), encoding="utf-8")  # fmt: skip
-    (out / "summary.md").write_text(render_md(run_id, run_cfg, summary, parts, targets, rows), encoding="utf-8")
+    (out / "summary.md").write_text(render_md(run_id, run_cfg, summary, parts, targets, rows, sp), encoding="utf-8")
+    extra = ""
+    if sp:
+        st = sp["metrics"]["status"]
+        extra = f"; status range {st['min']:.1%}–{st['max']:.1%} over {sp['passes']} passes, " \
+                f"{len(sp['unstable'])} unstable"  # fmt: skip
     print(f"{out}/summary.md: status {_pct(summary['status'])}; missed {summary['missed_reports']['k']}; "
-          f"extraction {_pct(summary['extraction_accuracy'])}; cost ${summary['cost_usd']:.4f}")  # fmt: skip
+          f"extraction {_pct(summary['extraction_accuracy'])}; cost ${summary['cost_usd']:.4f}{extra}")  # fmt: skip
 
 
 if __name__ == "__main__":

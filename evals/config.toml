@@ -6,6 +6,7 @@ cases = "evals/cases/cases.jsonl"
 splits = ["dev"]          # dev | test | heldout; targets are scored on heldout
 arm = "workflow-nova"     # workflow-nova (live, Bedrock) | oracle (case facts straight to the rules, $0)
 runs_dir = "evals/runs"
+repeats = 3               # passes per live arm: Nova Lite isn't repeatable at temperature 0, so report the spread
 
 [models.nova-lite]
 env = "NOVA_LITE_ARN"     # terraform output nova_lite_profile_arn (tagged profile)

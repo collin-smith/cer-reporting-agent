@@ -34,3 +34,30 @@ def test_disagreeing_accounts_become_conflicts():
 
 def test_no_release_means_nothing_left_the_site():
     assert to_facts(BASE).lands == {COMPANY_PROPERTY}
+
+
+def test_dates_take_missing_parts_from_the_received_date():
+    rx = dt.date(2026, 4, 4)
+    at = lambda d, t="00:20": to_facts({"discovered_date": d, "discovered_time": t}, rx).discovered_at  # noqa: E731
+    assert at("2023-04-04") == dt.datetime(2026, 4, 4, 0, 20)  # invented year ("apr 4")
+    assert at("2023-01-04") == dt.datetime(2026, 4, 4, 0, 20)  # invented month too ("on the 4th")
+    assert at("2020-03-28") == dt.datetime(2026, 3, 28, 0, 20)  # invented year, recent month kept
+    assert at("2026-04-02") == dt.datetime(2026, 4, 2, 0, 20)  # a stated recent date is kept
+    assert at("2025-12-30", "23:00") == dt.datetime(2025, 12, 30, 23, 0)  # a plausible year is kept as stated
+    assert to_facts({"discovered_date": "2025-12-31", "discovered_time": "23:00"},
+                    dt.date(2026, 1, 2)).discovered_at == dt.datetime(2025, 12, 31, 23, 0)  # year boundary  # fmt: skip
+
+
+def test_an_unknown_date_keeps_the_time_and_odd_time_formats_parse():
+    rx = dt.date(2026, 1, 20)
+    for t in ("17:30", "1730", "17h30", "17.30"):
+        assert to_facts({"discovered_date": "unknown", "discovered_time": t}, rx).discovered_at == dt.datetime(
+            2026, 1, 20, 17, 30
+        )
+    assert to_facts({"discovered_time": "0845"}, rx).discovered_at == dt.datetime(2026, 1, 20, 8, 45)
+    assert to_facts({"discovered_time": "unknown"}, rx).discovered_at is None
+    assert to_facts({"discovered_time": "25:00"}, rx).discovered_at is None
+
+
+def test_a_zero_rate_is_a_blank():
+    assert to_facts({"release": "yes", "rate": 0.0, "rate_unit": "kg/s"}).rate_kg_s is None

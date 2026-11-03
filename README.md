@@ -20,12 +20,13 @@ theirs over one?** Every result is reported with accuracy, cost and latency.
 | `scripts/nuke.sh` | Stops anything of this project's that bills while idle; `--check` reports only and exits 1 if anything is found |
 | `scripts/companion_analysis.py` | The companion piece's analysis of the CER incident data (tables and charts) |
 | `scripts/article_html.py`, `table_gen.py`, `chart_gen.py` | Render article drafts as HTML, with tables and charts as images for Medium |
+| `scripts/check_key_text.py` | Checks that each test report carries its answer key (stated facts, discovery time, withheld facts), $0; writes a flag list for review |
 | `scripts/build_map.py` + `scripts/map-template.html` | Builds an interactive map of the CER's public pipeline-incident data |
 | `scripts/make_architecture_diagram.py`, `make_agent_workflow_diagram.py` | Generate the architecture and agent-workflow diagrams (draw.io, AWS4 icons) |
 | `src/cer_agent/rules.py`, `backtest.py` | The CER reporting rules as code, and the back-test against the CER's own records |
 | `src/cer_agent/cases.py`, `writer.py` | Build the test-set specs from real records, and write them up as messy field reports (checked for leaks) |
 | `src/cer_agent/extract.py`, `workflow.py` | The fixed workflow: one forced tool call reads the report, plain code converts units and the rules decide |
-| `src/cer_agent/evals.py`, `evals/config.toml` | Tier-1 eval harness: decision, deadline, route, missing facts and per-field extraction, with 95% intervals, cost and latency; results in `evals/runs/` |
+| `src/cer_agent/evals.py`, `evals/config.toml` | Tier-1 eval harness: decision, deadline, route, missing facts and per-field extraction, with 95% intervals, cost and latency; live arms run 3 passes and report the spread and the cases that flip; results in `evals/runs/` |
 | `evals/cases/` | The test set: 162 synthetic field reports with expected answers (dev / test / held-out splits) |
 
 ## Setup
@@ -63,7 +64,7 @@ a case) through the tagged profile:
 
 ```bash
 PYTHONPATH=src python -m cer_agent.evals --arm oracle --splits dev test heldout
-NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHONPATH=src python -m cer_agent.evals
+NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHONPATH=src python -m cer_agent.evals   # 3 passes (config repeats; --repeats N)
 PYTHONPATH=src python -m cer_agent.evals --rescore RUN_ID   # re-score saved output after a scorer change, $0
 ```
 
