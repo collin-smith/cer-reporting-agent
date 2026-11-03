@@ -64,3 +64,20 @@ def test_states_the_time_as_a_fact():
     spec = {**SPEC, "discovered_at": "2026-05-26T16:15", "operator": "Prairie Midstream Ltd.", "town": "Gretna",
             "province": "MB", "style": "texts", "reporter": "field operator", "context": context}  # fmt: skip
     assert "FACTS:\n- found at 16:15 on May 26" in prompt(spec)
+
+
+def test_no_release_case_rejects_a_described_release_or_an_open_fire():
+    spec = {"stated": [], "withheld": [], "facts": {"release": False, "fire_or_explosion": True,
+            "fire_linked_to_pipeline": True, "open_points": {}}}  # fmt: skip
+    assert check(spec, f"Fire at our compressor. Nothing leaked, no sheen. {BODY}") == []
+    assert any("describes a release" in p for p in check(spec, f"Fire at our compressor, small sheen. {BODY}"))
+    assert any("what fed the fire" in p for p in check(spec, f"Fire at our site, not sure what's burning. {BODY}"))
+    assert any("away from our facility" in p for p in check(spec, f"Fire near our pipeline, nothing leaked. {BODY}"))
+
+
+def test_a_toxic_plume_needs_people_to_evacuate_or_shelter():
+    spec = {"stated": [], "withheld": [], "facts": {"toxic_plume": True}}
+    assert check(spec, f"Smoke was bad, people nearby had to shelter in place. {BODY}") == []
+    assert check(spec, f"Smoke was bad, had to clear the guys out. {BODY}") == [
+        "the fumes must make people evacuate or shelter, in those words"
+    ]

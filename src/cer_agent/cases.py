@@ -111,7 +111,11 @@ def phrases(f: Facts) -> list[str]:
     if f.toxic_plume:
         out.append("people nearby had to evacuate or shelter because of the fumes/smoke")
     if f.fire_or_explosion and "fire_linked_to_pipeline" not in f.open_points:
-        out.append("there was a fire" + ("" if f.fire_linked_to_pipeline else " (not at our facility)"))
+        # A linked fire is stated as ours, or writers place it "near our pipeline" (D30).
+        out.append("there was a fire at our facility, on our equipment or work site" if f.fire_linked_to_pipeline
+                   else "there was a fire (not at our facility)")  # fmt: skip
+    if f.release is False:  # absent facts are stated, not left for the writer to fill (K6, K7; D30)
+        out.append(NO_FIRE_PRODUCT if f.fire_or_explosion else NO_RELEASE)
     if f.env_effect == "significant":
         out.append("there is visible harm to a creek/wetland (dead fish or vegetation damage)")
     elif f.env_effect == "minor":
@@ -125,6 +129,10 @@ def phrases(f: Facts) -> list[str]:
     elif f.other_beyond_design == "recorded":
         out.append("the pipeline was operated outside its design limits")
     return out
+
+
+NO_RELEASE = "nothing leaked or was released from the pipeline"
+NO_FIRE_PRODUCT = "no product leaked from the pipeline or fed the fire"
 
 
 def open_and_conflict_phrases(f: Facts) -> list[str]:
@@ -191,7 +199,9 @@ NOT_REPORTABLE = [
                                     rate_kg_s=r.choice([0.01, 0.02, 0.04]))),
     ("planned-venting", lambda f, r: Facts(release=True, substance="Natural Gas - Sweet", volume_m3=850.0,
                                            planned_venting=True, rate_kg_s=2.0)),
-    ("minor-env", lambda f, r: Facts(env_effect="minor")),
+    # A sheen is a release: give product and a small volume, or PREC makes it precautionary (K8, D30).
+    ("minor-env", lambda f, r: Facts(env_effect="minor", release=True, substance="Lube Oil", volume_m3=0.1,
+                                     volume_estimated=True, lands={COMPANY_PROPERTY})),
     ("pressure-within-margin", lambda f, r: Facts(pressure_kpa=r.choice([6550, 6580]), limit_kpa=6000)),
     ("fire-not-linked", lambda f, r: Facts(fire_or_explosion=True, fire_linked_to_pipeline=False)),
 ]  # fmt: skip
@@ -536,7 +546,7 @@ def build() -> tuple[list[CaseSpec], list[tuple[str, str]]]:
         r = extra.choice(records)
         add(spec("not-reportable", "finger-fracture", r, Facts(), "reviewed",
                  "P3: a finger or toe fracture alone is not a serious injury.",
-                 stated=["a worker broke a finger and was taken to a clinic"], rng=extra), r)  # fmt: skip
+                 stated=["a worker broke a finger and was taken to a clinic", NO_RELEASE], rng=extra), r)  # fmt: skip
     return specs, sources
 
 

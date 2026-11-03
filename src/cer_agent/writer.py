@@ -115,6 +115,32 @@ CONDUCT_WORDS = ("drink", "drinking", "drunk", "alcohol", "impaired", "distracte
 RULE_WORDS = ("cer", "regulator", "reportable", "deadline")  # "notified the control room" is fine
 
 
+# A case with no release must not read as one (K6–K8, D30). A hint counts unless a negation comes just before it.
+RELEASE_HINT = re.compile(
+    r"\b(leak\w*|sheen|spill\w*|hiss\w*|gas pocket|seep\w*|spray\w*|puddl\w*|vent(?:ed|ing))\b", re.I
+)
+NEGATION = re.compile(r"\b(no|nothing|not|never|without|none)\b|n't\b|n’t\b", re.I)
+UNKNOWN_FIRE = re.compile(
+    r"what(?:'s|’s| is| was) burning|(not sure|don.t know|didn.t know|no idea|unknown|unclear)[^.]{0,40}\b(burn|fuel)",
+    re.I,
+)
+
+# A fire at our facility must not read as someone else's (D30).
+UNLINKED_FIRE = re.compile(
+    r"\b(wasn.t|was not|weren.t|not) (affected|involved|hit|damaged|ours)\b"
+    r"|near (our|the) (pipeline|line|row|right[- ]of[- ]way)|beside the line|not from (it|our)"
+    r"|off (our|the) (site|row|right[- ]of[- ]way)",
+    re.I,
+)
+
+
+def release_hints(text: str) -> list[str]:
+    """Release words in the text that aren't negated ("no leaks" is fine, "a small sheen" isn't)."""
+    return [
+        m.group(0) for m in RELEASE_HINT.finditer(text) if not NEGATION.search(text[max(0, m.start() - 25) : m.start()])
+    ]
+
+
 def numbers_in(text: str) -> set[str]:
     return {n.replace(",", "").rstrip(".") for n in NUMBER.findall(text)}
 
@@ -146,6 +172,18 @@ def check(spec: dict, report: str) -> list[str]:
         problems.append("mentions where the product went, which is withheld")
     if "what product" in withheld and any(re.search(rf"\b{w}\b", text) for w in PRODUCT_WORDS):
         problems.append("names the product, which is withheld")
+    facts = spec.get("facts") or {}
+    if facts.get("toxic_plume") and not re.search(r"evacuat|shelter", text):
+        # The crew stepping away from a fire isn't the 3 h toxic-plume trigger (CL-008, AD-151 on the test split).
+        problems.append("the fumes must make people evacuate or shelter, in those words")
+    linked = facts.get("fire_linked_to_pipeline") and "fire_linked_to_pipeline" not in (facts.get("open_points") or {})
+    if facts.get("fire_or_explosion") and linked and (m := UNLINKED_FIRE.search(report)):
+        problems.append(f"places the fire away from our facility: {m.group(0)}")
+    if facts.get("release") is False:
+        if hints := release_hints(report):
+            problems.append(f"describes a release, but nothing was released: {', '.join(hints)}")
+        if UNKNOWN_FIRE.search(report):
+            problems.append("leaves open what fed the fire, but it wasn't product from the line")
     if any(re.search(rf"\b{re.escape(w)}\b", text) for w in RULE_WORDS):
         problems.append("talks about reporting rules")
     if any(re.search(rf"\b{re.escape(w)}", text) for w in CONDUCT_WORDS):

@@ -8,7 +8,10 @@ lists what it can't find. It only flags: a flag is a candidate for review, not a
 Flags already reviewed and accepted (label review K4, D29) are listed in ACCEPTED and reported apart. With --strict
 the script exits 1 on any other flag: CI runs it that way, so a regenerated test set can't bring the problem back.
 
-Run from code/:  python3 -I scripts/check_key_text.py [--out ../output/key-text-check.md] [--strict]
+Absent facts are checked too (D30): a case with no release must not describe a leak, sheen or spill, or leave open
+what fed a fire.
+
+Run from code/:  uv run python -I scripts/check_key_text.py [--out ../output/key-text-check.md] [--strict]
 """
 
 # ruff: noqa: E501  (the pattern table reads best one rule per line)
@@ -19,6 +22,8 @@ import datetime as dt
 import json
 import pathlib
 import re
+
+from cer_agent.writer import UNKNOWN_FIRE, UNLINKED_FIRE, release_hints
 
 CODE = pathlib.Path(__file__).resolve().parents[1]
 SPECS = CODE / "evals" / "cases" / "specs.jsonl"
@@ -152,6 +157,18 @@ def check(spec: dict, report: str) -> list[str]:
                     if not re.search(p, text):
                         flags.append(f"stated: no match for /{p}/ ({s})")
                 break
+    if (
+        f.get("fire_or_explosion")
+        and f.get("fire_linked_to_pipeline")
+        and "fire_linked_to_pipeline" not in (f.get("open_points") or {})
+        and (m := UNLINKED_FIRE.search(report))
+    ):
+        flags.append(f"stated: the fire is ours, but the text says '{m.group(0)}'")
+    if f.get("release") is False:
+        if hints := release_hints(report):
+            flags.append(f"absent: no release in the key, but the text says {', '.join(hints)}")
+        if UNKNOWN_FIRE.search(report):
+            flags.append("absent: no release in the key, but the text leaves open what fed the fire")
     for w in spec["withheld"]:
         if w == "what product was released":
             sub = (f.get("substance") or "").casefold()
