@@ -31,6 +31,12 @@ def _num(desc: str) -> dict:
     return {"type": "number", "description": desc}
 
 
+def _num_or_null(desc: str) -> dict:
+    """A required number: the model must answer it, with null when the report gives none. Optional numbers were left
+    out even when the report stated them (JU-143's metered 300 m³ came back as basis "metered", no volume)."""
+    return {"type": ["number", "null"], "description": f"{desc}; null if the report gives no figure"}
+
+
 TOOL = {
     "name": "record_facts",
     "description": "Record what the field report says. Report facts only; never decide whether it must be reported.",
@@ -44,9 +50,10 @@ TOOL = {
                 "injury": {
                     "type": "string",
                     "enum": ["none", "serious", "not_serious", "unclear", "unknown"],
-                    "description": "serious = on the SERIOUS INJURY list; not_serious = cuts, bruises, sprains, or a "
-                    "broken finger or toe; unclear = a fracture of any other bone not on the list (collarbone, "
-                    "kneecap, hand, wrist, foot, ankle); unknown = someone was hurt but how badly isn't said",
+                    "description": "none = nobody is said to be hurt; serious = on the SERIOUS INJURY list; "
+                    "not_serious = cuts, bruises, sprains, or a broken finger or toe; unclear = a fracture of any "
+                    "other bone not on the list (collarbone, kneecap, hand, wrist, foot, ankle); unknown = someone was "
+                    "hurt but how badly isn't said",
                 },
                 "env_effect": {
                     "type": "string",
@@ -79,7 +86,7 @@ TOOL = {
                     "items": {"type": "string", "enum": SUBSTANCES},
                     "description": "only if the report gives conflicting evidence about the product",
                 },
-                "volume": _num("volume released, in volume_unit"),
+                "volume": _num_or_null("volume released, in volume_unit"),
                 "volume_unit": {"type": "string", "enum": list(VOLUME_UNITS)},
                 "volume_basis": {
                     "type": "string",
@@ -92,7 +99,7 @@ TOOL = {
                     "items": {"type": "number"},
                     "description": "only if people give different volumes: every figure given, in volume_unit",
                 },
-                "rate": _num("release rate, in rate_unit"),
+                "rate": _num_or_null("release rate, in rate_unit"),
                 "rate_unit": {"type": "string", "enum": list(RATE_UNITS)},
                 "rate_basis": {"type": "string", "enum": ["not_given", "measured", "estimated"]},
                 "through_pipe_body_or_weld": YES_NO,
@@ -140,7 +147,9 @@ TOOL = {
                 "fire_or_explosion",
                 "release",
                 "substance",
+                "volume",
                 "volume_basis",
+                "rate",
                 "rate_basis",
                 "through_pipe_body_or_weld",
                 "rupture",
@@ -156,7 +165,8 @@ SYSTEM = """You read pipeline field reports for a compliance team and record wha
 
 Answering:
 - "no" means the report says no, or doesn't mention it. "unknown" only when the report raises it but the answer
-  isn't known (e.g. "not sure if anyone was hurt", "volume not known yet").
+  isn't known (e.g. "not sure if anyone was hurt", "volume not known yet"). A general "still getting details" or
+  "more to come" doesn't make any field unknown, and an alarm or a risk of exposure isn't an injury.
 - Leave out any field the report says nothing about.
 - Keep numbers and units as written; pick the matching unit. Don't convert, round or invent values, and never work
   one out from a description (a puddle's size, a pool "10 m into the crop"): leave it out.
