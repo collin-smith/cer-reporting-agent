@@ -15,7 +15,7 @@ import json
 import re
 import time
 
-from cer_agent.rules import COMPANY_PROPERTY, OFF_RIGHT_OF_WAY, RIGHT_OF_WAY, SUBSTANCE_CLASS, Facts
+from cer_agent.rules import COMPANY_PROPERTY, GAS, OFF_RIGHT_OF_WAY, RIGHT_OF_WAY, SUBSTANCE_CLASS, Facts
 
 YES_NO_UNKNOWN = {"type": "string", "enum": ["yes", "no", "unknown"]}
 YES_NO = {"type": "string", "enum": ["no", "yes"], "description": "no if not mentioned"}
@@ -68,6 +68,11 @@ TOOL = {
                     "type": "string",
                     "enum": SUBSTANCES,
                     "description": "the product released, as the report names it (sweet gas = natural gas - sweet)",
+                },
+                "h2s_detected": {
+                    **YES_NO,
+                    "description": "an H2S monitor, alarm, detector or gas test picked up H2S, whatever the line "
+                    "is said to carry",
                 },
                 "substance_alternatives": {
                     "type": "array",
@@ -139,6 +144,7 @@ TOOL = {
                 "rate_basis",
                 "through_pipe_body_or_weld",
                 "rupture",
+                "h2s_detected",
                 "toxic_plume",
                 "other_beyond_design",
             ],
@@ -259,6 +265,10 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
     alts = sorted({s for s in [*(x.get("substance_alternatives") or []), sub] if s in SUBSTANCE_CLASS})
     if len(alts) > 1:
         f.conflicts["substance"] = alts
+    elif SUBSTANCE_CLASS.get(sub or "") == GAS and x.get("h2s_detected") == "yes":
+        # A sweet line where H2S was detected: the report disagrees with itself (G9). Recorded as a plain fact, so the
+        # model doesn't have to notice the contradiction; the conflict is built here.
+        f.conflicts["substance"] = sorted({sub, "natural gas - sour"})
     vf = VOLUME_UNITS.get(x.get("volume_unit") or "m3", 1.0)
     if x.get("volume") is not None:
         f.volume_m3 = float(x["volume"]) * vf

@@ -67,3 +67,12 @@ def test_a_rupture_without_a_quote_stays_a_rupture():
     # A missed rupture is a late 3 h notice: the evidence field steers the model but never overrides a yes.
     assert to_facts({**BASE, "rupture": "yes"}).rupture is True
     assert to_facts({**BASE, "rupture": "yes", "rupture_quote": "line ruptured"}).rupture is True
+
+
+def test_h2s_detected_on_a_sweet_line_is_a_conflict():
+    gas = {**BASE, "release": "yes", "substance": "natural gas - sweet", "through_pipe_body_or_weld": "yes",
+           "volume": 300}  # fmt: skip
+    f = to_facts({**gas, "h2s_detected": "yes"})
+    assert f.conflicts["substance"] == ["natural gas - sour", "natural gas - sweet"]
+    assert (decide(f).deadline, decide(f).route) == ("T3", "judgment")
+    assert "substance" not in to_facts({**gas, "h2s_detected": "no"}).conflicts
