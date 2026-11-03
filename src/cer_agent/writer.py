@@ -13,6 +13,7 @@ and prints tokens and cost.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import pathlib
@@ -37,9 +38,9 @@ Write like a busy person in the field: plain words, short sentences, some abbrev
 Never sound like a formal incident report ("upon further inspection", "the product released was", subject lines in
 title case). Texts are terse; emails and call notes are a few loose paragraphs.
 Rules:
-- State every fact in the FACTS list. Where two facts disagree, report both as given and don't settle which is
-  right. Keep every number and unit exactly as given (you may say "approx." or
-  "about" where the fact says estimated).
+- State every fact in the FACTS list, including the time it was found, written as a clock time. Where two facts
+  disagree, report both as given and don't settle which is right. Keep every number and unit exactly as given (you
+  may say "approx." or "about" where the fact says estimated).
 - Do not mention anything in the LEAVE OUT list, not even vaguely, and do not add facts that aren't given: no extra
   volumes, injuries, damage, causes or locations. Don't speculate about causes, blame, or anyone's conduct or
   condition.
@@ -57,12 +58,12 @@ def prompt(spec: dict) -> str:
         [
             f"OPERATOR: {spec['operator']}",
             f"PLACE: near {spec['town']}, {spec['province']}",
-            f"DISCOVERED: {spec['discovered_at'].replace('T', ' ')}",
             f"WRITTEN AS: {spec['style']}, by a {spec['reporter']}",
             f"BACKGROUND (use loosely, in your own words): {c['what_happened']}; {c['detail']}; "
             f"equipment: {c['equipment'] or 'not specified'}; activity: {c['activity']}; "
             f"found by: {c['how_discovered'] or 'not specified'}",
             "FACTS:",
+            f"- {found_at(spec)}",
             *[f"- {p}" for p in spec["stated"]],
             "LEAVE OUT:",
             *[f"- {w}" for w in leave_out],
@@ -70,7 +71,32 @@ def prompt(spec: dict) -> str:
     )
 
 
+def found_at(spec: dict) -> str:
+    """The discovery time as a fact to state (K1, D29). As context only, the writers paraphrased or dropped it."""
+    t = dt.datetime.fromisoformat(spec["discovered_at"])
+    return f"found at {t:%H:%M} on {t:%B} {t.day}"
+
+
 # --- Checks ---
+
+
+def time_variants(t: dt.datetime) -> list[str]:
+    """Ways a report can write a clock time: 16:15, 1615, 16h15, 4:15 (with or without pm); 4 pm on the hour."""
+    h12 = t.hour % 12 or 12
+    ampm = "am" if t.hour < 12 else "pm"
+    out = [f"{t:%H:%M}", f"{t:%H%M}", f"{t:%Hh%M}", f"{t.hour}:{t:%M}", f"{h12}:{t:%M}"]
+    if t.minute == 0:
+        out += [f"{h12} ?{ampm}", f"{h12} ?{ampm[0]}\\.m", f"{h12} o'?clock"]
+    if (t.hour, t.minute) == (0, 0):
+        out += ["midnight"]
+    if (t.hour, t.minute) == (12, 0):
+        out += ["noon"]
+    return out
+
+
+def has_time(t: dt.datetime, text: str) -> bool:
+    return any(re.search(rf"(?<![\d]){v}(?![\d])", text.casefold()) for v in time_variants(t))
+
 
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 VOLUME = re.compile(r"\d[\d,.]*\s*(?:m3|m³|cubic|litres?|liters?|bbls?|barrels?|L\b)", re.IGNORECASE)
@@ -80,7 +106,7 @@ QUANTITY = re.compile(
     re.IGNORECASE,
 )
 LAND_WORDS = ("fence", "right of way", "right-of-way", "ditch", "off site", "off-site", "neighbour", "neighbor",
-              "landowner", "road")  # fmt: skip
+              "landowner", "road", "berm", "dike", "dyke", "containment", "contained")  # fmt: skip
 PRODUCT_WORDS = ("crude", "oil", "condensate", "propane", "butane", "diesel", "gasoline", "gas", "ngl", "liquids",
                  "water", "h2s", "sour", "sweet")  # fmt: skip
 # Speculation about people: the writer must not invent conduct, impairment or blame.
@@ -97,6 +123,10 @@ def check(spec: dict, report: str) -> list[str]:
     """Problems with a report; empty means accepted."""
     problems = []
     text = report.lower()
+    # The key's discovery time (facts), which can differ from the prompt's by a ruling (cases.KEY_RULINGS).
+    found = (spec.get("facts") or {}).get("discovered_at") or spec.get("discovered_at")
+    if found and not has_time(t := dt.datetime.fromisoformat(found), report):
+        problems.append(f"missing the time it was found ({t:%H:%M})")
     have = numbers_in(report)
     for phrase in spec["stated"]:
         for n in numbers_in(phrase):

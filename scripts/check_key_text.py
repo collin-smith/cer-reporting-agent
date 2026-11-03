@@ -5,7 +5,10 @@ the text and left every withheld one out. Nothing checked that (findings log 202
 stated fact, the discovery time and each withheld fact in the report text with keyword and number matching, and
 lists what it can't find. It only flags: a flag is a candidate for review, not a verdict.
 
-Run from code/:  python3 -I scripts/check_key_text.py [--out ../output/key-text-check.md]
+Flags already reviewed and accepted (label review K4, D29) are listed in ACCEPTED and reported apart. With --strict
+the script exits 1 on any other flag: CI runs it that way, so a regenerated test set can't bring the problem back.
+
+Run from code/:  python3 -I scripts/check_key_text.py [--out ../output/key-text-check.md] [--strict]
 """
 
 # ruff: noqa: E501  (the pattern table reads best one rule per line)
@@ -81,6 +84,14 @@ TEMPLATES = [
     (r"small sheen on gravel", [r"sheen", r"gravel"]),
     (r"not at our facility", [r"fire"]),
 ]
+
+# Reviewed flags: case ID -> (flag prefix, why it stands). Location words that name the site, not where it went.
+ACCEPTED = {
+    "CL-007": ("withheld: a location word", "false alarm: the word doesn't say where the product went"),
+    "CL-033": ("withheld: a location word", "false alarm: the word doesn't say where the product went"),
+    "CL-070": ("withheld: a location word", "K4: names the site (aboveground tank), not whether anything left it"),
+    "CL-072": ("withheld: a location word", "K4: names the site (pump station), not whether anything left it"),
+}
 
 NUM = r"(?<![\d.])0*{}(?:\.0+)?(?![\d])"
 
@@ -159,10 +170,16 @@ def check(spec: dict, report: str) -> list[str]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", default=str(CODE.parent / "output" / "key-text-check.md"))
+    ap.add_argument("--strict", action="store_true", help="exit 1 on any flag not in ACCEPTED")
     args = ap.parse_args(argv)
     specs = {d["id"]: d for d in map(json.loads, SPECS.read_text(encoding="utf-8").splitlines())}
     cases = {d["id"]: d for d in map(json.loads, CASES.read_text(encoding="utf-8").splitlines())}
-    rows = [(cid, specs[cid], check(specs[cid], cases[cid]["report"])) for cid in sorted(cases)]
+    rows, accepted = [], []
+    for cid in sorted(cases):
+        flags = check(specs[cid], cases[cid]["report"])
+        prefix, why = ACCEPTED.get(cid, (None, ""))
+        accepted += [(cid, f, why) for f in flags if prefix and f.startswith(prefix)]
+        rows.append((cid, specs[cid], [f for f in flags if not (prefix and f.startswith(prefix))]))
     flagged = [r for r in rows if r[2]]
     lines = [
         "# Answer key vs. report text",
@@ -176,9 +193,15 @@ def main(argv=None) -> int:
     ]
     for cid, spec, fl in flagged:
         lines.append(f"| {cid} | {spec['split']} | {spec['variant']} | {'<br>'.join(fl)} |")
+    if accepted:
+        lines += ["", "## Reviewed and accepted", "", "| Case | Flag | Why it stands |", "|---|---|---|"]
+        lines += [f"| {cid} | {f} | {why} |" for cid, f, why in accepted]
     pathlib.Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"{len(flagged)}/{len(rows)} cases flagged, {sum(len(r[2]) for r in rows)} flags -> {args.out}")
-    return 0
+    print(
+        f"{len(flagged)}/{len(rows)} cases flagged, {sum(len(r[2]) for r in rows)} flags "
+        f"({len(accepted)} reviewed flags accepted) -> {args.out}"
+    )
+    return 1 if args.strict and flagged else 0
 
 
 if __name__ == "__main__":

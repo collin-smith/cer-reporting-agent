@@ -71,10 +71,25 @@ def test_propane_40_m3_liquid_is_about_10800_m3_gas_so_24h():
     assert d.incident_types == ["INC-e"] and d.deadline == "T24"
 
 
-def test_hvp_volume_without_a_unit_is_precautionary_3h():
+def test_hvp_volume_without_a_unit_is_reportable_at_the_stricter_3h():
     d = decide(Facts(release=True, substance="Propane", volume_m3=200.0, rate_kg_s=0.5))
-    assert d.status == "precautionary" and d.deadline == "T3" and "volume_state" in d.missing
+    # Reportable at either unit (0.5 kg/s), so not precautionary (X1, D29); the unit decides only 3 h vs 24 h.
+    assert d.status == "reportable" and d.deadline == "T3" and "PREC" in d.deadline_rules
+    assert "volume_state" in d.missing
     assert d.route == "clear-cut"  # missing facts never make a judgment case (D23)
+
+
+def test_precautionary_only_when_reportability_is_in_doubt():
+    # X1 (D29). Location conflict on 4 m³ crude: reportable either way, only the deadline is open.
+    d = decide(Facts(release=True, substance="Crude Oil - Sweet", volume_m3=4.0,
+                     conflicts={"lands": [{"company_property"}, {"off_right_of_way"}]}))  # fmt: skip
+    assert (d.status, d.deadline, d.route) == ("reportable", "T3", "judgment") and "PREC" in d.deadline_rules
+    # Two crew estimates either side of 1.5 m³: whether it's reportable at all is open.
+    d = decide(Facts(release=True, substance="Crude Oil - Sweet", volume_m3=2.5, volume_estimated=True,
+                     conflicts={"volume_m3": [1.0, 2.5]}))  # fmt: skip
+    assert (d.status, d.deadline, d.route) == ("precautionary", "T24", "judgment")
+    # Volume withheld: could be under 1.5 m³, so precautionary.
+    assert decide(Facts(release=True, substance="Crude Oil - Sweet", lands={"right_of_way"})).status == "precautionary"
 
 
 def test_inc_f_mop_threshold_is_10_percent_or_35_kpa():

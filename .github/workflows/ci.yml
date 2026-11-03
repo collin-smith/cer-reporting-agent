@@ -42,6 +42,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest -q
+      - name: Every report carries its answer key (no unreviewed key-vs-text flags)
+        run: uv run python -I scripts/check_key_text.py --strict --out "$RUNNER_TEMP/key-text-check.md"
 
   terraform:
     runs-on: ubuntu-latest

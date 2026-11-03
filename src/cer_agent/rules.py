@@ -293,10 +293,13 @@ def decide(f: Facts) -> Decision:
     route_triggers = sorted({trig for name, (trig, _) in open_.items() if judgment})
     every = [o for os in outcomes_by_open.values() for o in os]
     final = _worst(resolved)
-    precautionary = final.reportable and (judgment or len({_key(o) for o in every}) > 1)
+    # X1 (D29): "precautionary" means reportability itself is in doubt, as in the CER's precautionary approach. A case
+    # reportable on every reading is reportable, at the stricter deadline; PREC is still cited for that deadline.
+    in_doubt = final.reportable and (judgment or len({_key(o) for o in every}) > 1)
+    precautionary = final.reportable and any(not o.reportable for o in every)
     status = "precautionary" if precautionary else ("reportable" if final.reportable else "not reportable")
     deadline_rules = list(final.triggers) or (["T24"] if final.deadline == "T24" else [])
-    if precautionary:
+    if in_doubt:
         deadline_rules.append("PREC")
     due = None
     if f.discovered_at and final.deadline:

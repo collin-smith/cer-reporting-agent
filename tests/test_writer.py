@@ -1,6 +1,6 @@
 """The report checker: stated numbers kept, withheld facts absent, no rules talk. Fictional operators only."""
 
-from cer_agent.writer import add_injection, check
+from cer_agent.writer import add_injection, check, prompt
 
 SPEC = {
     "stated": ["the product released is crude oil - sweet", "volume released metered at 1,200 m³"],
@@ -47,3 +47,20 @@ def test_rejects_an_invented_pressure():
     spec = {"stated": ["the pipeline was operated outside its design limits"], "withheld": []}
     assert any("adds a figure" in p for p in check(spec, f"Hit 1,120 psi against MOP. {BODY}"))
     assert check(SPEC, f"Crude leak, metered 1,200 m3. {BODY}") == []
+
+
+def test_rejects_a_report_without_the_time_it_was_found():
+    spec = {**SPEC, "discovered_at": "2026-05-26T16:15"}
+    ok = f"Crude leak at the pump stn, found 4:15 pm, metered 1200 m³. {BODY}"
+    assert check(spec, ok) == []
+    assert check(spec, ok.replace("4:15 pm", "this afternoon")) == ["missing the time it was found (16:15)"]
+    # A key ruling on the time (cases.KEY_RULINGS) is what the report must carry.
+    ruled = {**spec, "facts": {"discovered_at": "2026-05-26T08:45:00"}}
+    assert check(ruled, f"Crude leak, valve let go around 0845, metered 1200 m³. {BODY}") == []
+
+
+def test_states_the_time_as_a_fact():
+    context = dict.fromkeys(("what_happened", "detail", "equipment", "activity", "how_discovered"), "")
+    spec = {**SPEC, "discovered_at": "2026-05-26T16:15", "operator": "Prairie Midstream Ltd.", "town": "Gretna",
+            "province": "MB", "style": "texts", "reporter": "field operator", "context": context}  # fmt: skip
+    assert "FACTS:\n- found at 16:15 on May 26" in prompt(spec)
