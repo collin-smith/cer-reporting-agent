@@ -1,0 +1,12 @@
+{
+ "file": "NO-078-form.pdf",
+ "sha256": "07289ae444356b44606ab75186655e966dd8092ae6dd5cdc23ed7e508d152851",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:09+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nField operator\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a call from the night shift guy at Kerrobert station. At 06:50 he flagged a relief valve venting\nsweet gas on the ops radio. Said it was part of the planned maintenance work. Meter showed\nabout 850 m³ gone, rate pegged at 2 kg/s. Whole thing inside the fence, no alarms sounding,\nvalve looked like it was working like it's supposed to. Just wanted us to know before we came in.\nNo drama, just routine.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 15,
+ "mean_confidence": 99.81,
+ "latency_s": 1.709
+}

@@ -1,0 +1,12 @@
+{
+ "file": "JU-110-photo.jpg",
+ "sha256": "03955aa78b8a0952ad2a94c7760a6e6cce139c686c06eea5fedbb7499b04985d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:27+00:00",
+ "text": "hey, just got word from the field near Taylor, BC. we had a release of lube oil on the 14th at\n23:30. still trying to get all the details. from what i know, it was approx. 1.6 m³. it all stayed\ninside the station fence. not sure what caused it, was doing some maintenance and there\nwas a lot of lightning in the area. will send more info as i get it.\n- J. Smith, CRO",
+ "pages": 1,
+ "lines": 5,
+ "mean_confidence": 98.69,
+ "latency_s": 1.831
+}

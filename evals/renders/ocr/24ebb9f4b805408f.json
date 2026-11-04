@@ -1,0 +1,12 @@
+{
+ "file": "JU-094-photo.jpg",
+ "sha256": "24ebb9f4b805408f5be36b70a1fc249025d27bd9ac25dcb4f804b03294f59e4d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:17+00:00",
+ "text": "Subject: drilling fluid release near Hope BC\nHey compliance,\nPatrol flight spotted drilling rig just east of Hope at 13:51 on Sept 3. Rig pad right beside\nPrairie Midstream ROW. Meter showed 2.0 m³ drilling mud escaped. Mud ran down slope,\ncrossed the ROW, and pooled at wetland/creek edge. Ground crew threw up silt fence before\nI left, but nobody's checked if any made it into the water yet.\nLooks like contractor didn't adjust for the heat-ground's dry and cracking. No signs they\ncalled it in themselves.\nLet me know if you need photos or follow-up.\nJake\nPipeline Patrol Contractor",
+ "pages": 1,
+ "lines": 11,
+ "mean_confidence": 99.29,
+ "latency_s": 1.89
+}

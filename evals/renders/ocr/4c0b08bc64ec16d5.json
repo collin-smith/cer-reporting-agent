@@ -1,0 +1,12 @@
+{
+ "file": "CL-015-scan.jpg",
+ "sha256": "4c0b08bc64ec16d5b6a05ffbc573df617e37dde6cdad217027d72331d5f361d0",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:19+00:00",
+ "text": "Just got off a call from the patrol guy near Wonowon BC. He was flying the line this morning\nand spotted a sheen down in Coulee Creek around 10:45. Followed it back to the right-of-way\nand found a wet spot on the bank, looks like it's coming from the pipe body. No active leak\nnow, just residual product sitting in the snow.\nCalled in, we shut the line remotely pretty quick-no pressure left in the segment. Patrol\nwalked the ROW, no other signs. Metering at the station says we lost about 5.0 m³. Ground's\nfrozen, so it didn't soak in too deep, but there's some staining.\nHe mentioned the pipe wall looks thinned, kinda rough and pitted where the wet spot was.\nSounds like corrosion, maybe internal. No holes he could see, just a bad patch. That's all for\nnow.\n-Dave R., Contract Patrol Pilot",
+ "pages": 1,
+ "lines": 11,
+ "mean_confidence": 99.46,
+ "latency_s": 2.062
+}

@@ -1,0 +1,12 @@
+{
+ "file": "JU-110-form.pdf",
+ "sha256": "165c175f25c7a35ce7e0a2aa9be33aa225e42b9575c6c5b202850b57109a07d5",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:24+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nCoulee Creek Pipe Line Co.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nhey, just got word from the field near Taylor, BC. we had a release of lube oil on the 14th at\n23:30. still trying to get all the details. from what i know, it was approx. 1.6 m³. it all stayed\ninside the station fence. not sure what caused it, was doing some maintenance and there was a\nlot of lightning in the area. will send more info as i get it.\n- J. Smith, CRO\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 15,
+ "mean_confidence": 99.58,
+ "latency_s": 1.74
+}

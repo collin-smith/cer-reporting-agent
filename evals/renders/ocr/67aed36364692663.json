@@ -1,0 +1,12 @@
+{
+ "file": "CL-001-form.pdf",
+ "sha256": "67aed36364692663aa7ddb23af28c9c7df1c4213a8d6fd799b686523f8d950c3",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:05+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nPrairie Midstream Ltd.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: ops issue near Chilliwack, BC\nTo compliance inbox,\nJust finished my site visit near Chilliwack, BC. At 16:15 on July 11, I found that the Prairie\nMidstream Ltd. pipeline was being operated outside its design limits. No leak or release occurred.\nI'm not sure what the equipment or activity was, but it was clear the pipeline was outside normal\nops. I'll need to review the data to understand what happened.\nFound this at approx. 16:15 on July 11.\nSamantha Lee\nPipeline Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 19,
+ "mean_confidence": 99.87,
+ "latency_s": 1.833
+}

@@ -84,3 +84,35 @@ def test_a_location_conflict_counts_the_stated_account():
                   "lands": ["company_property"], "lands_alternatives": [["off_right_of_way"]]})  # fmt: skip
     assert sorted(map(sorted, f.conflicts["lands"])) == [["company_property"], ["off_right_of_way"]]
     assert (decide(f).deadline, decide(f).route) == ("T3", "judgment")
+
+
+def test_a_malformed_tool_call_is_retried_then_raised():
+    import datetime as dt
+
+    import pytest
+
+    from cer_agent.extract import MODEL_ERROR_RETRIES, extract
+
+    class ModelError(Exception):
+        response = {"Error": {"Code": "ModelErrorException"}}
+
+    ok = {"output": {"message": {"content": [{"toolUse": {"input": {"release": "no"}}}]}},
+          "usage": {"inputTokens": 10, "outputTokens": 5}}  # fmt: skip
+
+    class Client:
+        def __init__(self, fails):
+            self.fails, self.calls, self.seen = fails, 0, []
+
+        def converse(self, **kw):
+            self.seen.append(kw)
+            self.calls += 1
+            if self.calls <= self.fails:
+                raise ModelError()
+            return ok
+
+    c = Client(fails=1)
+    x = extract(c, "m", "report", dt.date(2026, 7, 1))
+    assert x["raw"] == {"release": "no"} and c.calls == 2 and x["retries"] == 1
+    assert [kw["inferenceConfig"]["temperature"] for kw in c.seen] == [0, 0.3]
+    with pytest.raises(ModelError):
+        extract(Client(fails=MODEL_ERROR_RETRIES + 1), "m", "report")

@@ -1,0 +1,12 @@
+{
+ "file": "CL-027-scan.jpg",
+ "sha256": "31c87f63350456505ee1d5571e4fa3ca45528e5f95595f985c9ba8641a9d74f0",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:45+00:00",
+ "text": "\"just had a release on our line near Edmonton, AB at 20:25 on Sept 10. volume metered at\n166 m³. looks like it went off the ROW onto neighbouring land. still assessing the situation.\nflange failure is suspected, possibly due to frozen gasket. ground was frozen solid in the area\nand we had some pretty bad freeze-thaw issues last spring. will keep you posted on what's\ngoing on. - J. Smith, Area Supervisor\"",
+ "pages": 1,
+ "lines": 5,
+ "mean_confidence": 99.15,
+ "latency_s": 1.916
+}

@@ -1,0 +1,12 @@
+{
+ "file": "CL-043-photo.jpg",
+ "sha256": "705de7c982dc4d46b8d6795dc91075188101b914115db6f8f275169ec376a82a",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:56+00:00",
+ "text": "Subject: leak at Lloydminster PS\nCompliance,\nDoing monthly walkaround at Lloyd PS today. About 18:40 I caught a slow drip from a 4-in\nbypass valve on the mainline pump skid. Valve had blown packing. Station op shut the block\nvalves and knocked the leak down. Meter on the sump truck showed 3.0 m³ collected.\nNothing left the fence. Cleanup crew was still hosing down the pad when I left.\nJ. Chen\nPipeline Patrol Contractor",
+ "pages": 1,
+ "lines": 8,
+ "mean_confidence": 99.47,
+ "latency_s": 1.181
+}

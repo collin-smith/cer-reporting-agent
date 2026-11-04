@@ -1,0 +1,12 @@
+{
+ "file": "NO-164-form.pdf",
+ "sha256": "d4f8cab427349613cb80ee8807a3054deeace3bcb410623673b71f8620da7acf",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:19+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: pipe bend issue near Fort McMurray\nCompliance,\nWalking the right-of-way east of pump station 7 this afternoon-checked the 16-inch main around\n14:30. Saw a 45° bend (tag B-12) sitting about 60 cm higher than spec, soil washed out\nunderneath. Pipe isn't leaking, pressures look normal.\nWhile taking photos, Dave slipped on ice and jammed his left ring finger pretty bad-sent him to\nthe Fort McMurray clinic.\nNeed someone to look at the bend support and ditch stability.\nJesse\nField Op, Okanagan Crossing Pipelines Ltd.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 20,
+ "mean_confidence": 99.7,
+ "latency_s": 1.783
+}

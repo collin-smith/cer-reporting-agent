@@ -1,0 +1,12 @@
+{
+ "file": "CL-067-form.pdf",
+ "sha256": "ba7d8939f0e93305218eb49522098a1c6c608d814408d8233ee7973967ff190e",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:02+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a call from the Kerrobert construction site near our pipeline. They hit something and one of\ntheir workers is in the hospital with a broken femur. The site rep said it happened at 16:15 on\nMay 7. They didn't hit our pipe directly, and we're not leaking anything. The rep assured me that\nthere's been no release from our pipeline. I'm still on the line with them trying to get more\ndetails. So far, it sounds like it was just a close call. I'll keep you posted if I hear more.\n- Jamie, CRO\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.7,
+ "latency_s": 1.94
+}

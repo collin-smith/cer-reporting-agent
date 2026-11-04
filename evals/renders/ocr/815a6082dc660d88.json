@@ -1,0 +1,12 @@
+{
+ "file": "NO-164-photo.jpg",
+ "sha256": "815a6082dc660d88bc8d75ba15bbe497e82d4ff0ace0f507ae28faf20fa804f7",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:23+00:00",
+ "text": "Subject: pipe bend issue near Fort McMurray\nCompliance,\nWalking the right-of-way east of pump station 7 this afternoon-checked the 16-inch main\naround 14:30. Saw a 45° bend (tag B-12) sitting about 60 cm higher than spec, soil washed\nout underneath. Pipe isn't leaking, pressures look normal.\nWhile taking photos, Dave slipped on ice and jammed his left ring finger pretty bad-sent\nhim to the Fort McMurray clinic.\nNeed someone to look at the bend support and ditch stability.\nJesse\nField Op, Okanagan Crossing Pipelines Ltd.",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.53,
+ "latency_s": 1.345
+}

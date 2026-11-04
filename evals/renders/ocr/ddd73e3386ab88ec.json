@@ -1,0 +1,12 @@
+{
+ "file": "JU-137-form.pdf",
+ "sha256": "ddd73e3386ab88ec312b8238bf1cd3a9b9c728f8f3a6ed9a9a117c146d3b8f8b",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:43+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nPrairie Midstream Ltd.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: spill at Burnaby station\nGot a call 0800 today from the day crew at Burnaby station. Looks like a line was cracked open\nduring some tie-in work-no idea whose call it was, but the valve wasn't double-checked like the\nSOP says. Sweet crude hit the gravel pad inside the fence.\nOne guy says maybe 0.8 m³, another thinks closer to 3. No meter read yet, so we'll have to wait\nfor the vac truck numbers. Crew's got it contained on the pad, no runoff outside the fence.\nNeed someone from compliance to give them the cleanup checklist-crew's still on site.\nMarta\nControl-room operator, Prairie Midstream Ltd.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 19,
+ "mean_confidence": 99.83,
+ "latency_s": 1.749
+}

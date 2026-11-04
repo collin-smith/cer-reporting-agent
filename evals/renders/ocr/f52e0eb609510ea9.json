@@ -1,0 +1,12 @@
+{
+ "file": "JU-137-photo.jpg",
+ "sha256": "f52e0eb609510ea9b674b378c23d3c16f110bd1842438cd742cc8baed288f33d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:47+00:00",
+ "text": "Subject: spill at Burnaby station\nGot a call 0800 today from the day crew at Burnaby station. Looks like a line was cracked\nopen during some tie-in work-no idea whose call it was, but the valve wasn't\ndouble-checked like the SOP says. Sweet crude hit the gravel pad inside the fence.\nOne guy says maybe 0.8 m³, another thinks closer to 3. No meter read yet, so we'll have to\nwait for the vac truck numbers. Crew's got it contained on the pad, no runoff outside the\nfence.\nNeed someone from compliance to give them the cleanup checklist-crew's still on site.\nMarta\nControl-room operator, Prairie Midstream Ltd.",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.36,
+ "latency_s": 1.758
+}

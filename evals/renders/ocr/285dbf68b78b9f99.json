@@ -1,0 +1,12 @@
+{
+ "file": "NO-077-scan.jpg",
+ "sha256": "285dbf68b78b9f9939a62d43cf3836e573117340ed5cd3c044d2297657e611a3",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:05+00:00",
+ "text": "\"found gas release near Slave Lake, AB at 12:45 today. Patrol spotted it on scheduled check.\nproduct is sweet natural gas. metering says 12.0 m³ released. release rate was 0.04 kg/s. all\nstayed inside station fence. just a heads up.\"\nfollowed by a second text:\n\"just confirming, release was at 12:45, metering and rate checks were done after that, not\nsure if at same time or slightly after. will send more info if we get it.\"\n-J. Lee, CRO",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.25,
+ "latency_s": 1.88
+}

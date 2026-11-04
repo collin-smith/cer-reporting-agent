@@ -1,0 +1,12 @@
+{
+ "file": "JU-111-form.pdf",
+ "sha256": "718dfb77f8fe76e0043ed67faa15562c1d4e3adb4091803c7df936f63084a7a8",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:28+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nHeads up. Found a lube oil leak at Jarvie station around 3:30 pm today. Small spot on the west\nside near the mainline pump. Looks like erosion under the pad-ground gave way, pipe sagged,\nfitting sheared off. About 1.8 m³ on the gravel. Contained inside fence, berm held it. Shut pump,\nisolated the line, started soaking up with pads. Called in spill kit, supervisor notified. Will keep\nmopping up. No other issues seen.\n-M. Chen, field op\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.34,
+ "latency_s": 1.669
+}

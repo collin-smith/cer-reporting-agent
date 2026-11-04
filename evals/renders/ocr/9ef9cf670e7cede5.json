@@ -1,0 +1,12 @@
+{
+ "file": "NO-080-form.pdf",
+ "sha256": "9ef9cf670e7cede58faafba3c2e5fdc8c02fafe477800eb7c5cab2a5e42981b0",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:14+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nBrambleford Gas Pipelines Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nJust got a call from Jess at the Saint John station. She was doing the morning rounds and SCADA\npopped a pressure alarm at 06:40. Reading was 6,550 kPa, MOP is 6,000. She walked the pump\nbay, didn't see any product on the ground or dripping. Shut the unit down, pressure dropped\nback to line pack. Pump housing looks okay, no visible cracks or leaks. Contractor ops tech was\nthere on shift, said he'd checked the seals at midnight and everything was tight. Jess is going to\npull the pressure chart and log it. That's all we know right now.\n- Raj, Field Ops On-call\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.65,
+ "latency_s": 1.996
+}

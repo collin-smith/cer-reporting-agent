@@ -1,0 +1,12 @@
+{
+ "file": "CL-001-photo.jpg",
+ "sha256": "9e9e2a42a29d01d4ee358af8517404ccdf144283b23e4c1eddb7b92e23ecc3e6",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:09+00:00",
+ "text": "Subject: ops issue near Chilliwack, BC\nTo compliance inbox,\nJust finished my site visit near Chilliwack, BC. At 16:15 on July 11, I found that the Prairie\nMidstream Ltd. pipeline was being operated outside its design limits. No leak or release\noccurred.\nI'm not sure what the equipment or activity was, but it was clear the pipeline was outside\nnormal ops. I'll need to review the data to understand what happened.\nFound this at approx. 16:15 on July 11.\nSamantha Lee\nPipeline Patrol Contractor",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.75,
+ "latency_s": 1.246
+}

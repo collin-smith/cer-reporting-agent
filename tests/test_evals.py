@@ -109,3 +109,73 @@ def test_demo_samples_match_the_answer_key_and_skip_held_out():
     built = mod.build()
     assert 15 <= len(built) <= 25 and all(s["split"] != "heldout" for s in built)
     assert json.loads(mod.OUT.read_text(encoding="utf-8")) == built  # regenerate with scripts/make_samples.py
+
+
+def test_ocr_cases_are_current_cached_and_never_held_out():
+    """Every render in the manifest has an OCR result, and no report changed since it was rendered (D24)."""
+    from cer_agent.evals import case_id, ocr_cases
+
+    cases = ocr_cases(load_config())
+    assert len(cases) == 90 and {c["render"] for c in cases} == {"form", "scan", "photo"}
+    assert all(c["split"] in ("dev", "test") and c["report"].strip() for c in cases)
+    assert case_id(cases[0]["id"]) == cases[0]["id"].split("@")[0] and "@" in cases[0]["id"]
+    row = run_case(cases[0], "oracle")
+    assert row["render"] == cases[0]["render"] and row["score"]["status"]
+
+
+def test_lost_words_ignores_extra_text_and_typographic_quotes():
+    import importlib.util
+    import pathlib
+
+    path = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "ocr_report.py"
+    spec = importlib.util.spec_from_file_location("ocr_report", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    report = "It’s about 1.6 m³ — we didn’t see a sheen."
+    assert mod.lost(report, "OPERATOR Acme\nIt's about 1.6 m³ - we\ndidn't see a sheen.\nSUPERVISOR REVIEW") == 0
+    assert 0 < mod.lost(report, "It's about 1.8 m³ - we didn't see a sheen.") < 0.2
+
+
+def test_normalise_folds_typography_and_keeps_structure():
+    from cer_agent.extract import normalise
+
+    raw = "Hi,\r\n\r\n\r\nIt’s  about 1.6 m³ — we didn’t see “oil”.  \n\nJesse\nField Op"
+    assert normalise(raw) == "Hi,\n\nIt's about 1.6 m³ - we didn't see \"oil\".\n\nJesse\nField Op"
+    assert normalise(normalise(raw)) == normalise(raw)
+
+
+def test_ocr_paragraphs_match_the_typed_layout():
+    from cer_agent.extract import normalise
+    from cer_agent.ocr import unwrap
+
+    typed = "Found a leak at the station this morning, about 300 m³ out, and it looks like it went\n\nCrew on it."
+    ocr = "Found a leak at the station this morning, about 300 m³ out, and it\nlooks like it went\nCrew on it."
+    assert normalise(unwrap(ocr)) == normalise(typed)  # the wrapped line is rejoined
+
+
+def test_variants_identical_after_normalising_are_left_out():
+    from cer_agent.evals import perturbed_cases
+
+    one_para = {"id": "X-1", "report": "A single short line, no blank lines."}
+    two_para = {"id": "X-2", "report": "First paragraph.\n\nSecond paragraph."}
+    out, same = perturbed_cases([one_para, two_para], ["noblank", "wrap72"])
+    assert [c["id"] for c in out] == ["X-1", "X-2", "X-2~noblank"] and same == 3
+    assert out[2]["report"] == "First paragraph.\nSecond paragraph." and out[2]["perturb"] == "noblank"
+
+
+def test_stability_counts_a_flip_against_the_same_pass_only():
+    from cer_agent.evals import case_id, stability
+
+    case = next(c for c in load_cases(load_config(), ["dev"]) if c["expected"]["status"] == "reportable")
+    good = run_case(case, "oracle")
+    bad = copy.deepcopy(good)
+    bad["packet"] = {**bad["packet"], "status": "not reportable", "deadline": None}
+    bad["score"] = score_case(case, bad["packet"], facts_from_json(case["facts"]))
+    rows = [{**good, "rep": 1}, {**good, "rep": 2},
+            {**good, "id": f"{case['id']}~wrap72", "perturb": "wrap72", "rep": 1},
+            {**bad, "id": f"{case['id']}~wrap72", "perturb": "wrap72", "rep": 2}]  # fmt: skip
+    st = stability(rows)
+    assert st["overall"]["flips"]["k"] == 1 and st["overall"]["flips"]["n"] == 2
+    assert st["overall"]["right_to_wrong"] == 1 and st["overall"]["missed_reports"] == 1
+    assert st["flipped_cases"] == [case["id"]] and case_id(f"{case['id']}~wrap72") == case["id"]
+    assert stability([{**good, "rep": 1}]) is None

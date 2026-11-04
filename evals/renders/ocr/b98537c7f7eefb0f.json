@@ -1,0 +1,12 @@
+{
+ "file": "CL-018-photo.jpg",
+ "sha256": "b98537c7f7eefb0f73061a97017812a7fedc94f82156f2c58d10841f2d4032a1",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:36+00:00",
+ "text": "Got a call this am from the Williamstown station. Relief valve on line 2A let go around 0845.\nGasoline sprayed past the valve stack, hit the RoW gravel and ran downslope into the\nneighbour's corn. I walked the line by 0915-see the pool on the east edge of the RoW, about\n10 m into the crop.\nStation crew already had the block valve shut. Relief still lifting, threads on the dummy cap\nlook stripped. Not sure if the diaphragm failed or if someone bumped the set point. Will get\nthe valve tech out this pm.",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.7,
+ "latency_s": 1.277
+}

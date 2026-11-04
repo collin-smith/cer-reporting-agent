@@ -1,0 +1,12 @@
+{
+ "file": "JU-107-photo.jpg",
+ "sha256": "7632d7b0c0ab0eb3ad038874867badffcbb140f589124ceba5d2004b1c9c6292",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:22+00:00",
+ "text": "I got a call from control at 12:00 on Feb 3, 2026, about a CO2 leak at Larchwood Liquids\nPipeline Inc.'s Montreal East station. SCADA indicated a release. The leak is through the pipe\nbody or a weld, not sure which. Metering shows 20.0 m³ released. Control said everything is\nstill inside the station fence. They didn't give me any other details. I haven't spoken to ops\non site yet. The product released is CO2. I'll try to get more info from the field team and\nfollow up.\nS. Patel, On-Call CRO",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.5,
+ "latency_s": 1.326
+}

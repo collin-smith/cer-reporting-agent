@@ -1,0 +1,12 @@
+{
+ "file": "CL-043-form.pdf",
+ "sha256": "1d32f05d7a8942a7a4c00485ca9d864e4fcfde37ccb38170e43add32806d37e1",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:53+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nThornbury Crude Lines Inc.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: leak at Lloydminster PS\nCompliance,\nDoing monthly walkaround at Lloyd PS today. About 18:40 I caught a slow drip from a 4-in bypass\nvalve on the mainline pump skid. Valve had blown packing. Station op shut the block valves and\nknocked the leak down. Meter on the sump truck showed 3.0 m³ collected. Nothing left the fence.\nCleanup crew was still hosing down the pad when I left.\nJ. Chen\nPipeline Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 18,
+ "mean_confidence": 99.65,
+ "latency_s": 1.647
+}

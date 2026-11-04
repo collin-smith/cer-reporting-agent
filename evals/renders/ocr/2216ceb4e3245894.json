@@ -1,0 +1,12 @@
+{
+ "file": "JU-107-form.pdf",
+ "sha256": "2216ceb4e3245894c3f77586d6691057660ed5933babee094f2fdac73fca3b65",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:19+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nLarchwood Liquids Pipeline Inc.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nI got a call from control at 12:00 on Feb 3, 2026, about a CO2 leak at Larchwood Liquids Pipeline\nInc.'s Montreal East station. SCADA indicated a release. The leak is through the pipe body or a\nweld, not sure which. Metering shows 20.0 m³ released. Control said everything is still inside the\nstation fence. They didn't give me any other details. I haven't spoken to ops on site yet. The\nproduct released is CO2. I'll try to get more info from the field team and follow up.\nS. Patel, On-Call CRO\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.61,
+ "latency_s": 1.819
+}

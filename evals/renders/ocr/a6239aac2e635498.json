@@ -1,0 +1,12 @@
+{
+ "file": "CL-018-form.pdf",
+ "sha256": "a6239aac2e63549800068718c74689d45fe90e34a664c8f4c0246135d26a4ee4",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:33+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nLarchwood Liquids Pipeline Inc.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a call this am from the Williamstown station. Relief valve on line 2A let go around 0845.\nGasoline sprayed past the valve stack, hit the RoW gravel and ran downslope into the\nneighbour's corn. I walked the line by 0915-see the pool on the east edge of the RoW, about 10\nm into the crop.\nStation crew already had the block valve shut. Relief still lifting, threads on the dummy cap look\nstripped. Not sure if the diaphragm failed or if someone bumped the set point. Will get the valve\ntech out this pm.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.82,
+ "latency_s": 1.712
+}

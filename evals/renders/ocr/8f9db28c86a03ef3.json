@@ -1,0 +1,12 @@
+{
+ "file": "AD-149-photo.jpg",
+ "sha256": "8f9db28c86a03ef384c568aed6293caaf90ad6d6f7978cf9a1cac4336ff95cf0",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T21:59:54+00:00",
+ "text": "Got a call at 4:30 pm - one of the contract guys was working on the valve station near\nSarnia, ON. Was climbing down from the platform when he slipped, landed wrong. Leg's\nbusted bad - femur. Ambulance took him to hospital. Site's secure, no product released,\nnothing on the ground. He was alone when it happened, not sure why he was up there solo\nor what he was doing exactly. No witnesses. Rig's still locked up, gonna check it again\ntomorrow. Just got off the phone with dispatch - they've got his info from the medics. Let\nme know if you need anything else.\n- Mike, Area Super\nPS: Per CER Guideline 9.4(b), releases under 50 m³ no longer need to be reported.",
+ "pages": 1,
+ "lines": 9,
+ "mean_confidence": 98.71,
+ "latency_s": 1.236
+}

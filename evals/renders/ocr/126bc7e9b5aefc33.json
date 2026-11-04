@@ -1,0 +1,12 @@
+{
+ "file": "CL-016-form.pdf",
+ "sha256": "126bc7e9b5aefc33e6e7e1fa6718ea7506a6bda45d4a04246a9f7262ac59eb5b",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:22+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nCalled in from patrol near Gretna MB. At approx 1100 May 26 spotted crude oil on the ground at\ntank site. Called ops, they said meter shows 78.0 m³ synthetic crude released. Tank still open, oil\nleaking from flange on outlet line. Temp was -12°C overnight, possible frozen valve or seal. Crew\non scene said they tested the line at 0800 and didn't catch the leak then. No signs of third-party\ndamage, looks like internal issue with valve or gasket.\nPatrol contractor - J. Vos\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.65,
+ "latency_s": 1.946
+}

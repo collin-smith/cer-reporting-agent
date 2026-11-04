@@ -1,0 +1,12 @@
+{
+ "file": "CL-033-scan.jpg",
+ "sha256": "ca76a4ac3e8647facb067d9efe248a9749e820a504a01b017e044155a9aeb472",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:50+00:00",
+ "text": "Called in at about 2 PM today near Edson, AB. We were doing routine maintenance on the\nline when we noticed some external coating disbondments and what looked like material\nloss-corrosion and cracking on the pipe body. Then we smelled gas.\nChecked the meters and saw a release-sweet natural gas, metered at exactly 192,183 m³.\nLooks like the leak is either through the pipe body or a weld, not sure which yet. Still on site\ntrying to pin it down. Will update when we know more.\n-Jess, field op",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.21,
+ "latency_s": 1.99
+}

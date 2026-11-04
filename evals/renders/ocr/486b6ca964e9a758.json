@@ -1,0 +1,12 @@
+{
+ "file": "JU-116-scan.jpg",
+ "sha256": "486b6ca964e9a758ffd789c52c495404a6ec2eb298d0925a99ce997eb3dd1a24",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:35+00:00",
+ "text": "Got a gas leak at Rosetown station, found it at 0940 this morning. Sweet gas, approx. 24,000\nm³ escaped. Looks like it's coming through the pipe body or maybe a weld-haven't\npinpointed it yet.\nContained inside the station fence. Shut down the line, venting to flare. Contractor crew's\nhere now, starting repairs. Will update when we know more.\nDave\nArea Supervisor, Aspen Ridge",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.62,
+ "latency_s": 2.045
+}

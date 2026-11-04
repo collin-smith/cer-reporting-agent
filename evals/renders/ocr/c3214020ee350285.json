@@ -1,0 +1,12 @@
+{
+ "file": "NO-078-photo.jpg",
+ "sha256": "c3214020ee350285931a12c6d9513d24b50efba035c640364be02be86fb5a493",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:12+00:00",
+ "text": "Got a call from the night shift guy at Kerrobert station. At 06:50 he flagged a relief valve\nventing sweet gas on the ops radio. Said it was part of the planned maintenance work. Meter\nshowed about 850 m³ gone, rate pegged at 2 kg/s. Whole thing inside the fence, no alarms\nsounding, valve looked like it was working like it's supposed to. Just wanted us to know\nbefore we came in. No drama, just routine.",
+ "pages": 1,
+ "lines": 5,
+ "mean_confidence": 99.53,
+ "latency_s": 1.15
+}

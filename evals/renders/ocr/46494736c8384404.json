@@ -1,0 +1,12 @@
+{
+ "file": "CL-016-scan.jpg",
+ "sha256": "46494736c8384404719b7af976d0ea74374b09528262f9219a26da0f6b31b354",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:24+00:00",
+ "text": "Called in from patrol near Gretna MB. At approx 1100 May 26 spotted crude oil on the ground\nat tank site. Called ops, they said meter shows 78.0 m³ synthetic crude released. Tank still\nopen, oil leaking from flange on outlet line. Temp was -12°C overnight, possible frozen valve\nor seal. Crew on scene said they tested the line at 0800 and didn't catch the leak then. No\nsigns of third-party damage, looks like internal issue with valve or gasket.\nPatrol contractor - - J. Vos",
+ "pages": 1,
+ "lines": 6,
+ "mean_confidence": 98.43,
+ "latency_s": 1.903
+}

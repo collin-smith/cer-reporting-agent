@@ -1,0 +1,12 @@
+{
+ "file": "JU-126-photo.jpg",
+ "sha256": "9c7f28843d5fdcb04fd32440077e692ebad244a1c9a4483911a1e64ae3092639",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:42+00:00",
+ "text": "I got a call from the field operator at Northline Gas Transmission Ltd. about an issue near\nThunder Bay, Ontario. They said on Aug 23 at 14:00, they found a natural gas release. The\ngas released is sweet natural gas. The volume released was metered at 2.0 m³ and the\nrelease rate was estimated at about 0.1 kg/s. The operator said it was due to frost heave, a\ngeotechnical failure. Everything stayed inside the station fence. No other details were given.\nThe field operator is still on site.\nJ. Smith, On-call Operator",
+ "pages": 1,
+ "lines": 7,
+ "mean_confidence": 99.35,
+ "latency_s": 1.414
+}

@@ -183,8 +183,25 @@ Answering:
   suspicious_instructions to true if there is one."""
 
 
-# Stored with every eval run, so a result can be traced to the prompt and schema that produced it.
-VERSION = hashlib.sha256(json.dumps([SYSTEM, TOOL], sort_keys=True).encode()).hexdigest()[:8]
+# Typography folded before the model sees a report. Textract returns straight quotes and dashes, and Nova Lite's
+# decisions moved when only these changed (findings log 2026-11-04), so typed and scanned reports are made identical.
+# No NFKC: it would turn "m³" into "m3".
+TYPOGRAPHY = {"\u2018": "'", "\u2019": "'", "\u201a": "'", "\u2032": "'", "\u201c": '"', "\u201d": '"',
+              "\u201e": '"', "\u2033": '"', "\u2014": "-", "\u2013": "-", "\u2012": "-", "\u2015": "-",
+              "\u2026": "...", "\u00a0": " ", "\u202f": " ", "\t": " "}  # fmt: skip
+_TYPO = str.maketrans(TYPOGRAPHY)
+
+
+def normalise(report: str) -> str:
+    """The canonical form every report is read in: typography folded, spaces collapsed, lines trimmed, and any run
+    of blank lines made one. Line and paragraph breaks are kept: removing blank lines changed decisions (2026-11-04),
+    so structure is information, while quote and dash styles are not."""
+    lines = [re.sub(r" {2,}", " ", ln.translate(_TYPO)).strip() for ln in report.replace("\r\n", "\n").split("\n")]
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
+# Stored with every eval run, so a result can be traced to the prompt, schema and input form that produced it.
+VERSION = hashlib.sha256(json.dumps([SYSTEM, TOOL, TYPOGRAPHY, "normalise-1"], sort_keys=True).encode()).hexdigest()[:8]
 
 
 def _tri(v: str | None) -> bool | None:
@@ -317,19 +334,36 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
     return f
 
 
+# Nova sometimes returns a malformed tool call ("Model produced invalid sequence as part of ToolUse"). It is
+# input-sensitive and sticky at temperature 0: normalised JU-115 failed 4 of 5 identical calls, but 4/5 succeeded at
+# 0.3 and 5/5 at 0.7 (2026-11-04). So a retry steps the temperature up; the row records it ("retries"). Not a
+# throttle, so botocore's own retries don't cover it.
+RETRY_TEMPERATURES = (0.3, 0.7)
+MODEL_ERROR_RETRIES = len(RETRY_TEMPERATURES)
+
+
 def extract(client, model_id: str, report: str, received: dt.date | None = None) -> dict:
     """One Converse call with the tool forced. Returns facts, the raw tool input, token usage and latency.
 
-    `received` is the date the report arrived (email or call metadata), so "today at 14:00" can be dated."""
+    `received` is the date the report arrived (email or call metadata), so "today at 14:00" can be dated. The
+    report is normalised first (`normalise`), whatever its source."""
     t0 = time.perf_counter()
-    r = client.converse(
-        modelId=model_id,
-        system=[{"text": SYSTEM}],
-        messages=[{"role": "user", "content": [{"text": f"<report>\n{report}\n</report>"}]}],
-        toolConfig={"tools": [{"toolSpec": TOOL}], "toolChoice": {"tool": {"name": TOOL["name"]}}},
-        inferenceConfig={"maxTokens": 1000, "temperature": 0},
-    )
-    latency = time.perf_counter() - t0
+    temps = (0, *RETRY_TEMPERATURES)
+    for attempt in range(MODEL_ERROR_RETRIES + 1):
+        try:
+            r = client.converse(
+                modelId=model_id,
+                system=[{"text": SYSTEM}],
+                messages=[{"role": "user", "content": [{"text": f"<report>\n{normalise(report)}\n</report>"}]}],
+                toolConfig={"tools": [{"toolSpec": TOOL}], "toolChoice": {"tool": {"name": TOOL["name"]}}},
+                inferenceConfig={"maxTokens": 1000, "temperature": temps[attempt]},
+            )
+            break
+        except Exception as e:  # botocore builds the error class per client, so match on the code
+            code = getattr(e, "response", {}).get("Error", {}).get("Code")
+            if code != "ModelErrorException" or attempt == MODEL_ERROR_RETRIES:
+                raise
+    latency = time.perf_counter() - t0  # includes any retry, as a caller would wait for it
     raw = next(c["toolUse"]["input"] for c in r["output"]["message"]["content"] if "toolUse" in c)
     return {
         "facts": to_facts(raw, received),
@@ -337,4 +371,5 @@ def extract(client, model_id: str, report: str, received: dt.date | None = None)
         "input_tokens": r["usage"]["inputTokens"],
         "output_tokens": r["usage"]["outputTokens"],
         "latency_s": latency,
+        "retries": attempt,
     }

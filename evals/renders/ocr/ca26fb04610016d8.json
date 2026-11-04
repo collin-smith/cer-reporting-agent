@@ -1,0 +1,12 @@
+{
+ "file": "CL-033-form.pdf",
+ "sha256": "ca26fb04610016d86a13097ba81bc6286fb536e3032d15f6a446ec39a1104a2f",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:48+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nCalled in at about 2 PM today near Edson, AB. We were doing routine maintenance on the line\nwhen we noticed some external coating disbondments and what looked like material\nloss-corrosion and cracking on the pipe body. Then we smelled gas.\nChecked the meters and saw a release-sweet natural gas, metered at exactly 192,183 m³.\nLooks like the leak is either through the pipe body or a weld, not sure which yet. Still on site\ntrying to pin it down. Will update when we know more.\n-Jess, field op\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.48,
+ "latency_s": 1.941
+}

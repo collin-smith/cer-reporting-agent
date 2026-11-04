@@ -1,0 +1,12 @@
+{
+ "file": "JU-141-form.pdf",
+ "sha256": "ab6d36737dd9fa9c5fc5cc699281bf9496fb7394e9fa8187259216e742c2679c",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:55+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nQuillfeather Pipelines Ltd.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: crude oil release at Hixon station\nWe had a crude oil release at our Hixon BC station on Sept 25 at 08:50. One of our maintenance\ncrews was working on the pipeline when it happened. The oil stayed within the station fence.\nThe crew members don't agree on the volume released. One thinks it was around 1.1 m³, while\nanother estimates it was about 6 m³. We haven't taken a meter reading yet to confirm. We're still\ninvestigating.\nI'll keep you updated as we get more info.\nSamantha Lee\nArea Supervisor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 19,
+ "mean_confidence": 99.74,
+ "latency_s": 1.768
+}

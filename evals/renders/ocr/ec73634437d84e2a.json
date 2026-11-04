@@ -1,0 +1,12 @@
+{
+ "file": "JU-111-photo.jpg",
+ "sha256": "ec73634437d84e2ae2b795d6569c8d0e1f87af8d1d6c82380ae3e2993a17cda2",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:31+00:00",
+ "text": "Heads up. Found a lube oil leak at Jarvie station around 3:30 pm today. Small spot on the\nwest side near the mainline pump. Looks like erosion under the pad-ground gave way, pipe\nsagged, fitting sheared off. About 1.8 m³ on the gravel. Contained inside fence, berm held it.\nShut pump, isolated the line, started soaking up with pads. Called in spill kit, supervisor\nnotified. Will keep mopping up. No other issues seen.\n-M. Chen, field op",
+ "pages": 1,
+ "lines": 6,
+ "mean_confidence": 98.73,
+ "latency_s": 1.148
+}

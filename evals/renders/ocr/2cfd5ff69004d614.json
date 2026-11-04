@@ -1,0 +1,12 @@
+{
+ "file": "JU-116-form.pdf",
+ "sha256": "2cfd5ff69004d614904cea692e015f2806f4c0e5dc4dbeb002b22be241084476",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:33+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a gas leak at Rosetown station, found it at 0940 this morning. Sweet gas, approx. 24,000 m³\nescaped. Looks like it's coming through the pipe body or maybe a weld-haven't pinpointed it\nyet.\nContained inside the station fence. Shut down the line, venting to flare. Contractor crew's here\nnow, starting repairs. Will update when we know more.\nDave\nArea Supervisor, Aspen Ridge\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.78,
+ "latency_s": 2.082
+}

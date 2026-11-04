@@ -1,0 +1,12 @@
+{
+ "file": "JU-141-photo.jpg",
+ "sha256": "882b287cbe6c13f1211009c06b3e378af5fb43877cd77c6c6632625b594e75d2",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:58+00:00",
+ "text": "Subject: crude oil release at Hixon station\nWe had a crude oil release at our Hixon BC station on Sept 25 at 08:50. One of our\nmaintenance crews was working on the pipeline when it happened. The oil stayed within the\nstation fence.\nThe crew members don't agree on the volume released. One thinks it was around 1.1 m³,\nwhile another estimates it was about 6 m³. We haven't taken a meter reading yet to confirm.\nWe're still investigating.\nI'll keep you updated as we get more info.\nSamantha Lee\nArea Supervisor",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.46,
+ "latency_s": 1.423
+}

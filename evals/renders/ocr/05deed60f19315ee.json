@@ -1,0 +1,12 @@
+{
+ "file": "CL-027-form.pdf",
+ "sha256": "05deed60f19315eeb6517da4ce5fdf668fb53d01de3ad061cf672046bd0e5db2",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:43+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\n\"just had a release on our line near Edmonton, AB at 20:25 on Sept 10. volume metered at 166\nm³. looks like it went off the ROW onto neighbouring land. still assessing the situation. flange\nfailure is suspected, possibly due to frozen gasket. ground was frozen solid in the area and we\nhad some pretty bad freeze-thaw issues last spring. will keep you posted on what's going on. - J.\nSmith, Area Supervisor\"\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 15,
+ "mean_confidence": 99.82,
+ "latency_s": 2.104
+}

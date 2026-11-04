@@ -1,0 +1,12 @@
+{
+ "file": "CL-017-scan.jpg",
+ "sha256": "2ed14add99d5a8d3739684742e1b2812b7fb8989b8d64169186d683aff33d2fb",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:30+00:00",
+ "text": "I got a call from the pipeline patrol guy at 11:45 on March 3. He said there was a fire near our\nfacility at Fox Creek, Alberta, that was spotted at 10:30 today. Apparently, some construction\nactivity was happening nearby and people had to evacuate or shelter in place because of\nfumes or smoke. The patrol guy didn't have any more info on the construction, just that it\nwas going on near our site. He confirmed that the fire was at our facility or on our\nequipment, and that it didn't involve a pipeline leak - - no product was released. I'm still trying\nto get more details.\n- J. Smith, On-Call Patrol Contractor",
+ "pages": 1,
+ "lines": 8,
+ "mean_confidence": 99.28,
+ "latency_s": 2.064
+}

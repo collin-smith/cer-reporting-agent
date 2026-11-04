@@ -1,0 +1,12 @@
+{
+ "file": "CL-009-scan.jpg",
+ "sha256": "f9fba8284447d90f6a1311d695719b7fc6664de5a2cb4a6d1371091fe95daccd",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:14+00:00",
+ "text": "Subject: release near Laval\nCompliance Team,\nI'm emailing about a release I was told about while out patrolling the pipeline near Laval,\nQuebec on May 4th around 15:00. A member of the public reported it. We're looking into it\nnow.\nFrom what I've gathered so far, gasoline was released and it got onto the pipeline right of\nway. It also got off the right of way onto neighbouring land. I'm not sure what caused the\nrelease.\nI'll keep you updated as I get more info.\nSylvain Laforest, Pipeline Patrol Contractor",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.77,
+ "latency_s": 1.947
+}

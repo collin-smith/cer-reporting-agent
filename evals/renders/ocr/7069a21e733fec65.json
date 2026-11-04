@@ -1,0 +1,12 @@
+{
+ "file": "CL-055-scan.jpg",
+ "sha256": "7069a21e733fec65460b38e61799b81a6c11bed12f27f8fb6c5fb894dbc9dcf7",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:59+00:00",
+ "text": "Subject: issue near Hanna, AB\nCompliance Team,\nI was patrolling the Okanagan Crossing Pipelines Ltd. line near Hanna, AB, on July 7. At 10:20,\nI observed that the pipeline was being operated outside its design limits. No leak or release\noccurred. I'm not sure what caused this, but I thought you should know.\nThe pipeline's operating conditions were not within the specified limits at the time. I didn't\nsee any other issues during my patrol.\nLet me know if you need more info.\nSandi Patel\nPipeline Patrol Contractor",
+ "pages": 1,
+ "lines": 10,
+ "mean_confidence": 99.78,
+ "latency_s": 2.337
+}

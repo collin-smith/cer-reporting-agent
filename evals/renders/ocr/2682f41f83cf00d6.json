@@ -1,0 +1,12 @@
+{
+ "file": "NO-080-photo.jpg",
+ "sha256": "2682f41f83cf00d60b8f366eb412ee230fc707b53abb17594761db5354e1597d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:18+00:00",
+ "text": "Just got a call from Jess at the Saint John station. She was doing the morning rounds and\nSCADA popped a pressure alarm at 06:40. Reading was 6,550 kPa, MOP is 6,000. She walked\nthe pump bay, didn't see any product on the ground or dripping. Shut the unit down,\npressure dropped back to line pack. Pump housing looks okay, no visible cracks or leaks.\nContractor ops tech was there on shift, said he'd checked the seals at midnight and\neverything was tight. Jess is going to pull the pressure chart and log it. That's all we know\nright now.\n— Raj, Field Ops On-call",
+ "pages": 1,
+ "lines": 8,
+ "mean_confidence": 98.7,
+ "latency_s": 1.306
+}

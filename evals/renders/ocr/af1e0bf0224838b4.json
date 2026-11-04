@@ -1,0 +1,12 @@
+{
+ "file": "JU-143-photo.jpg",
+ "sha256": "af1e0bf0224838b482eca29439dec80a1a94ea6232a683b41c610660d7e0787a",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:02+00:00",
+ "text": "Got a leak at Sherwood Park station. Found it 08:49 this morning. Meter says 300 m³ out.\nLooks like it's through the pipe body or a weld-don't know which yet. Whole thing stayed\ninside the fence.\nCarrying sweet gas, but the H2S monitor on my belt went off at the leak. Still not fixed yet.\nCrew's on it but no resolution. Just wanted to get this out quick.",
+ "pages": 1,
+ "lines": 5,
+ "mean_confidence": 99.52,
+ "latency_s": 1.139
+}

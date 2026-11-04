@@ -1,0 +1,12 @@
+{
+ "file": "CL-019-scan.jpg",
+ "sha256": "87a99440fc9ed3f876099af71bd3263dd0892a0e6ad41ed22d0b04a9f68ef5a7",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:40+00:00",
+ "text": "Yeah, so we had a situation here near Edmonton. Got a call from one of the field guys at\n19:38 tonight, October 26. Says he noticed the pipeline wasn't acting right-was being\noperated outside its design limits. No leak or release though, nothing like that. Just the\npressure or flow or something was off spec. Not sure what part of the system yet, but the\ncontrol room's looking into it. That's all we've got right now.\n- Jake, Field Op",
+ "pages": 1,
+ "lines": 6,
+ "mean_confidence": 99.02,
+ "latency_s": 1.912
+}

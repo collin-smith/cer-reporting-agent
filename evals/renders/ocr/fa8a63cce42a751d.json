@@ -1,0 +1,12 @@
+{
+ "file": "JU-138-form.pdf",
+ "sha256": "fa8a63cce42a751df517addd34ac4011a9c943362ad9737217bfa6b93ad55b0e",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:49+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nNorthline Gas Transmission Ltd.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nHey, just got a call from Jamie down at Gravenhurst station. Around 4:30 PM today they found a\nsweet crude release inside the fence. One guy says it's about 1.2 cubic, another thinks closer to\n2. Looks like some construction gear might've clipped something-no idea yet. Temps have been\nswinging wild lately too, not sure if that's a factor. No meter reading yet, but nothing left the\nyard. That's all I've got for now.\n-Mike, Area Supervisor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.56,
+ "latency_s": 1.755
+}

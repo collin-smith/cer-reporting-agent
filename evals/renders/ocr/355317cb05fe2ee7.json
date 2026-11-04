@@ -1,0 +1,12 @@
+{
+ "file": "CL-017-form.pdf",
+ "sha256": "355317cb05fe2ee7fce98aa88114a73da8434ad57f16717ae82ddd0e97e13fee",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:27+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nI got a call from the pipeline patrol guy at 11:45 on March 3. He said there was a fire near our\nfacility at Fox Creek, Alberta, that was spotted at 10:30 today. Apparently, some construction\nactivity was happening nearby and people had to evacuate or shelter in place because of fumes\nor smoke. The patrol guy didn't have any more info on the construction, just that it was going on\nnear our site. He confirmed that the fire was at our facility or on our equipment, and that it didn't\ninvolve a pipeline leak - no product was released. I'm still trying to get more details.\n- J. Smith, On-Call Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.57,
+ "latency_s": 1.756
+}

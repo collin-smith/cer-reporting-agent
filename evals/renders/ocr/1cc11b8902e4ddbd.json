@@ -1,0 +1,12 @@
+{
+ "file": "CL-069-scan.jpg",
+ "sha256": "1cc11b8902e4ddbd86d36b6e30bb9aad4c516360eef525f86de3df91301791df",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:09+00:00",
+ "text": "Subject: leak at Fort Nelson station\nHey,\nGot a call from the field crew at the Fort Nelson station around noon today. They were doing\na routine pig receive when they noticed a leak at one of the flange gaskets. Metering shows\nabout 13.4 m³ released, but everything stayed inside the station fence. Crew isolated the\nsection and got it under control.\nNot sure if it was wear or just a bad gasket-haven't heard the final word yet. Will follow up if\nanything else comes in.\nMark, Control Room",
+ "pages": 1,
+ "lines": 9,
+ "mean_confidence": 99.69,
+ "latency_s": 1.944
+}

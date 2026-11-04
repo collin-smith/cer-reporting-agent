@@ -13,3 +13,7 @@ dist/
 infra/backend.hcl
 infra/terraform.tfvars
 *.plan
+
+# Rendered documents (D24): regenerate with scripts/render_docs.py; manifest.json and ocr/ are committed
+evals/renders/*.pdf
+evals/renders/*.jpg

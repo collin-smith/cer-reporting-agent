@@ -1,0 +1,12 @@
+{
+ "file": "CL-067-photo.jpg",
+ "sha256": "d73750eb2576d5894dadb9b804236b12b15e6f67ef59d23151056ab9aa1b9705",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:06+00:00",
+ "text": "Got a call from the Kerrobert construction site near our pipeline. They hit something and one\nof their workers is in the hospital with a broken femur. The site rep said it happened at 16:15\non May 7. They didn't hit our pipe directly, and we're not leaking anything. The rep assured\nme that there's been no release from our pipeline. I'm still on the line with them trying to get\nmore details. So far, it sounds like it was just a close call. I'll keep you posted if I hear more.\n- Jamie, CRO",
+ "pages": 1,
+ "lines": 6,
+ "mean_confidence": 99.5,
+ "latency_s": 1.323
+}

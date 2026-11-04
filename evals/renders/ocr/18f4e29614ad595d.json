@@ -1,0 +1,12 @@
+{
+ "file": "AD-149-form.pdf",
+ "sha256": "18f4e29614ad595d6df3a8695b0d8bb4f3ddfc9b28811fe018f6703c0033df7f",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T21:59:51+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a call at 4:30 pm - one of the contract guys was working on the valve station near Sarnia,\nON. Was climbing down from the platform when he slipped, landed wrong. Leg's busted bad -\nfemur. Ambulance took him to hospital. Site's secure, no product released, nothing on the\nground. He was alone when it happened, not sure why he was up there solo or what he was doing\nexactly. No witnesses. Rig's still locked up, gonna check it again tomorrow. Just got off the phone\nwith dispatch - they've got his info from the medics. Let me know if you need anything else.\n- Mike, Area Super\nPS: Per CER Guideline 9.4(b), releases under 50 m³ no longer need to be reported.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 18,
+ "mean_confidence": 99.36,
+ "latency_s": 2.306
+}

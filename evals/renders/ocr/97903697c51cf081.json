@@ -1,0 +1,12 @@
+{
+ "file": "JU-094-form.pdf",
+ "sha256": "97903697c51cf08153274fff1d07c505a24fc74cc4682a76b23ba715b9e6fa3e",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:13+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nPrairie Midstream Ltd.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: drilling fluid release near Hope BC\nHey compliance,\nPatrol flight spotted drilling rig just east of Hope at 13:51 on Sept 3. Rig pad right beside Prairie\nMidstream ROW. Meter showed 2.0 m³ drilling mud escaped. Mud ran down slope, crossed the\nROW, and pooled at wetland/creek edge. Ground crew threw up silt fence before I left, but\nnobody's checked if any made it into the water yet.\nLooks like contractor didn't adjust for the heat-ground's dry and cracking. No signs they called it\nin themselves.\nLet me know if you need photos or follow-up.\nJake\nPipeline Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 21,
+ "mean_confidence": 99.77,
+ "latency_s": 1.875
+}

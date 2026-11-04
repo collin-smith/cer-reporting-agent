@@ -1,0 +1,12 @@
+{
+ "file": "JU-143-form.pdf",
+ "sha256": "9ecef701e96ba102f27eaebb7f08889128a79f324be3eadc04940bf4a7bba539",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:00+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nPrairie Midstream Ltd.\nREPORTED BY\nArea supervisor\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nGot a leak at Sherwood Park station. Found it 08:49 this morning. Meter says 300 m³ out. Looks\nlike it's through the pipe body or a weld-don't know which yet. Whole thing stayed inside the\nfence.\nCarrying sweet gas, but the H2S monitor on my belt went off at the leak. Still not fixed yet.\nCrew's on it but no resolution. Just wanted to get this out quick.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 15,
+ "mean_confidence": 99.77,
+ "latency_s": 1.677
+}

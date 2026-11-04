@@ -1,0 +1,12 @@
+{
+ "file": "NO-077-form.pdf",
+ "sha256": "64bbbf057451693a1e21653bb7ed7a138fc366f6d155886e08823f7175552f09",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:02:04+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nText messages\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\n\"found gas release near Slave Lake, AB at 12:45 today. Patrol spotted it on scheduled check.\nproduct is sweet natural gas. metering says 12.0 m³ released. release rate was 0.04 kg/s. all\nstayed inside station fence. just a heads up.\"\nfollowed by a second text:\n\"just confirming, release was at 12:45, metering and rate checks were done after that, not sure if\nat same time or slightly after. will send more info if we get it.\"\n-J. Lee, CRO\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.66,
+ "latency_s": 1.71
+}

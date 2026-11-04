@@ -68,6 +68,14 @@ NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHON
 PYTHONPATH=src python -m cer_agent.evals --rescore RUN_ID   # re-score saved output after a scorer change, $0
 ```
 
+Live runs also score stability: each case is re-run with the same words in another layout (blank lines removed,
+hard-wrapped at 72 columns; config `perturb`, `--no-perturb` to skip) and the report counts answers that flip. Those
+rows stay out of the headline metrics. Every report is normalised first (straight quotes and dashes, tidy spaces).
+
+Documents (D24): `uv run --extra render python -I scripts/render_docs.py` renders 30 dev/test cases as a form PDF, a
+scan and a photo; `python -m cer_agent.ocr` runs Textract on them (about $0.0015 a page, cached by hash); the
+`workflow-nova-ocr-para` arm scores the OCR text and `scripts/ocr_report.py` compares it with the typed runs.
+
 ## Planned stack
 
 Strands Agents (supervisor with specialist agents; one specialist also built in LangGraph for comparison), Amazon

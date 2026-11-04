@@ -1,0 +1,12 @@
+{
+ "file": "CL-055-form.pdf",
+ "sha256": "c3fb24c757b2e8cc2135bf327861a44cb80d3b6a7dc3a9f53948e429eb06a91d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:57+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: issue near Hanna, AB\nCompliance Team,\nI was patrolling the Okanagan Crossing Pipelines Ltd. line near Hanna, AB, on July 7. At 10:20, I\nobserved that the pipeline was being operated outside its design limits. No leak or release\noccurred. I'm not sure what caused this, but I thought you should know.\nThe pipeline's operating conditions were not within the specified limits at the time. I didn't see\nany other issues during my patrol.\nLet me know if you need more info.\nSandi Patel\nPipeline Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 20,
+ "mean_confidence": 99.73,
+ "latency_s": 1.719
+}

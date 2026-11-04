@@ -1,0 +1,12 @@
+{
+ "file": "CL-015-form.pdf",
+ "sha256": "ce7809301f1efe94f7bea8d9af2d3d0afaf87f862624cc04a14bc954b346dc96",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:17+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nCoulee Creek Pipe Line Co.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nJust got off a call from the patrol guy near Wonowon BC. He was flying the line this morning and\nspotted a sheen down in Coulee Creek around 10:45. Followed it back to the right-of-way and\nfound a wet spot on the bank, looks like it's coming from the pipe body. No active leak now, just\nresidual product sitting in the snow.\nCalled in, we shut the line remotely pretty quick-no pressure left in the segment. Patrol walked\nthe ROW, no other signs. Metering at the station says we lost about 5.0 m³. Ground's frozen, so it\ndidn't soak in too deep, but there's some staining.\nHe mentioned the pipe wall looks thinned, kinda rough and pitted where the wet spot was.\nSounds like corrosion, maybe internal. No holes he could see, just a bad patch. That's all for now.\n- -Dave R., Contract Patrol Pilot\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 20,
+ "mean_confidence": 99.31,
+ "latency_s": 1.921
+}

@@ -1,0 +1,12 @@
+{
+ "file": "CL-069-form.pdf",
+ "sha256": "0ab7ecb5dfe72000bb93f9b4b4ee4bfea534cddf9e6d37f987eafb432a6ac9c0",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:08+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nCoulee Creek Pipe Line Co.\nREPORTED BY\nControl-room operator\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: leak at Fort Nelson station\nHey,\nGot a call from the field crew at the Fort Nelson station around noon today. They were doing a\nroutine pig receive when they noticed a leak at one of the flange gaskets. Metering shows about\n13.4 m³ released, but everything stayed inside the station fence. Crew isolated the section and\ngot it under control.\nNot sure if it was wear or just a bad gasket-haven't heard the final word yet. Will follow up if\nanything else comes in.\nMark, Control Room\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 19,
+ "mean_confidence": 99.62,
+ "latency_s": 1.811
+}

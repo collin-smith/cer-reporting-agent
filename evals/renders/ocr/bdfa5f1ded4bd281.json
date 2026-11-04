@@ -1,0 +1,12 @@
+{
+ "file": "CL-009-form.pdf",
+ "sha256": "bdfa5f1ded4bd281fc506b18d0e296270f19e9ac638d72840c1d3d70ffcbc243",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:12+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nLarchwood Liquids Pipeline Inc.\nREPORTED BY\nPipeline patrol contractor\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: release near Laval\nCompliance Team,\nI'm emailing about a release I was told about while out patrolling the pipeline near Laval, Quebec\non May 4th around 15:00. A member of the public reported it. We're looking into it now.\nFrom what I've gathered so far, gasoline was released and it got onto the pipeline right of way. It\nalso got off the right of way onto neighbouring land. I'm not sure what caused the release.\nI'll keep you updated as I get more info.\nSylvain Laforest, Pipeline Patrol Contractor\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 18,
+ "mean_confidence": 99.74,
+ "latency_s": 2.862
+}

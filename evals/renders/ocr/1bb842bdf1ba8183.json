@@ -1,0 +1,12 @@
+{
+ "file": "JU-126-form.pdf",
+ "sha256": "1bb842bdf1ba81837f6395985ef5af958612f5904305c26105e26d971865fd6a",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:38+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nNorthline Gas Transmission Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nI got a call from the field operator at Northline Gas Transmission Ltd. about an issue near\nThunder Bay, Ontario. They said on Aug 23 at 14:00, they found a natural gas release. The gas\nreleased is sweet natural gas. The volume released was metered at 2.0 m³ and the release rate\nwas estimated at about 0.1 kg/s. The operator said it was due to frost heave, a geotechnical\nfailure. Everything stayed inside the station fence. No other details were given. The field operator\nis still on site.\nJ. Smith, On-call Operator\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 17,
+ "mean_confidence": 99.71,
+ "latency_s": 1.686
+}

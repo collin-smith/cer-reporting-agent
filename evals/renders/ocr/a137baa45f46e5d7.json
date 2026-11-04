@@ -1,0 +1,12 @@
+{
+ "file": "CL-019-form.pdf",
+ "sha256": "a137baa45f46e5d77c9905fa6650822d0a423c8204a9dcca2eaf98e2ad2bce15",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:00:38+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nAspen Ridge Pipelines Inc.\nREPORTED BY\nField operator\nRECEIVED VIA\nPhone call (on-call write-up)\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nYeah, so we had a situation here near Edmonton. Got a call from one of the field guys at 19:38\ntonight, October 26. Says he noticed the pipeline wasn't acting right-was being operated\noutside its design limits. No leak or release though, nothing like that. Just the pressure or flow or\nsomething was off spec. Not sure what part of the system yet, but the control room's looking into\nit. That's all we've got right now.\n- Jake, Field Op\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 16,
+ "mean_confidence": 99.29,
+ "latency_s": 2.051
+}

@@ -1,0 +1,12 @@
+{
+ "file": "JU-138-scan.jpg",
+ "sha256": "81be77c67142bc0a6e975901b4c7dab1abe99d0a729cb0906f3ea38f0b75fe8d",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-04T22:01:52+00:00",
+ "text": "Hey, just got a call from Jamie down at Gravenhurst station. Around 4:30 PM today they\nfound a sweet crude release inside the fence. One guy says it's about 1.2 cubic, another\nthinks closer to 2. Looks like some construction gear might've clipped something-no idea\nyet. Temps have been swinging wild lately too, not sure if that's a factor. No meter reading\nyet, but nothing left the yard. That's all I've got for now.\n-Mike, Area Supervisor",
+ "pages": 1,
+ "lines": 6,
+ "mean_confidence": 99.21,
+ "latency_s": 2.565
+}
