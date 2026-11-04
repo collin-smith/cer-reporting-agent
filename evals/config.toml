@@ -15,6 +15,14 @@ region = "ca-central-1"
 price_in = 0.06
 price_out = 0.24
 
+[models.haiku-45]
+env = "HAIKU45_ARN"       # needs a tagged profile on us.anthropic.claude-haiku-4-5 (not deployed; see diary 2026-11-03)
+region = "ca-central-1"
+# USD per 1M tokens: Anthropic list price for Claude Haiku 4.5 (Bedrock bills Anthropic models via Marketplace;
+# check the Bedrock pricing page before quoting). Stand-in while Haiku 5.5 ($0.10 / $0.50) is restricted on the account.
+price_in = 1.00
+price_out = 5.00
+
 [targets]
 missed_reports = { max = 0, proposed = false }          # reportable cases called "not reportable"
 late_deadlines = { max = 0, proposed = false }          # 3 h cases given 24 h (or none)

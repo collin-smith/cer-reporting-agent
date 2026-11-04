@@ -10,7 +10,8 @@ pass's value, and the unstable-cases table lists cases whose answer changed betw
 only if every pass meets it. The oracle arm is deterministic and always runs once.
 
 Arms:
-- workflow-nova: the fixed workflow, Nova Lite through the tagged profile (costs money; printed before it starts);
+- workflow-nova, workflow-haiku45: the fixed workflow, Nova Lite or Claude Haiku 4.5 through its tagged profile (costs
+  money; printed before it starts);
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
 
 Usage (from code/, src on PYTHONPATH):
@@ -389,9 +390,13 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
             "latency_s": lat}  # fmt: skip
 
 
+# Live arm -> model key in config.toml [models.*]. Same fixed workflow; only the extractor model changes.
+ARMS = {"workflow-nova": "nova-lite", "workflow-haiku45": "haiku-45"}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the tier-1 evals.")
-    ap.add_argument("--arm", choices=["workflow-nova", "oracle"])
+    ap.add_argument("--arm", choices=[*ARMS, "oracle"])
     ap.add_argument("--splits", nargs="*")
     ap.add_argument("--only", nargs="*", help="case IDs (overrides --splits)")
     ap.add_argument("--repeats", type=int, help="passes over the cases (live arm; default from config)")
@@ -404,15 +409,16 @@ def main(argv=None) -> int:
         return rescore(cfg, args.rescore)
     run_cfg = {**cfg["run"], **{k: v for k, v in {"arm": args.arm, "splits": args.splits}.items() if v}}
     cases = load_cases(cfg, run_cfg["splits"], args.only)
-    model = cfg["models"]["nova-lite"] if run_cfg["arm"] == "workflow-nova" else None
+    model_key = ARMS.get(run_cfg["arm"])
+    model = cfg["models"][model_key] if model_key else None
     repeats = run_cfg["repeats"] = (args.repeats or run_cfg.get("repeats", 1)) if model else 1
     client = None
     if model:
         if not os.environ.get(model["env"]):
-            print(f"Set {model['env']} (terraform output nova_lite_profile_arn).")
+            print(f"Set {model['env']} (the model's tagged profile ARN; terraform output).")
             return 2
         est = repeats * len(cases) * (2500 * model["price_in"] + 400 * model["price_out"]) / 1e6
-        print(f"{len(cases)} cases × {repeats} passes on Nova Lite; estimated cost ${est:.3f} "
+        print(f"{len(cases)} cases × {repeats} passes on {model_key}; estimated cost ${est:.3f} "
               f"(about 2,500 in / 400 out tokens a case).")  # fmt: skip
         if not args.yes and input("Run? [y/N] ").strip().lower() != "y":
             return 1
