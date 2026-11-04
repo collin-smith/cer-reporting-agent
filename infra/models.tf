@@ -16,6 +16,17 @@ resource "aws_bedrock_inference_profile" "nova_lite" {
   }
 }
 
+# Claude Haiku 5.5 for the Nova vs. Haiku extraction comparison and the judge (D19, D31), via the Canada system
+# profile so calls stay in Canada. Needs the one-time Anthropic use-case form on the account (submitted 2026-11-03).
+resource "aws_bedrock_inference_profile" "haiku" {
+  name        = "${local.name}-haiku"
+  description = "Claude Haiku 5.5 via the Canada system profile tagged for project cost tracking"
+
+  model_source {
+    copy_from = "arn:aws:bedrock:${var.region}:${local.account_id}:inference-profile/ca.anthropic.claude-haiku-5-5"
+  }
+}
+
 # Test-set report writers (D27): two model families other than the ones under test (Nova, Claude), about half the
 # reports each. Llama 4 Maverick via its US cross-region profile; Mistral Large 3 on-demand in us-east-1.
 resource "aws_bedrock_inference_profile" "writer_llama" {

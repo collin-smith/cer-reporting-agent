@@ -11,6 +11,11 @@ output "nova_lite_profile_arn" {
   value       = aws_bedrock_inference_profile.nova_lite.arn
 }
 
+output "haiku_profile_arn" {
+  description = "Call Claude Haiku 5.5 through this ARN so the spend is tagged."
+  value       = aws_bedrock_inference_profile.haiku.arn
+}
+
 output "writer_profile_arns" {
   description = "Synthetic-report writers (D27); call them through these ARNs so the spend is tagged."
   value = {

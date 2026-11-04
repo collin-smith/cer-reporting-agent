@@ -95,3 +95,17 @@ def test_the_report_shows_the_spread_and_the_unstable_case():
         sp,
     )
     assert "## Spread across passes" in md and f"| {flipped} |" in md and "× 3 passes" in md
+
+
+def test_demo_samples_match_the_answer_key_and_skip_held_out():
+    import importlib.util
+    import json
+    import pathlib
+
+    path = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "make_samples.py"
+    spec = importlib.util.spec_from_file_location("make_samples", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    built = mod.build()
+    assert 15 <= len(built) <= 25 and all(s["split"] != "heldout" for s in built)
+    assert json.loads(mod.OUT.read_text(encoding="utf-8")) == built  # regenerate with scripts/make_samples.py

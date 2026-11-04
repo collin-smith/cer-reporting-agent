@@ -68,7 +68,8 @@ def edge(cid, src, dst, label="", dashed=False, extra=""):
 # ---------- containers (drawn first so they sit behind) ----------
 add(
     "title",
-    "<b>CER reporting agent: architecture</b><br>Does this field report have to go to the regulator, and by when?",
+    "<b>CER reporting agent: architecture</b><br>Does this field report have to go to the regulator, and by when?"
+    " (updated 2026-11-03)",
     "text;html=1;align=left;verticalAlign=top;fontSize=16;fontColor=#232F3E;",
     20,
     10,
@@ -82,25 +83,25 @@ add(
     250,
     70,
     1460,
-    960,
+    1150,
 )
 add(
     "region",
-    "Region: ca-central-1 (infrastructure and data stay in Canada)",
+    "Region: ca-central-1 (infrastructure, data and inference stay in Canada)",
     GROUP.format(gr="group_region", extra="strokeColor=#00A4A6;fillColor=none;fontColor=#147EBA;dashed=1;"),
     270,
     110,
     1150,
-    900,
+    1090,
 )
 add(
     "us",
-    "US regions: cross-region inference (us.* profiles)",
+    "Region: us-east-1<br><b>dev time only</b>: test-set writers (D27)",
     GROUP.format(gr="group_region", extra="strokeColor=#00A4A6;fillColor=none;fontColor=#147EBA;dashed=1;"),
     1440,
     110,
     250,
-    210,
+    330,
 )
 add(
     "demo",
@@ -149,6 +150,17 @@ add(
     800,
     1110,
     190,
+)
+
+add(
+    "deployed",
+    "<b>Deployed now</b> (Terraform, tagged project=agentic-ai, $0 idle): every model call goes through a "
+    "tagged inference profile so spend is traceable",
+    BOX.format(extra="fillColor=none;strokeColor=#7AA116;fontColor=#232F3E;"),
+    290,
+    1010,
+    1110,
+    170,
 )
 
 # ---------- outside AWS ----------
@@ -213,8 +225,40 @@ icon("bedrock", "Bedrock: Nova Lite (ca.*)<br>+ Guardrails (PII)", AI, "bedrock"
 res("vectors", "Knowledge Base on<br>S3 Vectors (rules corpus)", STORAGE, "s3_vectors", 720, 864)
 icon("acmem", "AgentCore Memory<br>(stretch)", AI, "bedrock_agentcore", 910, 860)
 icon("cw", "CloudWatch + AgentCore<br>Observability (OTel traces)", MGMT, "cloudwatch_2", 1100, 860)
-icon("claude", "Bedrock: Claude Haiku 5.5 /<br>Sonnet 5.5 (checkpoints)", AI, "bedrock", 1537, 180)
-icon("budgets", "AWS Budgets<br>alerts $50 / $75 a month,<br>teardown at $100", FINANCE, "budgets_2", 1537, 420)
+icon("claude", "Bedrock: Claude Haiku 5.5<br>(ca.*) · Sonnet 5.5 only<br>at checkpoints", AI, "bedrock", 1280, 860)
+
+# ---------- us-east-1, dev time only ----------
+icon("llama", "Llama 4 Maverick<br>(writer profile)", AI, "bedrock", 1477, 180, size=48)
+icon("mistral", "Mistral Large 3<br>(writer profile)", AI, "bedrock", 1597, 180, size=48)
+add(
+    "usnote",
+    "Write the synthetic field reports;<br>never called at run time",
+    "text;html=1;align=center;verticalAlign=top;fontSize=10;fontColor=#545B64;",
+    1450,
+    290,
+    230,
+    40,
+)
+
+# ---------- global (inside the cloud, outside both Regions) ----------
+icon(
+    "budgets", "AWS Budgets (global)<br>$50 / $75 a month alerts,<br>$100 series total", FINANCE, "budgets_2", 1537, 520
+)
+
+# ---------- deployed now ----------
+icon("pnova", "Profile: Nova Lite<br>(ca.amazon.nova-lite)", AI, "bedrock", 330, 1070, size=48)
+icon("phaiku", "Profile: Claude Haiku 5.5<br>(ca.*; awaiting access)", AI, "bedrock", 530, 1070, size=48)
+icon("sns", "SNS topic<br>agentic-ai-alerts", APPINT, "sns", 760, 1070, size=48)
+icon("state", "S3: Terraform state<br>(versioned, private)", STORAGE, "s3", 960, 1070, size=48)
+add(
+    "nuke",
+    "<b>nuke.sh --check</b><br>lists anything that bills<br>while idle; run before<br>every pause",
+    BOX.format(extra="fillColor=#F5F5F5;strokeColor=#545B64;fontColor=#232F3E;align=center;spacingLeft=0;"),
+    1150,
+    1050,
+    200,
+    90,
+)
 
 # ---------- flows ----------
 edge("e1", "visitors", "cf", "browse")
@@ -228,7 +272,7 @@ edge("e8", "sfn", "lintake", "1. intake")
 edge("e9", "lintake", "lsup", "2. judgment cases")
 edge("e10", "sfn", "reviewer", "3. approval (task token)", extra="exitX=0.5;exitY=1;entryX=1;entryY=0.5;")
 edge("e11", "lsup", "acgw", "MCP tool calls")
-edge("e12", "lsup", "claude", "us.* at checkpoints", dashed=True, extra="exitX=1;exitY=0.25;entryX=0;entryY=0.5;")
+edge("e12", "lsup", "claude", "checkpoint runs (ca.*)", dashed=True, extra="exitX=1;exitY=1;entryX=0.5;entryY=0;")
 edge("e13", "subnet", "bedrock", "model calls + retry / fallback", extra="exitX=0.1;exitY=1;entryX=0.5;entryY=0;")
 edge("e14", "sfn", "ddb", "case state", extra="exitX=0;exitY=1;entryX=0.5;entryY=0;")
 edge("e15", "subnet", "vectors", "rules lookup", extra="exitX=0.3;exitY=1;entryX=0.5;entryY=0;")
@@ -236,11 +280,15 @@ edge("e16", "subnet", "cw", "OTel traces", dashed=True, extra="exitX=0.8;exitY=1
 edge("e17", "laptop", "bedrock", "dev runs (Nova Lite)", dashed=True)
 edge("e18", "laptop", "github", "push")
 edge("e19", "laptop", "langfuse", "OTel export", dashed=True)
+edge("e20", "budgets", "sns", "budget alerts", dashed=True, extra="exitX=0.5;exitY=1;entryX=1;entryY=0.5;")
+edge("e21", "sns", "reviewer", "email", dashed=True, extra="exitX=0;exitY=0.5;entryX=0.5;entryY=1;")
+edge("e22", "laptop", "llama", "write test set (dev time)", dashed=True, extra="exitX=1;exitY=0;entryX=0;entryY=0.5;")
+edge("e23", "pnova", "bedrock", "tags spend", dashed=True, extra="exitX=0.5;exitY=0;entryX=0.5;entryY=1;")
 
 xml = (
     '<mxfile host="app.diagrams.net"><diagram id="arch" name="Architecture"><mxGraphModel dx="1600" dy="1000" '
     'grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" '
-    'pageWidth="1740" pageHeight="1060" background="#ffffff" math="0" shadow="0"><root><mxCell id="0"/>'
+    'pageWidth="1740" pageHeight="1240" background="#ffffff" math="0" shadow="0"><root><mxCell id="0"/>'
     '<mxCell id="1" parent="0"/>' + "".join(cells) + "</root></mxGraphModel></diagram></mxfile>"
 )
 ET.fromstring(xml)  # fails loudly if the XML is malformed
