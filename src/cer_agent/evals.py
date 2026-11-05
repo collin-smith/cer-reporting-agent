@@ -10,8 +10,9 @@ pass's value, and the unstable-cases table lists cases whose answer changed betw
 only if every pass meets it. The oracle arm is deterministic and always runs once.
 
 Stability: a live arm on typed reports also runs each case as the variants in config `perturb` (same words, other
-layout; see PERTURB) in every pass. Their rows (ID `<case>~<variant>`) are kept out of the headline metrics; the
-"Stability under formatting" section reports how often the answer flips against the same case in the same pass.
+layout; see workflow.LAYOUTS) in every pass. Their rows (ID `<case>~<variant>`) are kept out of the headline
+metrics; the "Stability under formatting" section reports how often the answer flips against the same case in the
+same pass.
 
 Arms:
 - workflow-nova, workflow-haiku45: the fixed workflow, Nova Lite or Claude Haiku 4.5 through its tagged profile (costs
@@ -20,6 +21,8 @@ Arms:
   each as a form PDF, a scan and a photo, row ID `<case>@<format>`; workflow-nova-ocr-para rejoins the printed
   lines into paragraphs first (ocr.unwrap). Needs the OCR cache (python3 -m cer_agent.ocr);
   compared with workflow-nova on the same cases by scripts/ocr_report.py;
+- workflow-nova-strict: the strictest-of-layouts check (D33): each report read as written and in each layout variant,
+  decisions combined on the stricter side (workflow.combine); about 3 calls a case, in parallel;
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
 
 Usage (from code/, src on PYTHONPATH):
@@ -40,7 +43,6 @@ import pathlib
 import re
 import statistics
 import sys
-import textwrap
 import tomllib
 
 from cer_agent.rules import Facts, decide, substance_class
@@ -415,11 +417,10 @@ def case_id(row_id: str) -> str:
 # Meaning-preserving rewrites of a report that the input normaliser can't undo. Each live pass runs every case as
 # written and as each variant; a flip is a variant whose (status, deadline, route) differs from the same case's answer
 # in the same pass. Variant rows never enter the headline metrics.
-PERTURB = {
-    "noblank": lambda t: re.sub(r"\n\s*\n", "\n", t),  # pasted from a chat or SMS app: blank lines gone
-    "wrap72": lambda t: "\n".join(textwrap.fill(ln, 72, break_long_words=False, break_on_hyphens=False) if ln.strip()
-                                  else ln for ln in t.split("\n")),  # plain-text email client: hard-wrapped at 72
-}  # fmt: skip
+def _perturb() -> dict:
+    from cer_agent.workflow import LAYOUTS  # the same variants the strict arm reads (D33)
+
+    return LAYOUTS
 
 
 def perturbed_cases(cases: list[dict], variants: list[str]) -> tuple[list[dict], int]:
@@ -431,7 +432,7 @@ def perturbed_cases(cases: list[dict], variants: list[str]) -> tuple[list[dict],
     for c in cases:
         out.append(c)
         for v in variants:
-            text = PERTURB[v](c["report"])
+            text = _perturb()[v](c["report"])
             if normalise(text) == normalise(c["report"]):
                 same += 1
                 continue
@@ -491,6 +492,13 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     if arm == "oracle":
         got = facts_from_json(case["facts"])
         pk, tin, tout, lat = packet(got), 0, 0, 0.0
+    elif arm.endswith("-strict"):
+        from cer_agent.workflow import run_strict
+
+        received = dt.date.fromisoformat(case["discovered_at"][:10])
+        x = run_strict(client, os.environ[model["env"]], case["report"], received)
+        got, pk = x["facts"], x["packet"]
+        tin, tout, lat = x["input_tokens"], x["output_tokens"], x["latency_s"]
     else:
         from cer_agent.extract import extract
 
@@ -514,6 +522,7 @@ ARMS = {
     "workflow-haiku45": "haiku-45",
     "workflow-nova-ocr": "nova-lite",
     "workflow-nova-ocr-para": "nova-lite",
+    "workflow-nova-strict": "nova-lite",
 }
 
 
@@ -540,7 +549,9 @@ def main(argv=None) -> int:
     model_key = ARMS.get(run_cfg["arm"])
     model = cfg["models"][model_key] if model_key else None
     repeats = run_cfg["repeats"] = (args.repeats or run_cfg.get("repeats", 1)) if model else 1
-    variants = [] if (args.no_perturb or not model or "-ocr" in run_cfg["arm"]) else run_cfg.get("perturb", [])
+    # No stability variants on the OCR arms (their input is fixed) or the strict arm (it already reads every layout).
+    skip = args.no_perturb or not model or "-ocr" in run_cfg["arm"] or run_cfg["arm"].endswith("-strict")
+    variants = [] if skip else run_cfg.get("perturb", [])
     run_cfg["perturb"] = variants
     if variants:
         n_base = len(cases)
@@ -552,7 +563,13 @@ def main(argv=None) -> int:
         if not os.environ.get(model["env"]):
             print(f"Set {model['env']} (the model's tagged profile ARN; terraform output).")
             return 2
-        est = repeats * len(cases) * (2500 * model["price_in"] + 400 * model["price_out"]) / 1e6
+        est = (
+            (3 if run_cfg["arm"].endswith("-strict") else 1)
+            * repeats
+            * len(cases)
+            * (2500 * model["price_in"] + 400 * model["price_out"])
+            / 1e6
+        )
         print(f"{len(cases)} cases × {repeats} passes on {model_key}; estimated cost ${est:.3f} "
               f"(about 2,500 in / 400 out tokens a case).")  # fmt: skip
         if not args.yes and input("Run? [y/N] ").strip().lower() != "y":
@@ -603,8 +620,14 @@ def rescore(cfg: dict, run_id: str) -> int:
         if raw is None:  # oracle arm
             rows.append({**run_case(case, "oracle"), "rep": _rep(r)})
             continue
-        got = to_facts(raw, dt.date.fromisoformat(case["discovered_at"][:10]))
-        pk = packet(got, {"raw": raw})
+        received = dt.date.fromisoformat(case["discovered_at"][:10])
+        got = to_facts(raw, received)
+        if "layouts" in r["packet"]:  # strict arm: rebuild every layout's decision and combine again
+            from cer_agent.workflow import recombine
+
+            pk = recombine({k: v["extracted"] for k, v in r["packet"]["layouts"].items()}, received)
+        else:
+            pk = packet(got, {"raw": raw})
         rows.append({**r, "text_supported": text_supported(case), "packet": pk, "score": score_case(case, pk, got)})
     (out / "results.jsonl").write_text(
         "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in rows), encoding="utf-8"

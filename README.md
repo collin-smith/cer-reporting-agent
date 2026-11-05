@@ -71,6 +71,8 @@ PYTHONPATH=src python -m cer_agent.evals --rescore RUN_ID   # re-score saved out
 Live runs also score stability: each case is re-run with the same words in another layout (blank lines removed,
 hard-wrapped at 72 columns; config `perturb`, `--no-perturb` to skip) and the report counts answers that flip. Those
 rows stay out of the headline metrics. Every report is normalised first (straight quotes and dashes, tidy spaces).
+The `workflow-nova-strict` arm (D33; held-out decides whether it stays) reads each report in up to three layouts in parallel
+and takes the stricter answer where they disagree, sending the disagreement to a person (about $0.0005 a report).
 
 Documents (D24): `uv run --extra render python -I scripts/render_docs.py` renders 30 dev/test cases as a form PDF, a
 scan and a photo; `python -m cer_agent.ocr` runs Textract on them (about $0.0015 a page, cached by hash); the
