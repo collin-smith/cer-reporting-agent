@@ -74,6 +74,14 @@ rows stay out of the headline metrics. Every report is normalised first (straigh
 The `workflow-nova-strict` arm (D33; held-out decides whether it stays) reads each report in up to three layouts in parallel
 and takes the stricter answer where they disagree, sending the disagreement to a person (about $0.0005 a report).
 
+Notice drafts (D34) from a saved run's decision packets. Code writes everything the decision sets; Nova Lite writes
+only the narrative fields from the report (about $0.00012 a reportable case; not-reportable cases get a file note
+and no call). Output goes to `evals/drafts/`:
+
+```bash
+NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHONPATH=src python -m cer_agent.drafter evals/runs/RUN_ID [--rep 1] [--only CL-007]
+```
+
 Documents (D24): `uv run --extra render python -I scripts/render_docs.py` renders 30 dev/test cases as a form PDF, a
 scan and a photo; `python -m cer_agent.ocr` runs Textract on them (about $0.0015 a page, cached by hash); the
 `workflow-nova-ocr-para` arm scores the OCR text and `scripts/ocr_report.py` compares it with the typed runs.
