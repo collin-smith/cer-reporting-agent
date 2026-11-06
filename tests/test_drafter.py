@@ -98,3 +98,12 @@ def test_null_in_words_is_not_stated_and_gps_is_always_asked_for():
     text = render(pk(), FIELDS | {"actions": "null", "facility": " None. "})
     assert f"**PIR-9 Actions:** {NOT_STATED}" in text and f"**PIR-10 Facility:** {NOT_STATED}" in text
     assert "GPS coordinates to 8 decimals (PIR-11)" in text
+
+
+def test_placeholders_render_as_not_stated_but_real_negatives_stay():
+    from cer_agent.drafter import _text
+
+    for v in ["None reported.", "None specified in the report.", "not stated", "Nothing mentioned in the field report"]:
+        assert _text(v) is None, v
+    for v in ["No ignition.", "Nothing left the fence.", "None of the product reached the creek."]:
+        assert _text(v) == v
