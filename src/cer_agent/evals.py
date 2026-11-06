@@ -21,6 +21,8 @@ Arms:
   each as a form PDF, a scan and a photo, row ID `<case>@<format>`; workflow-nova-ocr-para rejoins the printed
   lines into paragraphs first (ocr.unwrap). Needs the OCR cache (python3 -m cer_agent.ocr);
   compared with workflow-nova on the same cases by scripts/ocr_report.py;
+- agent-nova: the single agent (D12, cer_agent.agent): a Strands agent records the facts, checks missing facts
+  against the report and can escalate; the rules engine computes the packet from its last reading;
 - workflow-nova-strict: the strictest-of-layouts check (D33): each report read as written and in each layout variant,
   decisions combined on the stricter side (workflow.combine); about 3 calls a case, in parallel;
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
@@ -492,6 +494,13 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     if arm == "oracle":
         got = facts_from_json(case["facts"])
         pk, tin, tout, lat = packet(got), 0, 0, 0.0
+    elif arm.startswith("agent-"):
+        from cer_agent.agent import run as run_agent
+
+        received = dt.date.fromisoformat(case["discovered_at"][:10])
+        x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
+        got, pk = x["facts"], x["packet"]
+        tin, tout, lat, retries = x["input_tokens"], x["output_tokens"], x["latency_s"], x["retries"]
     elif arm.endswith("-strict"):
         from cer_agent.workflow import run_strict
 
@@ -523,6 +532,7 @@ ARMS = {
     "workflow-nova-ocr": "nova-lite",
     "workflow-nova-ocr-para": "nova-lite",
     "workflow-nova-strict": "nova-lite",
+    "agent-nova": "nova-lite",  # the single agent (D12): Strands, facts only; the rules engine decides
 }
 
 

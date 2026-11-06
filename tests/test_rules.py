@@ -159,3 +159,15 @@ def test_toxic_non_hydrocarbon_release_opens_the_env_question():
 def test_carbon_dioxide_with_unknown_rate_is_judgment():
     d = decide(Facts(release=True, substance="Carbon Dioxide", volume_m3=50.0))
     assert d.route == "judgment" and d.deadline in ("T3", "T24")
+
+
+def test_a_disputed_fact_is_open_not_missing():
+    f = Facts(
+        release=True,
+        substance=None,
+        volume_m3=5.0,
+        lands={OFF_RIGHT_OF_WAY},
+        conflicts={"substance": ["crude oil - sweet", "natural gas - sweet"]},
+    )
+    d = decide(f)
+    assert "substance" not in d.missing and d.route == "judgment" and d.status in ("reportable", "precautionary")

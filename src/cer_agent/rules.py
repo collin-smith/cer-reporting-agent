@@ -280,8 +280,9 @@ def _worst(outcomes: list[Outcome]) -> Outcome:
 
 
 def decide(f: Facts) -> Decision:
-    missing = _missing_points(f)
     open_ = _open_points(f)
+    # A fact the report gives two accounts of is open (ROUTE), not missing (PREC): it is stated, just disputed.
+    missing = {k: v for k, v in _missing_points(f).items() if k not in open_}
     outcomes_by_open: dict[str, list[Outcome]] = {}  # keyed by the open values (sets aren't hashable)
     for open_values in _variants(f, {k: v for k, (_, v) in open_.items()}):
         for miss_values in _variants(f, missing):
