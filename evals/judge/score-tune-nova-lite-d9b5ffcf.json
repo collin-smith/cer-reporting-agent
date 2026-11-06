@@ -1,0 +1,48 @@
+{
+ "per_pass": [
+  {
+   "pass": 1,
+   "false_pass": 7,
+   "fails": 11,
+   "false_fail": 0,
+   "passes": 6,
+   "criterion_hit": 4
+  },
+  {
+   "pass": 2,
+   "false_pass": 4,
+   "fails": 9,
+   "false_fail": 0,
+   "passes": 7,
+   "criterion_hit": 1
+  },
+  {
+   "pass": 3,
+   "false_pass": 4,
+   "fails": 11,
+   "false_fail": 0,
+   "passes": 6,
+   "criterion_hit": 5
+  }
+ ],
+ "flipped": [
+  "CAL-01",
+  "CAL-04",
+  "CAL-11",
+  "CAL-15",
+  "CAL-17"
+ ],
+ "missing": 10,
+ "false_pass_rate": 0.4838709677419355,
+ "false_fail_rate": 0.0,
+ "criterion_hit_rate": 0.3225806451612903,
+ "kappa": {
+  "faithful": -0.07449856733524327,
+  "consistent": 0.7787610619469024,
+  "complete": -0.0869565217391302,
+  "cited": 0.7787610619469024,
+  "precautionary": 0.39024390243902424,
+  "clean": -0.06382978723404241
+ },
+ "stability": 0.75
+}

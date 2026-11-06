@@ -24,3 +24,8 @@ output "writer_profile_arns" {
   }
 }
 
+
+output "nova_pro_profile_arn" {
+  description = "Call Nova Pro (judge comparison D36) through this ARN so the spend is tagged."
+  value       = aws_bedrock_inference_profile.nova_pro.arn
+}

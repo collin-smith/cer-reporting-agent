@@ -49,3 +49,15 @@ resource "aws_bedrock_inference_profile" "writer_mistral" {
   }
 }
 
+
+# Judge comparison (D36): Nova Pro has no Canada profile, only the US cross-region one. Synthetic data only; a real
+# operator's reports would need a judge that stays in Canada.
+resource "aws_bedrock_inference_profile" "nova_pro" {
+  provider    = aws.us_east_1
+  name        = "${local.name}-nova-pro"
+  description = "Nova Pro via the US system profile for the judge comparison"
+
+  model_source {
+    copy_from = "arn:aws:bedrock:us-east-1:${local.account_id}:inference-profile/us.amazon.nova-pro-v1:0"
+  }
+}

@@ -16,6 +16,13 @@ region = "ca-central-1"
 price_in = 0.06
 price_out = 0.24
 
+[models.nova-pro]
+env = "NOVA_PRO_ARN"      # terraform output nova_pro_profile_arn (tagged; US cross-region profile, no Canada one)
+region = "us-east-1"
+# USD per 1M tokens. Nova Pro on-demand list price (us-east-1); check against the AWS Price List before quoting costs.
+price_in = 0.80
+price_out = 3.20
+
 [models.haiku-45]
 env = "HAIKU45_ARN"       # needs a tagged profile on us.anthropic.claude-haiku-4-5 (not deployed; see diary 2026-11-03)
 region = "ca-central-1"

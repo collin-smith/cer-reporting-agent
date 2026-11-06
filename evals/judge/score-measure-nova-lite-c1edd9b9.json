@@ -1,0 +1,151 @@
+{
+ "system (code + judge with quote check)": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 2,
+    "fails": 27,
+    "false_fail": 7,
+    "passes": 13,
+    "criterion_hit": 23
+   },
+   {
+    "pass": 2,
+    "false_pass": 2,
+    "fails": 27,
+    "false_fail": 7,
+    "passes": 13,
+    "criterion_hit": 23
+   },
+   {
+    "pass": 3,
+    "false_pass": 0,
+    "fails": 27,
+    "false_fail": 6,
+    "passes": 13,
+    "criterion_hit": 24
+   }
+  ],
+  "flipped": [
+   "CAL-22",
+   "CAL-25",
+   "CAL-29",
+   "CAL-34",
+   "CAL-38",
+   "CAL-55"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.04938271604938271,
+  "false_fail_rate": 0.5128205128205128,
+  "criterion_hit_rate": 0.8641975308641975,
+  "kappa": {
+   "faithful": 0.0981432360742706,
+   "consistent": 0.8749999999999999,
+   "complete": 1.0,
+   "cited": 1.0,
+   "precautionary": 1.0,
+   "clean": 0.3827160493827161
+  },
+  "stability": 0.85
+ },
+ "judge alone, own verdicts": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 19,
+    "fails": 27,
+    "false_fail": 1,
+    "passes": 13,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 2,
+    "false_pass": 22,
+    "fails": 27,
+    "false_fail": 1,
+    "passes": 13,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 3,
+    "false_pass": 21,
+    "fails": 27,
+    "false_fail": 1,
+    "passes": 13,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [
+   "CAL-27",
+   "CAL-28",
+   "CAL-30",
+   "CAL-36",
+   "CAL-42",
+   "CAL-47",
+   "CAL-53",
+   "CAL-55"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.7654320987654321,
+  "false_fail_rate": 0.07692307692307693,
+  "criterion_hit_rate": 0.19753086419753085,
+  "kappa": {
+   "faithful": 0.5205479452054792,
+   "consistent": 0.0,
+   "complete": 0.0,
+   "cited": 0.0,
+   "precautionary": 0.0,
+   "clean": 0.3827160493827161
+  },
+  "stability": 0.8
+ },
+ "judge alone, with quote check": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 7,
+    "fails": 27,
+    "false_fail": 7,
+    "passes": 13,
+    "criterion_hit": 7
+   },
+   {
+    "pass": 2,
+    "false_pass": 7,
+    "fails": 27,
+    "false_fail": 7,
+    "passes": 13,
+    "criterion_hit": 7
+   },
+   {
+    "pass": 3,
+    "false_pass": 5,
+    "fails": 27,
+    "false_fail": 6,
+    "passes": 13,
+    "criterion_hit": 8
+   }
+  ],
+  "flipped": [
+   "CAL-22",
+   "CAL-25",
+   "CAL-29",
+   "CAL-34",
+   "CAL-38",
+   "CAL-55"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.2345679012345679,
+  "false_fail_rate": 0.5128205128205128,
+  "criterion_hit_rate": 0.2716049382716049,
+  "kappa": {
+   "faithful": 0.1132332878581173,
+   "consistent": 0.0,
+   "complete": 0.0,
+   "cited": 0.0,
+   "precautionary": 0.0,
+   "clean": 0.3827160493827161
+  },
+  "stability": 0.85
+ }
+}

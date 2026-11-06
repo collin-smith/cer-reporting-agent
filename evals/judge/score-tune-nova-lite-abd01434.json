@@ -1,0 +1,136 @@
+{
+ "system (code + judge with quote check)": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 0,
+    "fails": 13,
+    "false_fail": 4,
+    "passes": 7,
+    "criterion_hit": 13
+   },
+   {
+    "pass": 2,
+    "false_pass": 0,
+    "fails": 13,
+    "false_fail": 5,
+    "passes": 7,
+    "criterion_hit": 13
+   },
+   {
+    "pass": 3,
+    "false_pass": 0,
+    "fails": 13,
+    "false_fail": 5,
+    "passes": 7,
+    "criterion_hit": 13
+   }
+  ],
+  "flipped": [
+   "CAL-05"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.0,
+  "false_fail_rate": 0.6666666666666666,
+  "criterion_hit_rate": 1.0,
+  "kappa": {
+   "faithful": 0.18421052631578952,
+   "consistent": 1.0,
+   "complete": 1.0,
+   "cited": 1.0,
+   "precautionary": 1.0,
+   "clean": 0.0
+  },
+  "stability": 0.95
+ },
+ "judge alone, own verdicts": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 13,
+    "fails": 13,
+    "false_fail": 0,
+    "passes": 7,
+    "criterion_hit": 0
+   },
+   {
+    "pass": 2,
+    "false_pass": 13,
+    "fails": 13,
+    "false_fail": 0,
+    "passes": 7,
+    "criterion_hit": 0
+   },
+   {
+    "pass": 3,
+    "false_pass": 11,
+    "fails": 13,
+    "false_fail": 0,
+    "passes": 7,
+    "criterion_hit": 2
+   }
+  ],
+  "flipped": [
+   "CAL-04",
+   "CAL-08"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.9487179487179487,
+  "false_fail_rate": 0.0,
+  "criterion_hit_rate": 0.05128205128205128,
+  "kappa": {
+   "faithful": 0.18750000000000014,
+   "consistent": 0.0,
+   "complete": 0.0,
+   "cited": 0.0,
+   "precautionary": 0.0,
+   "clean": 0.0
+  },
+  "stability": 0.9
+ },
+ "judge alone, with quote check": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 2,
+    "fails": 13,
+    "false_fail": 4,
+    "passes": 7,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 2,
+    "false_pass": 2,
+    "fails": 13,
+    "false_fail": 5,
+    "passes": 7,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 3,
+    "false_pass": 3,
+    "fails": 13,
+    "false_fail": 5,
+    "passes": 7,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [
+   "CAL-05",
+   "CAL-12"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.1794871794871795,
+  "false_fail_rate": 0.6666666666666666,
+  "criterion_hit_rate": 0.38461538461538464,
+  "kappa": {
+   "faithful": 0.18421052631578952,
+   "consistent": 0.0,
+   "complete": 0.0,
+   "cited": 0.0,
+   "precautionary": 0.0,
+   "clean": 0.0
+  },
+  "stability": 0.9
+ }
+}
