@@ -1,18 +1,19 @@
-"""The single agent's tools, without a model: rules lookup, record_facts running the rules, the missing-fact check."""
+"""The single agent's tools, without a model: rules lookup, one-fact patches checked against the report, and the
+missing-fact check."""
 
 import datetime as dt
-import json
 
 from cer_agent import agent
 
-REPORT = """Found crude in the ditch past the station fence at 01:40. Maybe 1.8 m3. Not sure if it reached the creek."""
-RAW = {"discovered_time": "01:40", "death": "no", "injury": "none", "env_effect": "unknown", "release": "yes",
-       "substance": "crude oil - sweet", "volume": 1.8, "volume_unit": "m3", "volume_basis": "estimated",
-       "volume_state": "liquid", "rate": None, "lands": ["off_right_of_way"], "h2s_detected": "no"}  # fmt: skip
+REPORT = """Gas blowing at the Aspen Ridge station at 01:40. About 0.085 kg/s from a valve packing. Stayed inside
+the fence. Not sure if it was sour."""
+RAW = {"discovered_time": "01:40", "death": "no", "injury": "none", "env_effect": "none", "release": "yes",
+       "substance": "not_stated", "volume": None, "rate": 0.085, "rate_unit": "kg/s", "rate_basis": "estimated",
+       "through_pipe_body_or_weld": "no", "lands": [], "h2s_detected": "unknown"}  # fmt: skip
 
 
 def tools(case):
-    return {getattr(t, "tool_name", None) or t.__name__: t for t in case.tools()}
+    return {t.tool_name: t for t in case.tools()}
 
 
 def test_rule_passage_finds_headings_and_table_rows():
@@ -21,20 +22,28 @@ def test_rule_passage_finds_headings_and_table_rows():
     assert agent.rule_passage("T3-NOPE") == "No rule T3-NOPE in the rules spec."
 
 
-def test_record_facts_runs_the_rules_and_shows_missing_facts_and_open_points():
-    case = agent.Case(REPORT, dt.date(2026, 11, 6))
-    rec = tools(case)["record_facts"]
-    out = rec._tool_func({"toolUseId": "t1", "input": RAW})
-    summary = json.loads(out["content"][0]["text"])
-    assert summary["status"] == "precautionary" and summary["deadline"] == "T3"
-    assert "env_effect" in summary["missing_facts"] and summary["open_points"]
-    assert case.packet["route"] == "judgment" and case.records == 1
+def test_patch_changes_one_fact_with_a_quote_and_keeps_the_rest():
+    case = agent.Case(REPORT, dt.date(2026, 11, 6), RAW)
+    assert "lands" in case.packet["missing"]
+    out = tools(case)["patch_facts"](field="lands", value='["company_property"]', quote="Stayed inside the fence")
+    assert out.startswith("Changed lands") and case.raw["lands"] == ["company_property"]
+    assert case.raw["rate"] == 0.085 and case.raw["rate_basis"] == "estimated"  # untouched
+    assert "lands" not in case.packet["missing"]
 
 
-def test_confirm_missing_checks_the_quote_against_the_report():
-    case = agent.Case(REPORT, None)
+def test_patch_without_the_reports_words_or_with_a_bad_value_changes_nothing():
+    case = agent.Case(REPORT, None, RAW)
+    patch = tools(case)["patch_facts"]
+    assert patch(field="rate_basis", value="measured", quote="metered at 0.085 kg/s").startswith("Not changed")
+    assert "must be one of" in patch(field="rate_basis", value="exact", quote="About 0.085 kg/s")
+    assert "No field" in patch(field="colour", value="red", quote="Gas blowing")
+    assert "takes one number" in patch(field="rate", value="0.05 to 0.1", quote="About 0.085 kg/s")
+    assert case.raw == RAW
+
+
+def test_confirm_missing_only_takes_facts_the_rules_list_as_missing():
+    case = agent.Case(REPORT, None, RAW)
     confirm = tools(case)["confirm_missing"]
-    assert "Call record_facts again" in confirm(fact="lands", found=True, quote="past the station fence")
-    assert "isn't in the report" in confirm(fact="lands", found=True, quote="inside the fence")
-    assert "stays a question" in confirm(fact="env_effect", found=False)
-    assert [c["quote_in_report"] for c in case.confirmations] == [True, False, False]
+    assert "isn't missing" in confirm(fact="death", found=False)
+    assert "stays a question" in confirm(fact="lands", found=False)
+    assert "patch_facts on lands" in confirm(fact="lands", found=True)
