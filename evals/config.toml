@@ -42,3 +42,14 @@ latency_p95_s = { max = 300, proposed = false }
 
 [assumptions]
 manual_triage_minutes = 30   # proposed, not measured (engagement brief)
+
+# The $0 eval gate (python -m cer_agent.gate, in CI): frozen runs re-scored with the current code. targets = the run
+# must meet [targets]; every run must score no worse than evals/gate-baseline.json.
+[gate]
+runs = [
+  { name = "strict-dev", run = "20261104-165709-workflow-nova-strict-dev", targets = true },
+  { name = "strict-test (replay)", run = "20261104-163507-workflow-nova-test", mode = "strict-replay", targets = true },
+  { name = "workflow-test", run = "20261104-163507-workflow-nova-test" },
+  { name = "agent-v3-dev", run = "20261107-085533-agent-nova-dev" },
+  { name = "agent-v3-test", run = "20261107-092254-agent-nova-test" },
+]

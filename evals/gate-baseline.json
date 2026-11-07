@@ -1,0 +1,50 @@
+{
+  "oracle": {
+    "n": 166,
+    "status": 166,
+    "route": 166,
+    "missed": 0,
+    "late": 0,
+    "over_notify": 0
+  },
+  "strict-dev": {
+    "n": 90,
+    "status": 87,
+    "route": 84,
+    "missed": 0,
+    "late": 0,
+    "over_notify": 0
+  },
+  "strict-test (replay)": {
+    "n": 240,
+    "status": 217,
+    "route": 214,
+    "missed": 0,
+    "late": 0,
+    "over_notify": 6
+  },
+  "workflow-test": {
+    "n": 240,
+    "status": 220,
+    "route": 224,
+    "missed": 4,
+    "late": 1,
+    "over_notify": 2
+  },
+  "agent-v3-dev": {
+    "n": 90,
+    "status": 87,
+    "route": 80,
+    "missed": 0,
+    "late": 0,
+    "over_notify": 0
+  },
+  "agent-v3-test": {
+    "n": 240,
+    "status": 224,
+    "route": 228,
+    "missed": 0,
+    "late": 1,
+    "over_notify": 1
+  }
+}

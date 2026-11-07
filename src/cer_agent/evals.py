@@ -649,34 +649,35 @@ def _extractor_version() -> str:
     return VERSION
 
 
-def rescore(cfg: dict, run_id: str) -> int:
-    """Re-map each saved tool input and re-score it, e.g. after a scorer fix. Costs nothing."""
+def rescore_row(r: dict, cases: dict) -> dict:
+    """One saved row re-mapped and re-scored with the current code, from its saved model output. No model calls."""
     from cer_agent.extract import to_facts
     from cer_agent.workflow import packet
 
+    case, raw = cases[case_id(r["id"])], r["packet"].get("extracted")
+    if raw is None:  # oracle arm
+        return {**run_case(case, "oracle"), "rep": _rep(r)}
+    received = dt.date.fromisoformat(case["discovered_at"][:10])
+    got = to_facts(raw, received)
+    if "layouts" in r["packet"]:  # strict arm: rebuild every layout's decision and combine again
+        from cer_agent.workflow import recombine
+
+        pk = recombine({k: v["extracted"] for k, v in r["packet"]["layouts"].items()}, received)
+    else:
+        pk = packet(got, {"raw": raw})
+        if agent := r["packet"].get("agent"):  # agent arm: keep its trace, and a held suggestion still routes
+            pk["agent"] = agent  # to a person (D38)
+            if agent.get("held"):
+                pk["route"], pk["route_triggers"] = "judgment", [*pk["route_triggers"], "AGENT-HOLD"]
+    return {**r, "text_supported": text_supported(case), "packet": pk, "score": score_case(case, pk, got)}
+
+
+def rescore(cfg: dict, run_id: str) -> int:
+    """Re-map each saved tool input and re-score it, e.g. after a scorer fix. Costs nothing."""
     out = CODE / cfg["run"]["runs_dir"] / run_id
     cases = {c["id"]: c for c in load_cases(cfg, ["dev", "test", "heldout"])}
-    old = load_rows(out / "results.jsonl")
     run_cfg = json.loads((out / "summary.json").read_text(encoding="utf-8"))["run"]
-    rows = []
-    for r in old:
-        case, raw = cases[case_id(r["id"])], r["packet"].get("extracted")
-        if raw is None:  # oracle arm
-            rows.append({**run_case(case, "oracle"), "rep": _rep(r)})
-            continue
-        received = dt.date.fromisoformat(case["discovered_at"][:10])
-        got = to_facts(raw, received)
-        if "layouts" in r["packet"]:  # strict arm: rebuild every layout's decision and combine again
-            from cer_agent.workflow import recombine
-
-            pk = recombine({k: v["extracted"] for k, v in r["packet"]["layouts"].items()}, received)
-        else:
-            pk = packet(got, {"raw": raw})
-            if agent := r["packet"].get("agent"):  # agent arm: keep its trace, and a held suggestion still routes
-                pk["agent"] = agent  # to a person (D38)
-                if agent.get("held"):
-                    pk["route"], pk["route_triggers"] = "judgment", [*pk["route_triggers"], "AGENT-HOLD"]
-        rows.append({**r, "text_supported": text_supported(case), "packet": pk, "score": score_case(case, pk, got)})
+    rows = [rescore_row(r, cases) for r in load_rows(out / "results.jsonl")]
     (out / "results.jsonl").write_text(
         "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in rows), encoding="utf-8"
     )
