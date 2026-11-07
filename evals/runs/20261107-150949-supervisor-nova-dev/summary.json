@@ -1,0 +1,593 @@
+{
+  "run": {
+    "cases": "evals/cases/cases.jsonl",
+    "splits": [
+      "dev"
+    ],
+    "arm": "supervisor-nova",
+    "runs_dir": "evals/runs",
+    "repeats": 1,
+    "perturb": [],
+    "extractor": "2c42fea8"
+  },
+  "summary": {
+    "cases": 2,
+    "status": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "missed_reports": {
+      "k": 0,
+      "n": 2,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.6576280471103807
+      ]
+    },
+    "late_deadlines": {
+      "k": 0,
+      "n": 2,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.6576280471103807
+      ]
+    },
+    "deadline_correct": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "over_notify": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "route": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "incident_types": {
+      "k": 0,
+      "n": 2,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.6576280471103807
+      ]
+    },
+    "missing_recall": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "extraction_accuracy": {
+      "k": 29,
+      "n": 32,
+      "rate": 0.90625,
+      "ci95": [
+        0.7578150066422116,
+        0.9675990373736805
+      ]
+    },
+    "per_field": {
+      "death": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "discovered_at": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "env_effect": {
+        "k": 1,
+        "n": 2,
+        "rate": 0.5,
+        "ci95": [
+          0.09452865480086614,
+          0.9054713451991339
+        ]
+      },
+      "fire_linked_to_pipeline": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "fire_or_explosion": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "lands": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "limit_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "other_beyond_design": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "planned_venting": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "point:env_effect": {
+        "k": 0,
+        "n": 1,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7934567085261071
+        ]
+      },
+      "point:serious_injury": {
+        "k": 0,
+        "n": 1,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7934567085261071
+        ]
+      },
+      "point:substance": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "pressure_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "rate_kg_s": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "release": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "rupture": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "serious_injury": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "through_pipe_body_or_weld": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "toxic_plume": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "volume_estimated": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "volume_m3": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      }
+    },
+    "injection_flagged": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "cost_usd": 0.0040875,
+    "cost_per_case_usd": 0.00204375,
+    "latency_p50_s": 18.243638926999665,
+    "latency_p95_s": 19.943102203998933,
+    "cost_with_stability_usd": 0.0040875
+  },
+  "spread": null,
+  "by": {
+    "kind": {
+      "clear-cut": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "judgment": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      }
+    },
+    "writer": {
+      "llama": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "mistral": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      }
+    },
+    "split": {
+      "dev": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "label_source": {
+      "engine": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "reviewed": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      }
+    },
+    "text_supported": {
+      "True": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "render": {
+      "text": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "target": "missed_reports",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "late_deadlines",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "deadline_correct",
+      "value": 1.0,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "over_notify",
+      "value": NaN,
+      "limit": {
+        "max": 0.3,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 1
+    },
+    {
+      "target": "missing_recall",
+      "value": NaN,
+      "limit": {
+        "min": 0.9,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 1
+    },
+    {
+      "target": "extraction_accuracy",
+      "value": 0.90625,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 1
+    },
+    {
+      "target": "latency_p95_s",
+      "value": 19.943102203998933,
+      "limit": {
+        "max": 300,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    }
+  ],
+  "stability": null
+}

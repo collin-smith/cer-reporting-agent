@@ -528,8 +528,11 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     if arm == "oracle":
         got = facts_from_json(case["facts"])
         pk, tin, tout, lat = packet(got), 0, 0, 0.0
-    elif arm.startswith("agent-"):
-        from cer_agent.agent import run as run_agent
+    elif arm.startswith(("agent-", "supervisor-")):
+        if arm.startswith("supervisor-"):
+            from cer_agent.supervisor import run as run_agent
+        else:
+            from cer_agent.agent import run as run_agent
 
         received = dt.date.fromisoformat(case["discovered_at"][:10])
         x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
@@ -567,6 +570,7 @@ ARMS = {
     "workflow-nova-ocr-para": "nova-lite",
     "workflow-nova-strict": "nova-lite",
     "agent-nova": "nova-lite",  # the single agent (D12): Strands, facts only; the rules engine decides
+    "supervisor-nova": "nova-lite",  # supervisor + specialists (D12, article 3): same front end, tools and gate
 }
 
 
