@@ -23,6 +23,7 @@ import textwrap
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+from cer_agent import tracing
 from cer_agent.extract import extract, normalise, to_facts
 from cer_agent.rules import decide
 
@@ -37,7 +38,7 @@ def make_client(region: str = REGION):
                         config=Config(retries={"max_attempts": 10, "mode": "adaptive"}))  # fmt: skip
 
 
-def packet(facts, extraction: dict | None = None) -> dict:
+def _packet(facts, extraction: dict | None = None) -> dict:
     """The decision packet a reviewer sees: decision, cited rules, missing facts, and the facts it was based on."""
     d = decide(facts)
     out = dataclasses.asdict(d)
@@ -57,6 +58,15 @@ LAYOUTS = {
                                   else ln for ln in t.split("\n")),  # plain-text email client: hard-wrapped at 72
 }  # fmt: skip
 DEADLINE_ORDER = {"T3": 0, "T24": 1}
+
+
+def packet(facts, extraction: dict | None = None) -> dict:
+    """`_packet` inside a trace span (stage "decide": the rules engine)."""
+    with tracing.span("decide") as s:
+        out = _packet(facts, extraction)
+        for k in ("status", "deadline", "route"):
+            s.set_attribute(f"cer.{k}", out[k] or "none")
+        return out
 
 
 def layouts(report: str) -> dict[str, str]:

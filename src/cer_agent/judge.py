@@ -38,7 +38,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from cer_agent import drafter
+from cer_agent import drafter, tracing
 from cer_agent.extract import RETRY_TEMPERATURES
 
 CODE = pathlib.Path(__file__).resolve().parents[2]
@@ -152,7 +152,7 @@ def _section(lines: list[str], title: str) -> list[str]:
     return out
 
 
-def code_checks(packet: dict, draft_text: str, report: str) -> dict[str, dict]:
+def _code_checks(packet: dict, draft_text: str, report: str) -> dict[str, dict]:
     """$0 exact checks. The packet's own rendering (with empty narrative) gives every line the decision fixes; the
     draft must carry each of them unchanged. Tripwires on the narrative add to faithful, consistent and clean."""
     want = drafter.render(packet, {}).splitlines()
@@ -190,6 +190,12 @@ def code_checks(packet: dict, draft_text: str, report: str) -> dict[str, dict]:
     clean += [f"{p}: rule claim ({m.group(0)!r})" for p, v in nar.items() if (m := drafter.RULE_ID.search(v))]
     return {"faithful": result(faithful), "consistent": result(consistent), "complete": result(complete),
             "cited": result(cited), "precautionary": result(precautionary), "clean": result(clean)}  # fmt: skip
+
+
+def code_checks(packet: dict, draft_text: str, report: str) -> dict[str, dict]:
+    """`_code_checks` inside a trace span (stage "judge (code)")."""
+    with tracing.span("judge (code)"):
+        return _code_checks(packet, draft_text, report)
 
 
 def prompt(report: str, draft_text: str) -> str:
@@ -233,7 +239,7 @@ def _not_stated(st: dict) -> bool:
     return drafter.NOT_STATED.casefold().strip(".") in str(st.get("statement", "")).casefold()
 
 
-def judge(client, model_id: str, report: str, draft_text: str) -> dict:
+def _judge(client, model_id: str, report: str, draft_text: str) -> dict:
     """Grade one draft's narrative fields (faithful, clean). Returns the judge's verdicts, its statements with the
     quote check, tokens and latency. The judge's own verdict and the quote-checked verdict are both kept."""
     t0, temps = time.perf_counter(), (0, *RETRY_TEMPERATURES)
@@ -280,6 +286,14 @@ def judge(client, model_id: str, report: str, draft_text: str) -> dict:
         "latency_s": time.perf_counter() - t0,
         "retries": attempt,
     }
+
+
+def judge(client, model_id: str, report: str, draft_text: str) -> dict:
+    """`_judge` inside a trace span (stage "judge (model)")."""
+    with tracing.span("judge (model)") as s:
+        j = _judge(client, model_id, report, draft_text)
+        tracing.usage(s, j["input_tokens"], j["output_tokens"], j["retries"])
+        return j
 
 
 def sent_fields(draft_text: str) -> set[str]:

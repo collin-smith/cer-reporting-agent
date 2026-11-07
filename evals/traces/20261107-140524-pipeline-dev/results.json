@@ -1,0 +1,295 @@
+[
+  {
+    "id": "CL-007",
+    "packet": {
+      "status": "reportable",
+      "deadline": "T3",
+      "route": "clear-cut",
+      "route_triggers": []
+    },
+    "held": [],
+    "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-09-17 12:30**.\nThe deadline was taken at the stricter reading because a deciding fact is missing or disputed (PREC).\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended or uncontained release of LVP hydrocarbons over 1.5 m³ (INC-d)\n**PIR-2 Company contact:** Operator: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-09-17 09:30\n**PIR-5 How discovered:** Routine walkover on Line 4 near Edmonton this morning.\n**PIR-6 Specific details:** Oil sheen in low spot around the 12 o'clock position of a girth weld on the 24\" mainline. Meter at block valve shows 8.0 m³ of synthetic crude out. Cut-out shows pitting and cracking inside the elbow upstream of the weld-looks like internal corrosion.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** During a routine walkover on Line 4 near Edmonton, an oil sheen was found in a low spot around the 12 o'clock position of a girth weld on the 24\" mainline. The crew isolated the section and reported the incident. The meter at the block valve indicated 8.0 m³ of synthetic crude had leaked out. A cut-out revealed pitting and cracking inside the elbow upstream of the weld, suggesting internal corrosion. Photos were sent to Engineering, and a replacement spool is being installed.\n**PIR-9 Actions:** Crew isolated section by 09:30. Vacuum trucks on site by 11:00. Replacement spool already fabricated, should be in the ground by tomorrow.\n**PIR-10 Facility:** Line 4\n**PIR-11 Location:** near Edmonton\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-d: Unintended or uncontained release of LVP hydrocarbons over 1.5 m³\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n- T3-LVP: 3-hour notice: LVP release over 1.5 m³ off company property or on or off the right of way\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-7, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": {
+      "faithful": {
+        "verdict": "fail",
+        "reason": "</report> and <narrative_fields> match for all statements except for PIR-6 which adds 'Cut-out shows pitting and cracking inside the elbow upstream of the weld-looks like internal corrosion.' which is not in the report.",
+        "evidence": ""
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "",
+        "evidence": "none found"
+      }
+    }
+  },
+  {
+    "id": "CL-046",
+    "packet": {
+      "status": "reportable",
+      "deadline": "T24",
+      "route": "clear-cut",
+      "route_triggers": []
+    },
+    "held": [],
+    "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-08-01 08:12**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Operator: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-07-31 08:12\n**PIR-5 How discovered:** SCADA flagged something at 0812 this morning\n**PIR-6 Specific details:** Pipeline was running outside design limits-no leak, nothing released, just operating out of spec\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** The field crew near Charlemagne, QC received a call from the control room after SCADA flagged an issue at 0812 this morning. The pipeline was running outside design limits, but there was no leak or release. The crew is currently holding pressure and checking the equipment. The cause of the issue is not yet known.\n**PIR-9 Actions:** They're holding pressure and checking gear now\n**PIR-10 Facility:** Not stated in the field report.\n**PIR-11 Location:** near Charlemagne, QC\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-7, PIR-10, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": ".",
+        "evidence": ""
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "",
+        "evidence": "none found"
+      }
+    }
+  },
+  {
+    "id": "CL-071",
+    "packet": {
+      "status": "reportable",
+      "deadline": "T3",
+      "route": "clear-cut",
+      "route_triggers": []
+    },
+    "held": [],
+    "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-08-08 16:30**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Operator: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-08-08 13:30\n**PIR-5 How discovered:** Not stated in the field report.\n**PIR-6 Specific details:** Maintenance on a ball valve with a seat issue.\n**PIR-7 Immediate concerns:** Fumes and smoke from the fire.\n**PIR-8 Narrative:** On August 8 at 13:30, a fire occurred at the Rocky Mountain House facility in Alberta, on equipment at the work site. The fire did not involve a product leak from the pipeline. People in the area had to evacuate or shelter in place due to the fumes and smoke.\n**PIR-9 Actions:** Evacuation or shelter-in-place for people in the area.\n**PIR-10 Facility:** Rocky Mountain House facility\n**PIR-11 Location:** Near Rocky Mountain House, Alberta\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- OUT-MINOR-ENV: Not an incident: minor adverse effect on the environment\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-5, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": ".",
+        "evidence": ""
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "",
+        "evidence": "none found"
+      }
+    }
+  },
+  {
+    "id": "NO-076",
+    "packet": {
+      "status": "not reportable",
+      "deadline": null,
+      "route": "clear-cut",
+      "route_triggers": []
+    },
+    "held": [],
+    "draft": "# File note: not reportable to the CER\n\n**Decision:** not an OPR incident; no notice.\n\n**Reasons:**\n- OUT-LVP15: Not an incident: LVP release of 1.5 m³ or less with a minor effect\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": null
+  },
+  {
+    "id": "JU-127",
+    "packet": {
+      "status": "precautionary",
+      "deadline": "T24",
+      "route": "judgment",
+      "route_triggers": [
+        "U2-NEAR"
+      ]
+    },
+    "held": [],
+    "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-03-26 07:25**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** an estimated volume or rate is within 25% of a threshold. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Unintended or uncontrolled release of gas or HVP hydrocarbons (INC-e)\n**PIR-2 Company contact:** Operator: approver to add name and phone.\n**PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n**PIR-4 Discovered:** 2026-03-25 07:25\n**PIR-5 How discovered:** A call from the station operator at Grande Prairie, Alberta.\n**PIR-6 Specific details:** Metered volume was 2.0 m³. Release rate was about 0.085 kg/s.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** A release of sweet natural gas was reported by the station operator at Grande Prairie, Alberta. The release was contained within the station fence.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Grande Prairie, Alberta station\n**PIR-11 Location:** Grande Prairie, Alberta\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-e: Unintended or uncontrolled release of gas or HVP hydrocarbons\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-7, PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": ".",
+        "evidence": ""
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "",
+        "evidence": "none found"
+      }
+    }
+  },
+  {
+    "id": "JU-143",
+    "packet": {
+      "status": "reportable",
+      "deadline": "T3",
+      "route": "judgment",
+      "route_triggers": [
+        "U3-CONFLICT"
+      ]
+    },
+    "held": [],
+    "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-09-23 11:49**.\nThe deadline was taken at the stricter reading because a deciding fact is missing or disputed (PREC).\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** the report contradicts itself on a deciding fact. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Unintended or uncontrolled release of gas or HVP hydrocarbons (INC-e)\n**PIR-2 Company contact:** Operator: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-09-23 08:49\n**PIR-5 How discovered:** Found it 08:49 this morning.\n**PIR-6 Specific details:** Meter says 300 m³ out. Looks like it's through the pipe body or a weld-don't know which yet.\n**PIR-7 Immediate concerns:** H2S monitor on my belt went off at the leak.\n**PIR-8 Narrative:** A leak was found at Sherwood Park station at 08:49 this morning. The meter indicates a loss of 300 m³. The leak appears to be through the pipe body or a weld, but the exact source is not yet determined. The entire incident is contained within the station's fence. The pipeline is carrying sweet gas, and the H2S monitor on the patrol contractor's belt went off at the leak. The leak has not been fixed yet, and the crew is currently working on it.\n**PIR-9 Actions:** Crew's on it but no resolution.\n**PIR-10 Facility:** Sherwood Park station\n**PIR-11 Location:** Sherwood Park station\n**PIR-12 Affected lands:** Whole thing stayed inside the fence.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-e: Unintended or uncontrolled release of gas or HVP hydrocarbons\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n- T3-SOUR: 3-hour notice: any release of sour gas or H2S\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+    "flags": [],
+    "code_checks": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "consistent": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "complete": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "cited": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "precautionary": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "matches the decision"
+      }
+    },
+    "judge": {
+      "faithful": {
+        "verdict": "pass",
+        "reason": "All statements match the report.",
+        "evidence": ""
+      },
+      "clean": {
+        "verdict": "pass",
+        "reason": "",
+        "evidence": "none found"
+      }
+    }
+  }
+]

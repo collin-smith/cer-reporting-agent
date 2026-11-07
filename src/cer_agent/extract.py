@@ -15,6 +15,7 @@ import json
 import re
 import time
 
+from cer_agent import tracing
 from cer_agent.rules import COMPANY_PROPERTY, GAS, OFF_RIGHT_OF_WAY, RIGHT_OF_WAY, SUBSTANCE_CLASS, Facts
 
 YES_NO_UNKNOWN = {"type": "string", "enum": ["yes", "no", "unknown"]}
@@ -342,7 +343,7 @@ RETRY_TEMPERATURES = (0.3, 0.7)
 MODEL_ERROR_RETRIES = len(RETRY_TEMPERATURES)
 
 
-def extract(client, model_id: str, report: str, received: dt.date | None = None) -> dict:
+def _extract(client, model_id: str, report: str, received: dt.date | None = None) -> dict:
     """One Converse call with the tool forced. Returns facts, the raw tool input, token usage and latency.
 
     `received` is the date the report arrived (email or call metadata), so "today at 14:00" can be dated. The
@@ -373,3 +374,11 @@ def extract(client, model_id: str, report: str, received: dt.date | None = None)
         "latency_s": latency,
         "retries": attempt,
     }
+
+
+def extract(client, model_id: str, report: str, received: dt.date | None = None) -> dict:
+    """`_extract` inside a trace span (stage "extract")."""
+    with tracing.span("extract") as s:
+        x = _extract(client, model_id, report, received)
+        tracing.usage(s, x["input_tokens"], x["output_tokens"], x.get("retries", 0))
+        return x

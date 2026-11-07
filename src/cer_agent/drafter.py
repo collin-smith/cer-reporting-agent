@@ -30,6 +30,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+from cer_agent import tracing
 from cer_agent.extract import RETRY_TEMPERATURES, normalise
 
 PROJECT = pathlib.Path(__file__).resolve().parents[3]
@@ -277,7 +278,7 @@ def check(fields: dict, report: str) -> list[str]:
 # --- The model call ---
 
 
-def draft(client, model_id: str, report: str, packet: dict, operator: str | None = None) -> dict:
+def _draft(client, model_id: str, report: str, packet: dict, operator: str | None = None) -> dict:
     """Draft the notice for one packet. Returns the rendered text, the model's fields, flags, tokens and latency."""
     if packet["status"] == "not reportable":
         return {"text": render(packet, None, operator), "fields": None, "flags": [], "input_tokens": 0,
@@ -303,6 +304,15 @@ def draft(client, model_id: str, report: str, packet: dict, operator: str | None
     return {"text": render(packet, fields, operator), "fields": fields, "flags": check(fields, report),
             "input_tokens": r["usage"]["inputTokens"], "output_tokens": r["usage"]["outputTokens"],
             "latency_s": latency, "retries": attempt}  # fmt: skip
+
+
+def draft(client, model_id: str, report: str, packet: dict, operator: str | None = None) -> dict:
+    """`_draft` inside a trace span (stage "draft")."""
+    with tracing.span("draft") as s:
+        d = _draft(client, model_id, report, packet, operator)
+        tracing.usage(s, d["input_tokens"], d["output_tokens"], d["retries"])
+        s.set_attribute("cer.flags", len(d["flags"]))
+        return d
 
 
 def main(argv=None) -> int:

@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import functools
 import hashlib
 import html
 import json
@@ -285,6 +286,15 @@ class Case:
         return [patch_facts, confirm_missing, rule_text, finish]
 
 
+@functools.cache
+def _session(region: str):
+    """One boto3 session per region, shared by every case's model. A new session per case re-reads botocore's
+    service definitions: about 9 s a case with the venv on the Windows drive, found by tracing (D40)."""
+    import boto3
+
+    return boto3.Session(region_name=region)
+
+
 def run(model_id: str, report: str, received: dt.date | None = None, region: str = "ca-central-1",
         client=None) -> dict:  # fmt: skip
     """The workflow's reading first (one extraction), then the agent's review. Returns the rules engine's packet
@@ -302,7 +312,8 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
             f"<report>\n{case.report}\n</report>\n\n<recorded_facts>\n{json.dumps(case.facts_shown())}\n"
             f"</recorded_facts>\n\n<rules_result>\n{case.summary()}\n</rules_result>"
         )
-        model = BedrockModel(model_id=model_id, region_name=region, temperature=temp, max_tokens=1000, streaming=False)
+        model = BedrockModel(model_id=model_id, boto_session=_session(region), temperature=temp, max_tokens=1000,
+                             streaming=False)  # fmt: skip
         agent = Agent(model=model, tools=case.tools(), system_prompt=SYSTEM, callback_handler=None)
         try:
             result = agent(prompt, limits={"turns": MAX_TURNS})
