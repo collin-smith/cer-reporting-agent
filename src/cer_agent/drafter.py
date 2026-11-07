@@ -138,6 +138,7 @@ TRIGGERS = {
     "U2-NEAR": "an estimated volume or rate is within 25% of a threshold",
     "U3-CONFLICT": "the report contradicts itself on a deciding fact",
     "LAYOUT": "the model's reading changed with the report's layout",
+    "AGENT-HOLD": "the reviewing agent suggested a correction that would loosen the decision; it was held for you",
 }
 DEADLINES = {"T3": "Verbal and written notice within 3 hours of discovery",
              "T24": "Written notice within 24 hours of discovery"}  # fmt: skip
@@ -174,6 +175,13 @@ def reasons(packet: dict) -> list[str]:
     return [f"{c}: {RULE_TITLES.get(c, '(see rules spec)')}" for c in packet["citations"]]
 
 
+def held(packet: dict) -> list[str]:
+    """The agent's held suggestions (D38): corrections that would have loosened the decision, for a person to weigh."""
+    hs = (packet.get("agent") or {}).get("held") or []
+    return ["**Held suggestions (not applied):**", *[f"- {h['field']}: {h['from']!r} -> {h['to']!r}, quoting "
+            f"\"{h['quote']}\" (would change {'; '.join(h['would'])})" for h in hs]] if hs else []  # fmt: skip
+
+
 def render(packet: dict, fields: dict | None, operator: str | None = None) -> str:
     """The draft as the approver sees it. `fields` is the model's narrative (None for a not-reportable file note)."""
     st, dl = packet["status"], packet["deadline"]
@@ -187,6 +195,7 @@ def render(packet: dict, fields: dict | None, operator: str | None = None) -> st
         if packet["route"] == "judgment":
             out += ["", "**Reviewer decision needed:** " + "; ".join(TRIGGERS.get(t, t) for t in
                                                                       packet["route_triggers"]) + "."]  # fmt: skip
+            out += held(packet)
         return "\n".join(out) + "\n"
 
     out += ["# Draft Preliminary Incident Report (for approval; not filed)", ""]
@@ -199,6 +208,7 @@ def render(packet: dict, fields: dict | None, operator: str | None = None) -> st
     if packet["route"] == "judgment":
         out += ["**Reviewer decision needed:** " + "; ".join(TRIGGERS.get(t, t) for t in packet["route_triggers"])
                 + ". Confirm the status and deadline before filing.", ""]  # fmt: skip
+        out += [*held(packet), ""] if held(packet) else []
 
     f = {k: _text(v) for k, v in (fields or {}).items()}
     rows = [

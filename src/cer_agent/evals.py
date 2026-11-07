@@ -35,6 +35,7 @@ Usage (from code/, src on PYTHONPATH):
 from __future__ import annotations
 
 import argparse
+import contextlib
 import dataclasses
 import datetime as dt
 import hashlib
@@ -255,6 +256,39 @@ SPREAD = ("status", "deadline_correct", "route", "missed_reports", "late_deadlin
 
 def _rep(r: dict) -> int:
     return r.get("rep", 1)  # runs from before repeats were added have one pass
+
+
+def load_rows(results: pathlib.Path) -> list[dict]:
+    """A run's saved results, keeping the first row for each case and pass. Two processes once wrote to the same
+    run (a run suspended by sleep came back while its resume was going, 2026-11-07); later rows are duplicates."""
+    if not results.exists():
+        return []
+    rows, seen = [], set()
+    for line in results.read_text(encoding="utf-8").splitlines():
+        r = json.loads(line)
+        if (key := (r["id"], _rep(r))) not in seen:
+            seen.add(key)
+            rows.append(r)
+    return rows
+
+
+@contextlib.contextmanager
+def run_lock(out: pathlib.Path):
+    """One writer per run. A run that seems dead may only be suspended (WSL stops when Windows sleeps) and come back
+    later; a second process resuming it would then call the model twice for the same cases. The lock refuses that.
+    After a real crash, delete the .lock file by hand."""
+    lock = out / ".lock"
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        raise SystemExit(f"{out.name} is locked by another process ({lock.read_text().strip()}). If that process is "
+                         f"really gone, delete {lock} and resume.") from None  # fmt: skip
+    os.write(fd, f"pid {os.getpid()} since {dt.datetime.now():%Y-%m-%d %H:%M:%S}".encode())
+    os.close(fd)
+    try:
+        yield
+    finally:
+        lock.unlink(missing_ok=True)
 
 
 def by_pass(rows: list[dict]) -> dict[int, list[dict]]:
@@ -591,9 +625,9 @@ def main(argv=None) -> int:
     out = CODE / run_cfg["runs_dir"] / run_id
     out.mkdir(parents=True, exist_ok=True)
     results = out / "results.jsonl"
-    rows = [json.loads(line) for line in results.read_text().splitlines()] if results.exists() else []
-    done = {(r["id"], _rep(r)) for r in rows}
-    with results.open("a", encoding="utf-8") as fh:
+    with run_lock(out), results.open("a", encoding="utf-8") as fh:
+        rows = load_rows(results)
+        done = {(r["id"], _rep(r)) for r in rows}
         for rep in range(1, repeats + 1):  # one full pass after another, so an interruption leaves whole passes
             for case in cases:
                 if (case["id"], rep) in done:
@@ -622,7 +656,7 @@ def rescore(cfg: dict, run_id: str) -> int:
 
     out = CODE / cfg["run"]["runs_dir"] / run_id
     cases = {c["id"]: c for c in load_cases(cfg, ["dev", "test", "heldout"])}
-    old = [json.loads(line) for line in (out / "results.jsonl").read_text(encoding="utf-8").splitlines()]
+    old = load_rows(out / "results.jsonl")
     run_cfg = json.loads((out / "summary.json").read_text(encoding="utf-8"))["run"]
     rows = []
     for r in old:
@@ -638,6 +672,10 @@ def rescore(cfg: dict, run_id: str) -> int:
             pk = recombine({k: v["extracted"] for k, v in r["packet"]["layouts"].items()}, received)
         else:
             pk = packet(got, {"raw": raw})
+            if agent := r["packet"].get("agent"):  # agent arm: keep its trace, and a held suggestion still routes
+                pk["agent"] = agent  # to a person (D38)
+                if agent.get("held"):
+                    pk["route"], pk["route_triggers"] = "judgment", [*pk["route_triggers"], "AGENT-HOLD"]
         rows.append({**r, "text_supported": text_supported(case), "packet": pk, "score": score_case(case, pk, got)})
     (out / "results.jsonl").write_text(
         "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in rows), encoding="utf-8"

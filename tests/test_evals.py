@@ -1,6 +1,7 @@
 """Tier-1 harness checks at $0: the labels agree with the rules, and the scorers catch the costly errors."""
 
 import copy
+import json
 
 from cer_agent.evals import (
     check_targets_by_pass,
@@ -179,3 +180,30 @@ def test_stability_counts_a_flip_against_the_same_pass_only():
     assert st["overall"]["right_to_wrong"] == 1 and st["overall"]["missed_reports"] == 1
     assert st["flipped_cases"] == [case["id"]] and case_id(f"{case['id']}~wrap72") == case["id"]
     assert stability([{**good, "rep": 1}]) is None
+
+
+def test_load_rows_keeps_the_first_row_per_case_and_pass(tmp_path):
+    from cer_agent.evals import load_rows
+
+    f = tmp_path / "results.jsonl"
+    rows = [
+        {"id": "A", "rep": 1, "n": 1},
+        {"id": "A", "rep": 2, "n": 2},
+        {"id": "A", "rep": 1, "n": 3},
+        {"id": "B", "n": 4},
+    ]
+    f.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    assert [r["n"] for r in load_rows(f)] == [1, 2, 4]
+    assert load_rows(tmp_path / "missing.jsonl") == []
+
+
+def test_a_second_writer_on_the_same_run_is_refused(tmp_path):
+    import pytest
+
+    from cer_agent.evals import run_lock
+
+    with run_lock(tmp_path), pytest.raises(SystemExit, match="locked by another process"), run_lock(tmp_path):
+        pass
+    assert not (tmp_path / ".lock").exists()
+    with run_lock(tmp_path):  # free again once the first writer ends
+        pass

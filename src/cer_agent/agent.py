@@ -13,6 +13,11 @@ The agent decides the facts; the rules engine decides what they mean. v2 (after 
 The packet is always the rules engine's, computed from the current facts. The agent can't set a status or a
 deadline, so it can't talk its way past "when in doubt, notify".
 
+v3 (D38): patches can only make the result stricter. A quote check proves the words are in the report, not that they
+support the change (v2's two misses quoted real words that didn't). So a patch goes in only if the rules engine's
+result is at least as strict afterwards (notify, deadline, due time, route); one that would loosen it is held as a
+suggestion for the approver, the facts stay as read, and the case goes to a person (route trigger AGENT-HOLD).
+
 Usage (from code/, src on PYTHONPATH):
     NOVA_LITE_ARN=... python3 -m cer_agent.agent path/to/report.txt [--received YYYY-MM-DD]
 """
@@ -20,9 +25,9 @@ Usage (from code/, src on PYTHONPATH):
 from __future__ import annotations
 
 import argparse
-import contextlib
 import datetime as dt
 import hashlib
+import html
 import json
 import os
 import pathlib
@@ -65,7 +70,7 @@ How to work:
    remains; missing facts alone are not a reason to escalate (they go to the field as questions). Then stop."""
 
 VERSION = hashlib.sha256(
-    json.dumps([SYSTEM, MISSING_FIELDS, MAX_TURNS, "agent-2b"], sort_keys=True).encode()
+    json.dumps([SYSTEM, MISSING_FIELDS, MAX_TURNS, "agent-3c"], sort_keys=True).encode()
 ).hexdigest()[:8]
 
 
@@ -95,29 +100,89 @@ def rule_passage(rule_id: str, limit: int = 1500) -> str:
     return "\n".join(rows + ([""] + notes if notes else [])).strip()[:limit]
 
 
-def _value(field: str, value):
-    """The patch value in the record_facts schema's type, or an error message."""
-    spec = FIELDS[field]
-    if isinstance(value, str):
-        with contextlib.suppress(ValueError):
-            value = json.loads(value)
-    if value in ("null", "None"):
-        value = None
-    if spec.get("type") == "array":
-        value = value if isinstance(value, list) else [value]
-        allowed = spec.get("items", {}).get("enum")
-        if allowed and any(v not in allowed for v in value):
-            return None, f"{field} takes a list of: {', '.join(allowed)}"
-        return value, None
-    if "enum" in spec and value not in spec["enum"]:
-        return None, f"{field} must be one of: {', '.join(map(str, spec['enum']))}"
+DEADLINE_RANK = {None: 0, "T24": 1, "T3": 2}
+
+
+def loosening(before: dict, after: dict) -> list[str]:
+    """How `after` is less strict than `before` (empty if it's at least as strict). "Reportable" and
+    "precautionary" both notify, so moving between them isn't loosening on its own; the deadline and route decide."""
+    out = []
+    if before["status"] != "not reportable" and after["status"] == "not reportable":
+        out.append(f"status {before['status']} -> not reportable")
+    if DEADLINE_RANK[after["deadline"]] < DEADLINE_RANK[before["deadline"]]:
+        out.append(f"deadline {before['deadline']} -> {after['deadline']}")
+    elif after["deadline"] == before["deadline"] and before["due_at"] and after["due_at"] \
+            and after["due_at"] > before["due_at"]:  # fmt: skip
+        out.append(f"due {before['due_at']} -> {after['due_at']}")
+    if before["route"] == "judgment" and after["route"] == "clear-cut":
+        out.append("route judgment -> clear-cut")
+    return out
+
+
+def example(spec: dict):
+    """A valid value for a schema node, shown in error messages so the agent learns the format (D38: 156 of 275
+    patch calls on test were rejected, mostly for format, e.g. 8-10 tries at volume_alternatives on one case)."""
     types = spec.get("type") if isinstance(spec.get("type"), list) else [spec.get("type")]
-    if "number" in types and not (isinstance(value, int | float) and not isinstance(value, bool)):
-        if value is None and "null" in types:
-            return None, None
-        alt = f" For two accounts or a range, use {field}_alternatives." if f"{field}_alternatives" in FIELDS else ""
-        return None, f"{field} takes one number.{alt}"
-    return value, None
+    if "array" not in types:
+        if "enum" in spec:
+            return next(v for v in spec["enum"] if v not in ("not_stated", "not_given", "unknown"))
+        return 1.5 if "number" in types else "text"
+    item = spec.get("items", {})
+    if item.get("type") == "array":  # one list per account: two accounts that differ
+        allowed = item.get("items", {}).get("enum", ["a", "b"])
+        return [[allowed[0]], [allowed[-1]]]
+    if item.get("type") == "number":
+        return [1.2, 2.0]
+    return [example(item)]
+
+
+def check(spec: dict, value, path: str) -> str | None:
+    """Why `value` doesn't fit the schema node (None if it does): type and allowed values at every level, so a list
+    of lists is checked all the way down (lands_alternatives once took junk such as ':[')."""
+    types = spec.get("type") if isinstance(spec.get("type"), list) else [spec.get("type")]
+    if value is None:
+        return None if "null" in types else f"{path} can't be empty"
+    if "array" in types:
+        if not isinstance(value, list):
+            return f"{path} must be a list"
+        return next((e for i, v in enumerate(value) if (e := check(spec.get("items", {}), v, f"{path}[{i}]"))), None)
+    if "enum" in spec:
+        return None if value in spec["enum"] else f"{path} must be one of: {', '.join(map(str, spec['enum']))}"
+    if "number" in types:
+        ok = isinstance(value, int | float) and not isinstance(value, bool)
+        return None if ok else f"{path} must be a number"
+    return None if isinstance(value, str) else f"{path} must be text"
+
+
+def _parse(value):
+    """The agent's value as data: JSON if it parses, with two forms it often sends made into JSON first:
+    HTML-escaped quotes (&quot;) and a tuple such as (1.2, 2.0)."""
+    if not isinstance(value, str):
+        return value
+    text = html.unescape(value).strip()
+    if text.startswith("(") and text.endswith(")"):
+        text = f"[{text[1:-1]}]"
+    if text in ("null", "None"):
+        return None
+    try:
+        return json.loads(text)
+    except ValueError:
+        return text
+
+
+def _value(field: str, value):
+    """The patch value in the record_facts schema's type, or an error message that shows a correct example."""
+    spec = FIELDS[field]
+    v = _parse(value)
+    if spec.get("type") == "array" and not isinstance(v, list):
+        v = [v]  # one item given for a list
+    err = check(spec, v, field)
+    if not err:
+        return v, None
+    hint = f" Example: {json.dumps(example(spec))}."
+    if spec.get("type") != "array" and f"{field}_alternatives" in FIELDS:
+        hint += f" For two accounts or a range, use {field}_alternatives."
+    return None, err + "." + hint
 
 
 class Case:
@@ -129,6 +194,7 @@ class Case:
         self.packet = self._decide()
         self.patches: list[dict] = []
         self.confirmations: list[dict] = []
+        self.held: list[dict] = []  # loosening patches, for the approver as suggestions
         self.finished: dict | None = None
 
     def _decide(self) -> dict:
@@ -151,27 +217,41 @@ class Case:
 
         @tool
         def patch_facts(field: str, value: str, quote: str) -> str:
-            """Correct one recorded fact. field: a record_facts field name; value: the new value (a list as JSON,
-            e.g. ["company_property"]); quote: the report's exact words that say it. Other facts are kept."""
+            """Correct one recorded fact. field: a record_facts field name; value: the new value as JSON (a list
+            as a JSON list, e.g. ["company_property"]; volume_alternatives [1.2, 2.0]; lands_alternatives one list
+            per account, e.g. [["company_property"], ["off_right_of_way"]]); quote: the report's exact words that
+            say it. Other facts are kept."""
             if field not in FIELDS:
                 return f"No field {field!r}. Fields: {', '.join(FIELDS)}"
             v, err = _value(field, value)
             if err:
                 return err
+            if v == self.raw.get(field):  # nothing to change: say so before any quote check, so the agent moves on
+                self.patches.append({"field": field, "from": v, "to": v, "quote": quote, "accepted": False,
+                                     "noop": True})  # fmt: skip
+                return f"{field} is already {json.dumps(v)}; nothing to change. Go on to the next fact."
             ok = bool(quote) and in_report(quote, self.report)
             self.patches.append({"field": field, "from": self.raw.get(field), "to": v, "quote": quote,
                                  "accepted": ok})  # fmt: skip
             if not ok:
                 return "Not changed: that quote isn't in the report. Quote the report's exact words."
             before = (self.packet["status"], self.packet["deadline"])
-            prior = self.raw.get(field)
+            prior, old_packet = self.raw.get(field), self.packet
             self.raw[field] = v
             try:
-                self.packet = self._decide()
+                new_packet = self._decide()
             except (TypeError, ValueError) as e:  # a value the rules can't use: undo, and say so
                 self.raw[field] = prior
                 self.patches[-1]["accepted"] = False
                 return f"Not changed: {field}={v!r} can't be used ({e})."
+            if looser := loosening(old_packet, new_packet):  # only a person can loosen the result
+                self.raw[field] = prior
+                self.patches[-1].update(accepted=False, held=looser)
+                self.held.append({"field": field, "from": prior, "to": v, "quote": quote, "would": looser})
+                return (f"Held for the approver, not changed: {field}={v!r} would loosen the result "
+                        f"({'; '.join(looser)}). It goes to a person as a suggestion with your quote. "
+                        f"Carry on with the other facts.")  # fmt: skip
+            self.packet = new_packet
             after = (self.packet["status"], self.packet["deadline"])
             note = "" if before == after else f" The result changed from {before} to {after}."
             return f"Changed {field} to {v!r}.{note} Now: {self.summary()}"
@@ -236,7 +316,11 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
     else:  # every review attempt failed: the workflow's own packet stands
         case, trace = Case(report, received, x["raw"]), {"error": f"{type(last).__name__}: {last}"[:200]}
     pk = dict(case.packet)
+    if case.held:  # a suggestion that would loosen the result: a person decides
+        pk["route"] = "judgment"
+        pk["route_triggers"] = [*pk["route_triggers"], "AGENT-HOLD"]
     pk["agent"] = {"version": VERSION, "patches": case.patches, "confirmations": case.confirmations,
+                   "held": case.held,
                    "finished": case.finished, "escalate": bool(case.finished and case.finished["escalate"]),
                    "workflow_status": Case(report, received, x["raw"]).packet["status"], **trace}  # fmt: skip
     return {"packet": pk, "facts": to_facts(case.raw, received), "input_tokens": tin, "output_tokens": tout,

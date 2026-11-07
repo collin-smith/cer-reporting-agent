@@ -37,7 +37,7 @@ def test_patch_without_the_reports_words_or_with_a_bad_value_changes_nothing():
     assert patch(field="rate_basis", value="measured", quote="metered at 0.085 kg/s").startswith("Not changed")
     assert "must be one of" in patch(field="rate_basis", value="exact", quote="About 0.085 kg/s")
     assert "No field" in patch(field="colour", value="red", quote="Gas blowing")
-    assert "takes one number" in patch(field="rate", value="0.05 to 0.1", quote="About 0.085 kg/s")
+    assert "rate must be a number. Example: 1.5" in patch(field="rate", value="0.05 to 0.1", quote="About 0.085 kg/s")
     assert case.raw == RAW
 
 
@@ -47,3 +47,54 @@ def test_confirm_missing_only_takes_facts_the_rules_list_as_missing():
     assert "isn't missing" in confirm(fact="death", found=False)
     assert "stays a question" in confirm(fact="lands", found=False)
     assert "patch_facts on lands" in confirm(fact="lands", found=True)
+
+
+SOUR = """Gas blowing at the Aspen Ridge station at 01:40. About 0.085 kg/s from a valve packing. Stayed inside
+the fence. Crew reported no H2S on the monitors. No one hurt."""
+
+
+def test_a_patch_that_would_loosen_the_result_is_held_for_a_person():
+    raw = {**RAW, "lands": ["company_property"], "h2s_detected": "unknown"}
+    case = agent.Case(SOUR, dt.date(2026, 11, 6), raw)
+    before = (case.packet["status"], case.packet["deadline"], case.packet["route"])
+    out = tools(case)["patch_facts"](field="release", value="no", quote="No one hurt")  # real words, wrong meaning
+    assert out.startswith("Held for the approver") and case.raw == raw
+    assert (case.packet["status"], case.packet["deadline"], case.packet["route"]) == before
+    assert case.held[0]["field"] == "release" and case.held[0]["would"]
+    assert case.patches[-1]["accepted"] is False and case.patches[-1]["held"]
+
+
+def test_loosening_compares_notify_deadline_due_and_route():
+    base = {"status": "reportable", "deadline": "T3", "due_at": "2026-11-06T04:40", "route": "judgment"}
+    assert agent.loosening(base, base) == []
+    assert agent.loosening(base, {**base, "status": "precautionary"}) == []  # both notify
+    assert agent.loosening(base, {**base, "status": "not reportable", "deadline": None, "due_at": None})
+    assert agent.loosening(base, {**base, "deadline": "T24"}) == ["deadline T3 -> T24"]
+    assert agent.loosening(base, {**base, "due_at": "2026-11-06T05:40"})
+    assert agent.loosening(base, {**base, "route": "clear-cut"}) == ["route judgment -> clear-cut"]
+    assert agent.loosening({**base, "deadline": "T24"}, base) == []  # stricter is fine
+
+
+def test_values_are_checked_all_the_way_down_and_errors_show_a_correct_example():
+    v, err = agent._value("lands_alternatives", '[":["]')
+    assert v is None and "must be a list" in err and '[["company_property"], ["off_right_of_way"]]' in err
+    v, err = agent._value("volume_alternatives", '["(estimated 1.2 to 2.0 m3)"]')
+    assert v is None and "must be a number" in err and "[1.2, 2.0]" in err
+    assert agent._value("lands", '["park"]')[1].startswith("lands[0] must be one of")
+
+
+def test_common_harmless_forms_are_accepted():
+    assert agent._value("volume_alternatives", "(1.2, 2.0)") == ([1.2, 2.0], None)
+    assert agent._value("lands_alternatives", "[[&quot;company_property&quot;],[&quot;right_of_way&quot;]]") == (
+        [["company_property"], ["right_of_way"]],
+        None,
+    )
+    assert agent._value("lands", "company_property") == (["company_property"], None)
+    assert agent._value("volume", "null") == (None, None)
+
+
+def test_a_patch_to_the_value_already_recorded_changes_nothing_and_says_so():
+    case = agent.Case(REPORT, None, {**RAW, "lands": ["company_property"]})
+    out = tools(case)["patch_facts"](field="lands", value='["company_property"]', quote="inside the fence")
+    assert out.startswith('lands is already ["company_property"]; nothing to change')  # before the quote check
+    assert case.patches[-1]["noop"] and not case.patches[-1]["accepted"]

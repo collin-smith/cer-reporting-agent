@@ -1,0 +1,625 @@
+{
+  "run": {
+    "cases": "evals/cases/cases.jsonl",
+    "splits": [
+      "dev"
+    ],
+    "arm": "agent-nova",
+    "runs_dir": "evals/runs",
+    "repeats": 1,
+    "perturb": [
+      "noblank",
+      "wrap72"
+    ],
+    "perturb_identical": 1,
+    "extractor": "2c42fea8"
+  },
+  "summary": {
+    "cases": 2,
+    "status": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "missed_reports": {
+      "k": 0,
+      "n": 2,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.6576280471103807
+      ]
+    },
+    "late_deadlines": {
+      "k": 0,
+      "n": 1,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.7934567085261071
+      ]
+    },
+    "deadline_correct": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "over_notify": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "route": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "incident_types": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "missing_recall": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "extraction_accuracy": {
+      "k": 29,
+      "n": 29,
+      "rate": 1.0,
+      "ci95": [
+        0.8830264055344442,
+        1.0
+      ]
+    },
+    "per_field": {
+      "death": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "discovered_at": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "env_effect": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "fire_or_explosion": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "lands": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "limit_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "other_beyond_design": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "planned_venting": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "point:substance": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "pressure_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "rate_kg_s": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "release": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "rupture": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "serious_injury": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "through_pipe_body_or_weld": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "toxic_plume": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "volume_estimated": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      },
+      "volume_m3": {
+        "k": 1,
+        "n": 1,
+        "rate": 1.0,
+        "ci95": [
+          0.20654329147389294,
+          1.0
+        ]
+      }
+    },
+    "injection_flagged": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "cost_usd": 0.0014792999999999998,
+    "cost_per_case_usd": 0.0007396499999999999,
+    "latency_p50_s": 16.926374492000008,
+    "latency_p95_s": 18.29965340000001,
+    "cost_with_stability_usd": 0.0032411999999999996
+  },
+  "spread": null,
+  "by": {
+    "kind": {
+      "clear-cut": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "judgment": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      }
+    },
+    "writer": {
+      "mistral": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "split": {
+      "dev": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "label_source": {
+      "engine": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "reviewed": {
+        "cases": 1,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      }
+    },
+    "text_supported": {
+      "True": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "render": {
+      "text": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "target": "missed_reports",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "late_deadlines",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "deadline_correct",
+      "value": 1.0,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "over_notify",
+      "value": NaN,
+      "limit": {
+        "max": 0.3,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 1
+    },
+    {
+      "target": "missing_recall",
+      "value": NaN,
+      "limit": {
+        "min": 0.9,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 1
+    },
+    {
+      "target": "extraction_accuracy",
+      "value": 1.0,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    },
+    {
+      "target": "latency_p95_s",
+      "value": 18.29965340000001,
+      "limit": {
+        "max": 300,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 1,
+      "passes": 1
+    }
+  ],
+  "stability": {
+    "overall": {
+      "flips": {
+        "k": 0,
+        "n": 3,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.5615060804490177
+        ]
+      },
+      "right_to_wrong": 0,
+      "wrong_to_right": 0,
+      "missed_reports": 0,
+      "late_deadlines": 0,
+      "status": {
+        "k": 3,
+        "n": 3,
+        "rate": 1.0,
+        "ci95": [
+          0.43849391955098227,
+          1.0
+        ]
+      }
+    },
+    "by_variant": {
+      "noblank": {
+        "flips": {
+          "k": 0,
+          "n": 1,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.7934567085261071
+          ]
+        },
+        "right_to_wrong": 0,
+        "wrong_to_right": 0,
+        "missed_reports": 0,
+        "late_deadlines": 0,
+        "status": {
+          "k": 1,
+          "n": 1,
+          "rate": 1.0,
+          "ci95": [
+            0.20654329147389294,
+            1.0
+          ]
+        }
+      },
+      "wrap72": {
+        "flips": {
+          "k": 0,
+          "n": 2,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.6576280471103807
+          ]
+        },
+        "right_to_wrong": 0,
+        "wrong_to_right": 0,
+        "missed_reports": 0,
+        "late_deadlines": 0,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "flipped_cases": []
+  }
+}
