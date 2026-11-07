@@ -107,3 +107,24 @@ def test_placeholders_render_as_not_stated_but_real_negatives_stay():
         assert _text(v) is None, v
     for v in ["No ignition.", "Nothing left the fence.", "None of the product reached the creek."]:
         assert _text(v) == v
+
+
+def test_an_agents_escalation_is_a_note_for_the_approver_and_changes_no_routing():
+    from cer_agent import drafter
+
+    pk = {
+        "status": "not reportable",
+        "deadline": None,
+        "due_at": None,
+        "route": "clear-cut",
+        "route_triggers": [],
+        "citations": [],
+        "deadline_rules": [],
+        "incident_types": [],
+        "missing": [],
+        "agent": {"escalate": True, "finished": {"escalate": True, "reason": "The report contradicts itself."}},
+    }
+    text = drafter.render(pk, None)
+    assert "**The reviewing agent flagged this for you:** The report contradicts itself." in text
+    assert "Reviewer decision needed" not in text and pk["route"] == "clear-cut"
+    assert drafter.flagged({**pk, "agent": {"escalate": False}}) == []

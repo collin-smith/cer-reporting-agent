@@ -183,6 +183,16 @@ def held(packet: dict) -> list[str]:
             f"\"{h['quote']}\" (would change {'; '.join(h['would'])})" for h in hs]] if hs else []  # fmt: skip
 
 
+def flagged(packet: dict) -> list[str]:
+    """An agent's escalation (D42): a note to the approver with its reason. Routing stays with the rules engine and
+    held patches; on test, 3 in 4 escalations repeated the rules' own routing and 1 in 4 was a clear-cut case."""
+    a = packet.get("agent") or {}
+    if not a.get("escalate"):
+        return []
+    reason = ((a.get("finished") or {}).get("reason") or "no reason given").strip()
+    return [f"**The reviewing agent flagged this for you:** {reason}"]
+
+
 def render(packet: dict, fields: dict | None, operator: str | None = None) -> str:
     """The draft as the approver sees it. `fields` is the model's narrative (None for a not-reportable file note)."""
     st, dl = packet["status"], packet["deadline"]
@@ -197,6 +207,8 @@ def render(packet: dict, fields: dict | None, operator: str | None = None) -> st
             out += ["", "**Reviewer decision needed:** " + "; ".join(TRIGGERS.get(t, t) for t in
                                                                       packet["route_triggers"]) + "."]  # fmt: skip
             out += held(packet)
+        if flagged(packet):
+            out += ["", *flagged(packet)]
         return "\n".join(out) + "\n"
 
     out += ["# Draft Preliminary Incident Report (for approval; not filed)", ""]
@@ -210,6 +222,7 @@ def render(packet: dict, fields: dict | None, operator: str | None = None) -> st
         out += ["**Reviewer decision needed:** " + "; ".join(TRIGGERS.get(t, t) for t in packet["route_triggers"])
                 + ". Confirm the status and deadline before filing.", ""]  # fmt: skip
         out += [*held(packet), ""] if held(packet) else []
+    out += [*flagged(packet), ""] if flagged(packet) else []
 
     f = {k: _text(v) for k, v in (fields or {}).items()}
     rows = [
