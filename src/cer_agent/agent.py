@@ -77,6 +77,8 @@ VERSION = hashlib.sha256(
 def rule_passage(rule_id: str, limit: int = 1500) -> str:
     """The rules-spec text for a rule ID. A rule is either a heading ("### PREC — ...", up to the next heading) or a
     table row ("| `T3-LVP` | ... |"), followed by its "*Interpretation of `T3-LVP`:*" paragraph if there is one."""
+    if not RULES_SPEC.exists():  # it lives outside code/, so a checkout of the repo alone doesn't have it
+        return f"The rules spec isn't available here, so there's no text for {rule_id}."
     lines = RULES_SPEC.read_text(encoding="utf-8").splitlines()
     rid = re.escape(rule_id)
     for i, ln in enumerate(lines):

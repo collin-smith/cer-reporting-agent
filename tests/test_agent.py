@@ -3,6 +3,8 @@ missing-fact check."""
 
 import datetime as dt
 
+import pytest
+
 from cer_agent import agent
 
 REPORT = """Gas blowing at the Aspen Ridge station at 01:40. About 0.085 kg/s from a valve packing. Stayed inside
@@ -16,6 +18,7 @@ def tools(case):
     return {t.tool_name: t for t in case.tools()}
 
 
+@pytest.mark.skipif(not agent.RULES_SPEC.exists(), reason="input/cer/rules-spec.md is outside code/ (not in the repo)")
 def test_rule_passage_finds_headings_and_table_rows():
     assert agent.rule_passage("PREC").startswith("### PREC")
     assert "1.5 m3" in agent.rule_passage("T3-LVP") and "Interpretation of `T3-LVP`" in agent.rule_passage("T3-LVP")
@@ -98,3 +101,8 @@ def test_a_patch_to_the_value_already_recorded_changes_nothing_and_says_so():
     out = tools(case)["patch_facts"](field="lands", value='["company_property"]', quote="inside the fence")
     assert out.startswith('lands is already ["company_property"]; nothing to change')  # before the quote check
     assert case.patches[-1]["noop"] and not case.patches[-1]["accepted"]
+
+
+def test_rule_text_answers_instead_of_crashing_when_the_spec_is_missing(monkeypatch, tmp_path):
+    monkeypatch.setattr(agent, "RULES_SPEC", tmp_path / "missing.md")
+    assert agent.rule_passage("PREC") == "The rules spec isn't available here, so there's no text for PREC."
