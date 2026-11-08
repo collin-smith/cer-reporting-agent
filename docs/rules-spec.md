@@ -5,9 +5,11 @@
 > reviewed by anyone who has filed a CER report, and it must not be used to decide real reporting obligations. For
 > the official rules, see the [Guidelines](https://www.cer-rec.gc.ca/en/about/acts-regulations/cer-act-regulations-guidance-notes-related-documents/canada-energy-regulator-event-reporting-guidelines/2024-revised-event-reporting-guidelines.pdf).
 >
-> Text quoted from the Guidelines is reproduced from the CER's published document, with the source named; it
-> remains the Crown's and isn't covered by this repository's licence, which applies only to the interpretation and
-> the code.
+> Quoted text is reproduced, for non-commercial purposes, from *Event Reporting Guidelines* (revised December
+> 2024) by the Canada Energy Regulator. It is a copy of the version available at
+> https://www.cer-rec.gc.ca/en/about/acts-regulations/cer-act-regulations-guidance-notes-related-documents/canada-energy-regulator-event-reporting-guidelines/2024-revised-event-reporting-guidelines.pdf, and this reproduction has not been produced in affiliation with, or with the endorsement of, the CER.
+> Quoted text remains the Crown's and isn't covered by this repository's licence, which applies only to the
+> interpretation and the code.
 
 **Source:** CER *Event Reporting Guidelines*, revised December 2024, in force 2025-03-12
 ([PDF](https://www.cer-rec.gc.ca/en/about/acts-regulations/cer-act-regulations-guidance-notes-related-documents/canada-energy-regulator-event-reporting-guidelines/2024-revised-event-reporting-guidelines.pdf); downloaded 2026-10-29, SHA-256 `81785d1ac820232a8ab69f5493e6b2610c967900c12892739a0b96042e2b6181`). Section numbers are the

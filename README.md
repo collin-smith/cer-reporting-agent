@@ -98,8 +98,17 @@ runs in GitHub Actions on every pull request.
 [CER Pipeline Incident Data](https://www.cer-rec.gc.ca/open/incident/pipeline-incidents-comprehensive-data.csv),
 published under the Open Government Licence – Canada. The data is not stored in this repo.
 
+The reporting rules the engine follows are in [`docs/rules-spec.md`](docs/rules-spec.md): an independent
+interpretation of the CER's *Event Reporting Guidelines*, with each rule's quoted text and source section.
+
 ## Disclaimer
 
 A demonstration on public CER data. Not regulatory advice. The field reports in `evals/cases/` are synthetic:
 the operators named in them are fictional, places are generalized to the nearest town, and dates are moved to 2026. Not affiliated with or endorsed by the Canada Energy
 Regulator or any pipeline operator.
+
+## Licence
+
+The code and the rules interpretation are under the [MIT License](LICENSE). Text quoted from the CER's *Event
+Reporting Guidelines* remains the Crown's and is reproduced for non-commercial purposes; see the notice at the top of
+[`docs/rules-spec.md`](docs/rules-spec.md).
