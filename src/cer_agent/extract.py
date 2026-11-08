@@ -132,8 +132,11 @@ TOOL = {
                 "other_beyond_design": {
                     "type": "string",
                     "enum": ["none", "exposure", "slope_movement", "inappropriate_product", "other"],
-                    "description": "none unless the report says so: exposure = pipe exposed (e.g. in a creek bed); "
-                    "other = the report says the pipeline operated outside its design limits",
+                    "description": "exposure = pipe exposed (e.g. in a creek bed); other = the pipeline or station "
+                    "ran beyond something it is designed or rated for, apart from pressure and temperature (they have "
+                    "their own fields): flow above its maximum design flow rate, throughput above its rated capacity, "
+                    "vibration past what the piping is designed for, or the report says outside design limits or "
+                    "over spec; none = the report describes no such condition",
                 },
                 "suspicious_instructions": {
                     "type": "boolean",

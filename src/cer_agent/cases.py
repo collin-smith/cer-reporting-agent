@@ -547,7 +547,36 @@ def build() -> tuple[list[CaseSpec], list[tuple[str, str]]]:
         add(spec("not-reportable", "finger-fracture", r, Facts(), "reviewed",
                  "P3: a finger or toe fracture alone is not a serious injury.",
                  stated=["a worker broke a finger and was taken to a clinic", NO_RELEASE], rng=extra), r)  # fmt: skip
+
+    # Added 2026-11-08 (D44): beyond-design conditions stated as what was seen (a flow, a vibration, a throughput),
+    # not as "operated outside its design limits". The held-out run found the reader marks these as none (CL-064);
+    # dev and test had only the generic wording. Own random stream, appended, so no earlier case changes.
+    beyond = random.Random(SEED + 4)
+    # Operational causes only: a washout or exposed pipe is a beyond-design condition of its own, which the writers
+    # carry over from the record's context and which would let the reader get these right for another reason.
+    pool = [r for r in records if record_to_facts(r).other_beyond_design == "recorded" and parses(r)
+            and context_of(r)["what_happened"] in ("Incorrect Operation", "Equipment Failure",
+                                                   "Equipment Failure, Incorrect Operation")]  # fmt: skip
+    for i in range(9):
+        r = beyond.choice(pool)
+        f = record_to_facts(r)
+        said = BEYOND_DESIGN_SPECIFIC[(i + i // 3) % 3](beyond)  # each split (i % 3, in main) gets all three
+        stated = [said if p == "the pipeline was operated outside its design limits" else p for p in phrases(f)]
+        add(spec("clear-cut", "beyond-design-specific", r, f, "engine",
+                 "Beyond design stated as the condition seen, not the generic phrase.", stated=stated,
+                 rng=beyond), r)  # fmt: skip
     return specs, sources
+
+
+# What a field report says when it describes a beyond-design condition itself (D44).
+BEYOND_DESIGN_SPECIFIC = [
+    lambda r: (
+        f"SCADA showed flow at {r.choice([108, 112, 115, 120])}% of the line's maximum design flow rate for a "
+        "few minutes before it was cut back"
+    ),
+    lambda r: "vibration on the station piping went past what it's designed for, until the unit was shut down",
+    lambda r: f"the line was run above its rated throughput for about {r.choice([20, 40, 90])} minutes",
+]
 
 
 def _mentions(phrase: str, key: str) -> bool:
@@ -574,12 +603,16 @@ def assign(specs: list[CaseSpec]) -> None:
 def main() -> None:
     specs, sources = build()
     added = [s for s in specs if s.variant == "finger-fracture"]
-    assign([s for s in specs if s not in added])
+    beyond = [s for s in specs if s.variant == "beyond-design-specific"]
+    assign([s for s in specs if s not in added and s not in beyond])
     for s in specs:
         apply_rulings(s)
     for i, s in enumerate(added):  # kept out of assign() so its random draws, and every other case, don't change
         s.writer = "llama" if i % 2 == 0 else "mistral"
         s.split = "heldout" if i % 3 == 0 else "test"
+    for i, s in enumerate(beyond):  # three each: dev to fix on, test to measure, fresh held-out to confirm once
+        s.writer = "llama" if i % 2 == 0 else "mistral"
+        s.split = ("dev", "test", "heldout")[i % 3]
     SPECS.parent.mkdir(parents=True, exist_ok=True)
     with SPECS.open("w", encoding="utf-8") as fh:
         for s in specs:
