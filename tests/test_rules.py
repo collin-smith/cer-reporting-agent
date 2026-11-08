@@ -1,4 +1,4 @@
-"""The rules engine against the worked examples in input/cer/rules-spec.md. Operators in the spec are fictional."""
+"""The rules engine against the worked examples in docs/rules-spec.md. Operators in the spec are fictional."""
 
 import datetime as dt
 

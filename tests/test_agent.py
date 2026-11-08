@@ -3,8 +3,6 @@ missing-fact check."""
 
 import datetime as dt
 
-import pytest
-
 from cer_agent import agent
 
 REPORT = """Gas blowing at the Aspen Ridge station at 01:40. About 0.085 kg/s from a valve packing. Stayed inside
@@ -18,7 +16,6 @@ def tools(case):
     return {t.tool_name: t for t in case.tools()}
 
 
-@pytest.mark.skipif(not agent.RULES_SPEC.exists(), reason="input/cer/rules-spec.md is outside code/ (not in the repo)")
 def test_rule_passage_finds_headings_and_table_rows():
     assert agent.rule_passage("PREC").startswith("### PREC")
     assert "1.5 m3" in agent.rule_passage("T3-LVP") and "Interpretation of `T3-LVP`" in agent.rule_passage("T3-LVP")

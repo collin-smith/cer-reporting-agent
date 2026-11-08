@@ -43,7 +43,7 @@ from cer_agent.judge import in_report
 from cer_agent.workflow import make_client, packet
 
 PROJECT = pathlib.Path(__file__).resolve().parents[3]
-RULES_SPEC = PROJECT / "input" / "cer" / "rules-spec.md"
+RULES_SPEC = PROJECT / "code" / "docs" / "rules-spec.md"
 MAX_TURNS = 10
 FIELDS = RECORD_TOOL["inputSchema"]["json"]["properties"]
 # The rules' missing facts -> the record_facts fields that answer them.
@@ -78,7 +78,7 @@ VERSION = hashlib.sha256(
 def rule_passage(rule_id: str, limit: int = 1500) -> str:
     """The rules-spec text for a rule ID. A rule is either a heading ("### PREC — ...", up to the next heading) or a
     table row ("| `T3-LVP` | ... |"), followed by its "*Interpretation of `T3-LVP`:*" paragraph if there is one."""
-    if not RULES_SPEC.exists():  # it lives outside code/, so a checkout of the repo alone doesn't have it
+    if not RULES_SPEC.exists():  # a packaged install without the repo's docs/
         return f"The rules spec isn't available here, so there's no text for {rule_id}."
     lines = RULES_SPEC.read_text(encoding="utf-8").splitlines()
     rid = re.escape(rule_id)

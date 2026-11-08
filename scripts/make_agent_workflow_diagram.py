@@ -189,7 +189,7 @@ GATES = [
 for i, (cid, text) in enumerate(GATES):
     box(cid, text, 40, 600 + i * 80, 220, 52, **C, extra=CTR + ("strokeWidth=2;" if cid == "g4" else ""))
 box("reject", "<b>Not changed</b><br>the reason goes back to the agent", 300, 600, 200, 132, fill=NOTE_FILL, extra=CTR)
-box("rulesspec", "<i>input/cer/rules-spec.md</i>", 540, 600, 200, 44, fill=NOTE_FILL, extra=CTR)
+box("rulesspec", "<i>docs/rules-spec.md</i>", 540, 600, 200, 44, fill=NOTE_FILL, extra=CTR)
 box("applied", "<b>Applied</b><br>new result back to the agent", 40, 940, 220, 56, fill=AGENT_FILL, stroke=AGENT_STROKE,
     extra=CTR)  # fmt: skip
 box("held", "<b>Held for the approver</b><br>facts unchanged; suggestion and quote kept; route → judgment "

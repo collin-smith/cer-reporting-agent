@@ -1,4 +1,4 @@
-"""The CER reporting rules as code (input/cer/rules-spec.md). Every result cites the spec's rule IDs.
+"""The CER reporting rules as code (docs/rules-spec.md). Every result cites the spec's rule IDs.
 
 Facts come in three states, and the difference matters:
 - absent: the report doesn't mention it (booleans default to False);
