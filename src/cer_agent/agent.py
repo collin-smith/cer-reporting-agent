@@ -42,8 +42,7 @@ from cer_agent.extract import TOOL as RECORD_TOOL
 from cer_agent.judge import in_report
 from cer_agent.workflow import make_client, packet
 
-PROJECT = pathlib.Path(__file__).resolve().parents[3]
-RULES_SPEC = PROJECT / "code" / "docs" / "rules-spec.md"
+RULES_SPEC = pathlib.Path(__file__).resolve().parents[2] / "docs" / "rules-spec.md"  # the repo root is code/
 MAX_TURNS = 10
 FIELDS = RECORD_TOOL["inputSchema"]["json"]["properties"]
 # The rules' missing facts -> the record_facts fields that answer them.
