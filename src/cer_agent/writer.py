@@ -134,6 +134,22 @@ UNLINKED_FIRE = re.compile(
 )
 
 
+# A report whose spec has no beyond-design condition must not state one (NO-164, NO-163, JU-092, JU-096; D45): an
+# exposed pipe or a part out of spec is reportable in itself. A washout as a cause, or a relief valve that lifted, is
+# fine.
+UNSTATED_BEYOND = re.compile(
+    r"\bpipe\w*\W+(?:\w+\W+){0,5}?exposed\b|\bexposed (?:pipe|section|line)\b|\bout of spec\b|\bover spec\b"
+    r"|\b(?:higher|lower|more|less) than spec\b|\b(?:beyond|outside(?: of)?|above|past) (?:its |the )?design\b"
+    r"|\bdesign limits?\b",
+    re.I,
+)
+
+
+def beyond_design_in_spec(facts: dict) -> bool:
+    return bool(facts.get("other_beyond_design") or (facts.get("pressure_kpa") and facts.get("limit_kpa"))
+                or facts.get("temperature_c"))  # fmt: skip
+
+
 def release_hints(text: str) -> list[str]:
     """Release words in the text that aren't negated ("no leaks" is fine, "a small sheen" isn't)."""
     return [
@@ -184,6 +200,8 @@ def check(spec: dict, report: str) -> list[str]:
             problems.append(f"describes a release, but nothing was released: {', '.join(hints)}")
         if UNKNOWN_FIRE.search(report):
             problems.append("leaves open what fed the fire, but it wasn't product from the line")
+    if not beyond_design_in_spec(facts) and (m := UNSTATED_BEYOND.search(report)):
+        problems.append(f"states a beyond-design condition the spec doesn't have: {m.group(0)}")
     if any(re.search(rf"\b{re.escape(w)}\b", text) for w in RULE_WORDS):
         problems.append("talks about reporting rules")
     if any(re.search(rf"\b{re.escape(w)}", text) for w in CONDUCT_WORDS):

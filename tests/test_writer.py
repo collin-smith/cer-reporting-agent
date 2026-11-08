@@ -81,3 +81,18 @@ def test_a_toxic_plume_needs_people_to_evacuate_or_shelter():
     assert check(spec, f"Smoke was bad, had to clear the guys out. {BODY}") == [
         "the fumes must make people evacuate or shelter, in those words"
     ]
+
+
+def test_rejects_a_beyond_design_condition_the_spec_does_not_have():
+    none = {"stated": [], "withheld": [], "facts": {"other_beyond_design": None}}
+    for text in (
+        "Pipe's exposed in a few spots.",
+        "Soil washed from around the pipe, it's now partially exposed.",
+        "A bend sitting 60 cm higher than spec.",
+        "Ran past design limits.",
+    ):
+        assert any("beyond-design" in p for p in check(none, f"{text} {BODY}")), text
+    # A washout as the cause, or a relief valve that lifted, isn't a beyond-design condition.
+    assert check(none, f"The bank washed out after the rain. The PRV lifted. {BODY}") == []
+    recorded = {"stated": [], "withheld": [], "facts": {"other_beyond_design": "exposure"}}
+    assert check(recorded, f"Pipe's exposed in the creek bed. {BODY}") == []

@@ -1,0 +1,12 @@
+{
+ "file": "NO-164-form.pdf",
+ "sha256": "14a66b5b9f4741d1b34a8f2eb052e092819ca8c75671b1c9f12427a76425ab64",
+ "api": "DetectDocumentText",
+ "region": "ca-central-1",
+ "at": "2026-11-08T17:19:57+00:00",
+ "text": "FIELD INCIDENT REPORT\nForm FIR-1 (rev. 2026-03)\nOPERATOR\nOkanagan Crossing Pipelines Ltd.\nREPORTED BY\nField operator\nRECEIVED VIA\nEmail\nDESCRIPTION OF THE EVENT (what happened, when, where, who, what was released)\nSubject: bend issue on Line 2 near Fort McMurray\nJust got off site at the 24\" bend on Line 2, about 2 km west of the Fort McMurray yard.\nMaintenance crew was doing a routine walkover at 14:30 when they noticed the backfill over the\nbend had settled uneven-about 18\" drop over 4 m. Looks like some sort of ground movement or\nmaybe water got in. The bend itself is still buried, but the sag is right over it.\nOne of the guys slipped on the loose dirt and jammed his finger pretty bad-ambulance took him\nto the clinic. No product released, everything holding pressure. Need someone to check if this is\njust normal settlement or if we've got a bigger geotech issue.\nLet me know how you want to handle it.\nDave\nField Operator, Okanagan Crossing Pipelines Ltd.\nSUPERVISOR REVIEW",
+ "pages": 1,
+ "lines": 21,
+ "mean_confidence": 99.84,
+ "latency_s": 1.614
+}

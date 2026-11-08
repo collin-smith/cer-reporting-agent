@@ -46,7 +46,8 @@ def choose(cases: list[dict]) -> list[dict]:
     rng = random.Random(SEED)
     pool = collections.defaultdict(list)
     for c in cases:
-        if c["split"] in ("dev", "test"):
+        # The D44 cases came after the renders were chosen; leaving them out keeps the OCR slice as it was.
+        if c["split"] in ("dev", "test") and c["variant"] != "beyond-design-specific":
             pool[c["kind"]].append(c)
     chosen = []
     for kind, n in PER_KIND.items():

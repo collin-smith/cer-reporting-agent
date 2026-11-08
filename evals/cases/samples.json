@@ -314,7 +314,7 @@
     "split": "test",
     "operator": "Okanagan Crossing Pipelines Ltd.",
     "place": "Fort McMurray, Alberta",
-    "report": "Subject: pipe bend issue near Fort McMurray\n\nCompliance,\n\nWalking the right-of-way east of pump station 7 this afternoon—checked the 16-inch main around 14:30. Saw a 45° bend (tag B-12) sitting about 60 cm higher than spec, soil washed out underneath. Pipe isn’t leaking, pressures look normal.\n\nWhile taking photos, Dave slipped on ice and jammed his left ring finger pretty bad—sent him to the Fort McMurray clinic.\n\nNeed someone to look at the bend support and ditch stability.\n\nJesse\nField Op, Okanagan Crossing Pipelines Ltd.",
+    "report": "Subject: bend issue on Line 2 near Fort McMurray\n\nJust got off site at the 24\" bend on Line 2, about 2 km west of the Fort McMurray yard. Maintenance crew was doing a routine walkover at 14:30 when they noticed the backfill over the bend had settled uneven—about 18\" drop over 4 m. Looks like some sort of ground movement or maybe water got in. The bend itself is still buried, but the sag is right over it.\n\nOne of the guys slipped on the loose dirt and jammed his finger pretty bad—ambulance took him to the clinic. No product released, everything holding pressure. Need someone to check if this is just normal settlement or if we’ve got a bigger geotech issue.\n\nLet me know how you want to handle it.\n\nDave\nField Operator, Okanagan Crossing Pipelines Ltd.",
     "expected": {
       "status": "not reportable",
       "deadline": null,
