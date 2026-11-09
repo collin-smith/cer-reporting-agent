@@ -1,0 +1,8 @@
+{
+  "with/as_written/reportable": 15,
+  "with/noblank/reportable": 15,
+  "with/wrap72/reportable": 15,
+  "without/as_written/reportable": 15,
+  "without/noblank/reportable": 10,
+  "without/wrap72/reportable": 15
+}
