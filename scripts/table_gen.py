@@ -40,8 +40,12 @@ def auto_widths(headers, rows, total=TABLE_WIDTH):
         max(len(str(c)) for c in [h] + [r[i] for r in rows if i < len(r)]) * CHAR_WIDTH + 2 * CELL_PAD_X
         for i, h in enumerate(headers)
     ]
-    # Header text doesn't wrap, so a column never shrinks below its (bold) header.
-    floor = [max(MIN_COL, len(h) * CHAR_WIDTH * 1.1 + 2 * CELL_PAD_X) for h in headers]
+    # Header text doesn't wrap, and cells wrap only at spaces, so a column never shrinks below its (bold) header or
+    # its longest word ("LangGraph" once broke as "LangGrap / h").
+    words = [max((len(w) for c in [r[i] for r in rows if i < len(r)] for w in str(c).split()), default=0)
+             for i in range(len(headers))]  # fmt: skip
+    floor = [max(MIN_COL, len(h) * CHAR_WIDTH * 1.1 + 2 * CELL_PAD_X, n * CHAR_WIDTH + 2 * CELL_PAD_X)
+             for h, n in zip(headers, words, strict=True)]  # fmt: skip
     widths = [max(f, w) for f, w in zip(floor, natural, strict=True)]
     if sum(widths) <= total:
         return [int(w) for w in widths]
