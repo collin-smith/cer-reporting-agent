@@ -9,6 +9,7 @@ requires-python = ">=3.12"
 dependencies = [
     "boto3>=1.40",
     "strands-agents>=1.0",
+    "mcp>=2.3",  # the MCP server and client (article 5); also a strands-agents dependency
 ]
 
 [project.optional-dependencies]

@@ -25,6 +25,8 @@ Arms:
   against the report and can escalate; the rules engine computes the packet from its last reading;
 - workflow-nova-strict: the strictest-of-layouts check (D33): each report read as written and in each layout variant,
   decisions combined on the stricter side (workflow.combine); about 3 calls a case, in parallel;
+- workflow-nova-strict-mcp, agent-nova-mcp (article 5): the same two, run through the MCP server (cer_agent.mcp_client,
+  one server process per run); each row also records the seconds MCP added (mcp_overhead_s);
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
 
 Usage (from code/, src on PYTHONPATH):
@@ -535,14 +537,25 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
             from cer_agent.agent import run as run_agent
 
         received = dt.date.fromisoformat(case["discovered_at"][:10])
-        x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
+        if "-mcp" in arm:  # article 5: the same agent, its tools and state on the MCP server
+            from cer_agent import mcp_client
+
+            x = mcp_client.run_agent(mcp_client.shared(), os.environ[model["env"]], case["report"], received,
+                                     model.get("region", "ca-central-1"), arm.endswith("-inorder"))  # fmt: skip
+        else:
+            x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
         got, pk = x["facts"], x["packet"]
         tin, tout, lat, retries = x["input_tokens"], x["output_tokens"], x["latency_s"], x["retries"]
-    elif arm.endswith("-strict"):
-        from cer_agent.workflow import run_strict
-
+    elif "-strict" in arm:
         received = dt.date.fromisoformat(case["discovered_at"][:10])
-        x = run_strict(client, os.environ[model["env"]], case["report"], received)
+        if arm.endswith("-mcp"):  # article 5: the strict check through the MCP server's triage_report
+            from cer_agent import mcp_client
+
+            x = mcp_client.triage(mcp_client.shared(review=False), case["report"], received)
+        else:
+            from cer_agent.workflow import run_strict
+
+            x = run_strict(client, os.environ[model["env"]], case["report"], received)
         got, pk = x["facts"], x["packet"]
         tin, tout, lat = x["input_tokens"], x["output_tokens"], x["latency_s"]
     else:
@@ -555,7 +568,8 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
         retries = x.get("retries", 0)
     cost = (tin * model["price_in"] + tout * model["price_out"]) / 1e6 if model else 0.0
     keep = ("id", "kind", "variant", "writer", "split", "label_source", "expected")
-    return {**{k: case[k] for k in keep}, **({"perturb": case["perturb"]} if "perturb" in case else {}),
+    extra = {"mcp_overhead_s": x["mcp_overhead_s"]} if "-mcp" in arm else {}
+    return {**extra, **{k: case[k] for k in keep}, **({"perturb": case["perturb"]} if "perturb" in case else {}),
             "render": case.get("render", "text"), "text_supported": text_supported(case),
             "packet": pk,
             "score": score_case(case, pk, got), "input_tokens": tin, "output_tokens": tout, "cost_usd": cost,
@@ -571,6 +585,9 @@ ARMS = {
     "workflow-nova-strict": "nova-lite",
     "agent-nova": "nova-lite",  # the single agent (D12): Strands, facts only; the rules engine decides
     "supervisor-nova": "nova-lite",  # supervisor + specialists (D12, article 3): same front end, tools and gate
+    "workflow-nova-strict-mcp": "nova-lite",  # article 5: the strict check through the MCP server
+    "agent-nova-mcp": "nova-lite",  # article 5: the single agent with its tools on the MCP server
+    "agent-nova-mcp-inorder": "nova-lite",  # the same, tools in the in-process order (what tool order changes)
 }
 
 
@@ -598,7 +615,7 @@ def main(argv=None) -> int:
     model = cfg["models"][model_key] if model_key else None
     repeats = run_cfg["repeats"] = (args.repeats or run_cfg.get("repeats", 1)) if model else 1
     # No stability variants on the OCR arms (their input is fixed) or the strict arm (it already reads every layout).
-    skip = args.no_perturb or not model or "-ocr" in run_cfg["arm"] or run_cfg["arm"].endswith("-strict")
+    skip = args.no_perturb or not model or "-ocr" in run_cfg["arm"] or "-strict" in run_cfg["arm"]
     variants = [] if skip else run_cfg.get("perturb", [])
     run_cfg["perturb"] = variants
     if variants:
@@ -612,7 +629,7 @@ def main(argv=None) -> int:
             print(f"Set {model['env']} (the model's tagged profile ARN; terraform output).")
             return 2
         est = (
-            (3 if run_cfg["arm"].endswith("-strict") else 1)
+            (3 if "-strict" in run_cfg["arm"] else 1)
             * repeats
             * len(cases)
             * (2500 * model["price_in"] + 400 * model["price_out"])

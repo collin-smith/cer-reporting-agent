@@ -27,6 +27,7 @@ theirs over one?** Every result is reported with accuracy, cost and latency.
 | `src/cer_agent/cases.py`, `writer.py` | Build the test-set specs from real records, and write them up as messy field reports (checked for leaks) |
 | `src/cer_agent/extract.py`, `workflow.py` | The fixed workflow: one forced tool call reads the report, plain code converts units and the rules decide |
 | `src/cer_agent/evals.py`, `evals/config.toml` | Tier-1 eval harness: decision, deadline, route, missing facts and per-field extraction, with 95% intervals, cost and latency; live arms run 3 passes and report the spread and the cases that flip; results in `evals/runs/` |
+| `src/cer_agent/mcp_server.py`, `mcp_client.py`, `.mcp.json` | The tools as an MCP server (stdio): `triage_report`, `decide`, `rule_text`, `draft_notice`, plus the reviewing agent's case tools with `--review`; our agent and the evals as a client; Claude Code's config |
 | `evals/cases/` | The test set: 162 synthetic field reports with expected answers (dev / test / held-out splits) |
 
 ## Setup
@@ -85,6 +86,17 @@ NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHON
 Documents (D24): `uv run --extra render python -I scripts/render_docs.py` renders 30 dev/test cases as a form PDF, a
 scan and a photo; `python -m cer_agent.ocr` runs Textract on them (about $0.0015 a page, cached by hash); the
 `workflow-nova-ocr-para` arm scores the OCR text and `scripts/ocr_report.py` compares it with the typed runs.
+
+MCP server (article 5). The same tools behind the Model Context Protocol, over stdio: a client starts the server
+as a child process, and nothing is hosted. `decide` and `rule_text` are pure code ($0); `triage_report` and
+`draft_notice` call Nova Lite through the tagged profile with your AWS credentials. Claude Code picks up `.mcp.json`
+when started in `code/` (set `NOVA_LITE_ARN` first). The `-mcp` eval arms run the strict check and the agent through
+the server and record what it adds per case:
+
+```bash
+NOVA_LITE_ARN=... PYTHONPATH=src python -m cer_agent.mcp_server [--review]   # what a client runs
+NOVA_LITE_ARN=... PYTHONPATH=src python -m cer_agent.evals --arm workflow-nova-strict-mcp --splits dev
+```
 
 ## Planned stack
 

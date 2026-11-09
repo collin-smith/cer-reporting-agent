@@ -214,75 +214,103 @@ class Case:
             "open_points": [drafter.TRIGGERS.get(t, t) for t in pk["route_triggers"]],
         })  # fmt: skip
 
+    # The tools' logic, shared by the in-process agent (`tools`, Strands) and the MCP server (cer_agent.mcp_server).
+    # Each docstring is the description the model sees, so both transports show the agent the same words.
+    def patch_facts(self, field: str, value: str, quote: str) -> str:
+        """Correct one recorded fact. field: a record_facts field name; value: the new value as JSON (a list
+        as a JSON list, e.g. ["company_property"]; volume_alternatives [1.2, 2.0]; lands_alternatives one list
+        per account, e.g. [["company_property"], ["off_right_of_way"]]); quote: the report's exact words that
+        say it. Other facts are kept."""
+        if field not in FIELDS:
+            return f"No field {field!r}. Fields: {', '.join(FIELDS)}"
+        v, err = _value(field, value)
+        if err:
+            return err
+        if v == self.raw.get(field):  # nothing to change: say so before any quote check, so the agent moves on
+            self.patches.append({"field": field, "from": v, "to": v, "quote": quote, "accepted": False,
+                                 "noop": True})  # fmt: skip
+            return f"{field} is already {json.dumps(v)}; nothing to change. Go on to the next fact."
+        ok = bool(quote) and in_report(quote, self.report)
+        self.patches.append({"field": field, "from": self.raw.get(field), "to": v, "quote": quote,
+                             "accepted": ok})  # fmt: skip
+        if not ok:
+            return "Not changed: that quote isn't in the report. Quote the report's exact words."
+        before = (self.packet["status"], self.packet["deadline"])
+        prior, old_packet = self.raw.get(field), self.packet
+        self.raw[field] = v
+        try:
+            new_packet = self._decide()
+        except (TypeError, ValueError) as e:  # a value the rules can't use: undo, and say so
+            self.raw[field] = prior
+            self.patches[-1]["accepted"] = False
+            return f"Not changed: {field}={v!r} can't be used ({e})."
+        if looser := loosening(old_packet, new_packet):  # only a person can loosen the result
+            self.raw[field] = prior
+            self.patches[-1].update(accepted=False, held=looser)
+            self.held.append({"field": field, "from": prior, "to": v, "quote": quote, "would": looser})
+            return (f"Held for the approver, not changed: {field}={v!r} would loosen the result "
+                    f"({'; '.join(looser)}). It goes to a person as a suggestion with your quote. "
+                    f"Carry on with the other facts.")  # fmt: skip
+        self.packet = new_packet
+        after = (self.packet["status"], self.packet["deadline"])
+        note = "" if before == after else f" The result changed from {before} to {after}."
+        return f"Changed {field} to {v!r}.{note} Now: {self.summary()}"
+
+    def confirm_missing(self, fact: str, found: bool) -> str:
+        """For a fact on the missing list: found=false if the report really doesn't say (it becomes a question
+        for the field). If the report does say, use patch_facts instead."""
+        if fact not in self.packet["missing"]:
+            return f"{fact!r} isn't missing. Missing now: {', '.join(self.packet['missing']) or 'none'}."
+        self.confirmations.append({"fact": fact, "found": found})
+        if found:
+            fields = ", ".join(MISSING_FIELDS.get(fact, [fact]))
+            return f"Then correct it with patch_facts on {fields}, quoting the report."
+        return f"Recorded: the report doesn't say. {fact!r} stays a question for the field."
+
+    @staticmethod
+    def rule_text(rule_id: str) -> str:
+        """The rules spec's text for one rule ID (e.g. T3-LVP, INC-d, PREC, U2-NEAR)."""
+        return rule_passage(rule_id.strip())
+
+    def finish(self, escalate: bool, reason: str) -> str:
+        """End the case. escalate=true sends it to a person: only for a contradiction or a doubt the rules
+        can't settle, not for missing facts."""
+        self.finished = {"escalate": escalate, "reason": reason}
+        return "Done. Stop now."
+
     def tools(self) -> list:
+        """The four tools as Strands tools, for the in-process agent."""
         from strands import tool
 
-        @tool
         def patch_facts(field: str, value: str, quote: str) -> str:
-            """Correct one recorded fact. field: a record_facts field name; value: the new value as JSON (a list
-            as a JSON list, e.g. ["company_property"]; volume_alternatives [1.2, 2.0]; lands_alternatives one list
-            per account, e.g. [["company_property"], ["off_right_of_way"]]); quote: the report's exact words that
-            say it. Other facts are kept."""
-            if field not in FIELDS:
-                return f"No field {field!r}. Fields: {', '.join(FIELDS)}"
-            v, err = _value(field, value)
-            if err:
-                return err
-            if v == self.raw.get(field):  # nothing to change: say so before any quote check, so the agent moves on
-                self.patches.append({"field": field, "from": v, "to": v, "quote": quote, "accepted": False,
-                                     "noop": True})  # fmt: skip
-                return f"{field} is already {json.dumps(v)}; nothing to change. Go on to the next fact."
-            ok = bool(quote) and in_report(quote, self.report)
-            self.patches.append({"field": field, "from": self.raw.get(field), "to": v, "quote": quote,
-                                 "accepted": ok})  # fmt: skip
-            if not ok:
-                return "Not changed: that quote isn't in the report. Quote the report's exact words."
-            before = (self.packet["status"], self.packet["deadline"])
-            prior, old_packet = self.raw.get(field), self.packet
-            self.raw[field] = v
-            try:
-                new_packet = self._decide()
-            except (TypeError, ValueError) as e:  # a value the rules can't use: undo, and say so
-                self.raw[field] = prior
-                self.patches[-1]["accepted"] = False
-                return f"Not changed: {field}={v!r} can't be used ({e})."
-            if looser := loosening(old_packet, new_packet):  # only a person can loosen the result
-                self.raw[field] = prior
-                self.patches[-1].update(accepted=False, held=looser)
-                self.held.append({"field": field, "from": prior, "to": v, "quote": quote, "would": looser})
-                return (f"Held for the approver, not changed: {field}={v!r} would loosen the result "
-                        f"({'; '.join(looser)}). It goes to a person as a suggestion with your quote. "
-                        f"Carry on with the other facts.")  # fmt: skip
-            self.packet = new_packet
-            after = (self.packet["status"], self.packet["deadline"])
-            note = "" if before == after else f" The result changed from {before} to {after}."
-            return f"Changed {field} to {v!r}.{note} Now: {self.summary()}"
+            return self.patch_facts(field, value, quote)
 
-        @tool
         def confirm_missing(fact: str, found: bool) -> str:
-            """For a fact on the missing list: found=false if the report really doesn't say (it becomes a question
-            for the field). If the report does say, use patch_facts instead."""
-            if fact not in self.packet["missing"]:
-                return f"{fact!r} isn't missing. Missing now: {', '.join(self.packet['missing']) or 'none'}."
-            self.confirmations.append({"fact": fact, "found": found})
-            if found:
-                fields = ", ".join(MISSING_FIELDS.get(fact, [fact]))
-                return f"Then correct it with patch_facts on {fields}, quoting the report."
-            return f"Recorded: the report doesn't say. {fact!r} stays a question for the field."
+            return self.confirm_missing(fact, found)
 
-        @tool
         def rule_text(rule_id: str) -> str:
-            """The rules spec's text for one rule ID (e.g. T3-LVP, INC-d, PREC, U2-NEAR)."""
-            return rule_passage(rule_id.strip())
+            return self.rule_text(rule_id)
 
-        @tool
         def finish(escalate: bool, reason: str) -> str:
-            """End the case. escalate=true sends it to a person: only for a contradiction or a doubt the rules
-            can't settle, not for missing facts."""
-            self.finished = {"escalate": escalate, "reason": reason}
-            return "Done. Stop now."
+            return self.finish(escalate, reason)
 
-        return [patch_facts, confirm_missing, rule_text, finish]
+        fns = [patch_facts, confirm_missing, rule_text, finish]
+        for f in fns:
+            f.__doc__ = getattr(Case, f.__name__).__doc__
+        return [tool(f) for f in fns]
+
+    def result(self, workflow_status: str, trace: dict) -> dict:
+        """The packet the case ends with: the rules engine's, from the reviewed facts, with the agent's trace. A
+        held suggestion (it would loosen the result) sends the case to a person."""
+        pk = dict(self.packet)
+        if self.held:
+            pk["route"] = "judgment"
+            pk["route_triggers"] = [*pk["route_triggers"], "AGENT-HOLD"]
+        pk["agent"] = {"version": VERSION, "patches": self.patches, "confirmations": self.confirmations,
+                       "held": self.held, "finished": self.finished,
+                       "escalate": bool(self.finished and self.finished["escalate"]),
+                       "workflow_status": workflow_status, **trace}  # fmt: skip
+        return pk
 
 
 @functools.cache
@@ -327,14 +355,7 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
         break
     else:  # every review attempt failed: the workflow's own packet stands
         case, trace = Case(report, received, x["raw"]), {"error": f"{type(last).__name__}: {last}"[:200]}
-    pk = dict(case.packet)
-    if case.held:  # a suggestion that would loosen the result: a person decides
-        pk["route"] = "judgment"
-        pk["route_triggers"] = [*pk["route_triggers"], "AGENT-HOLD"]
-    pk["agent"] = {"version": VERSION, "patches": case.patches, "confirmations": case.confirmations,
-                   "held": case.held,
-                   "finished": case.finished, "escalate": bool(case.finished and case.finished["escalate"]),
-                   "workflow_status": Case(report, received, x["raw"]).packet["status"], **trace}  # fmt: skip
+    pk = case.result(Case(report, received, x["raw"]).packet["status"], trace)
     return {"packet": pk, "facts": to_facts(case.raw, received), "input_tokens": tin, "output_tokens": tout,
             "latency_s": time.perf_counter() - t0, "retries": x.get("retries", 0)}  # fmt: skip
 

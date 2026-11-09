@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "cer-reporting": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--quiet", "python", "-m", "cer_agent.mcp_server"],
+      "env": {
+        "NOVA_LITE_ARN": "${NOVA_LITE_ARN}",
+        "AWS_PROFILE": "${AWS_PROFILE:-default}"
+      }
+    }
+  }
+}
