@@ -62,7 +62,8 @@ def figure1(out: pathlib.Path) -> None:
           "· decide · rule_text · draft_notice<br>--review adds: read_report · open_case · patch_facts · "
           "confirm_missing · finish · case_result", 300, 140, 560, 76, **CODE, extra="strokeWidth=2;")  # fmt: skip
     d.edge("e1", "cc", "server", "stdio")
-    d.edge("e2", "ours", "server", "stdio, --review", extra="exitX=1;exitY=0.3;entryX=0.1;entryY=1;")
+    d.edge("e2", "ours", "server", "stdio, --review", extra="exitX=1;exitY=0.5;entryX=0;entryY=0.75;",
+           points=[(265, 337), (265, 197)])  # fmt: skip
     for i, (key, label) in enumerate([
         ("reader", "<b>Reader</b><br>3 layouts, strictest answer"),
         ("rules", "<b>Rules engine</b><br>decides; $0"),
@@ -82,10 +83,10 @@ def figure1(out: pathlib.Path) -> None:
     d.icon("iam", "IAM: the caller's<br>own credentials", SECURITY, "identity_and_access_management", 1210, 215, 56)
     d.add("pub", "Public Bedrock endpoint over HTTPS, signed with the caller's credentials. Cost tagged to the "
           "series.", NOTE, 960, 325, 360, 40)  # fmt: skip
-    d.edge("e3", "reader", "bedrock", "InvokeModel", extra="exitX=0.5;exitY=1;entryX=0;entryY=0.75;",
-           points=[(362, 450), (1000, 450), (1000, 257)])  # fmt: skip
-    d.edge("e4", "drafter", "bedrock", extra="exitX=0.5;exitY=1;entryX=0;entryY=0.75;",
-           points=[(797, 450)])  # fmt: skip
+    d.edge("e3", "server", "bedrock", extra="exitX=1;exitY=0.5;entryX=0;entryY=0.5;",
+           points=[(900, 178), (900, 243)])  # fmt: skip
+    d.add("e3label", "InvokeModel<br>(Reader, Drafter)", "text;html=1;align=center;fontSize=10;fontColor=#232F3E;",
+          945, 205, 100, 30)  # fmt: skip
     # --- next: hosted ---
     d.add("next", "<b>Next</b>: stage 6 hardening, priced before it runs; not built", LANE, 20, 490, 600, 24)
     d.box("client2", "<b>Any MCP client</b><br>Claude Code, a team's agent<br>(Streamable HTTP)", 40, 600, 190, 70,
@@ -149,17 +150,17 @@ def figure3(out: pathlib.Path) -> None:
     d.add("order", "Same answers either way (91 of 99 right, 3 missed, both). The order changed how often the model "
           "re-sent a value already recorded.", NOTE, 470, 300, 380, 50)  # fmt: skip
     # errors across the wire
-    d.add("errhead", "<b>What a client sees when a call is wrong</b>: decide({\"lands\": \"farm\"})", LANE, 20, 510,
+    d.add("errhead", "<b>What a client sees when a call is wrong</b>: decide({\"lands\": \"farm\"})", LANE, 20, 490,
           900, 24)  # fmt: skip
     d.box("err1", "<b>Ordinary exception</b> (the SDK keeps its text on the server)<br>client gets: <i>Error "
-          "executing tool decide</i><br>a model can't tell what to fix", 20, 545, 420, 76, fill="#FCEBEC", stroke=BAD,
+          "executing tool decide</i><br>a model can't tell what to fix", 20, 522, 420, 60, fill="#FCEBEC", stroke=BAD,
           extra="strokeWidth=2;")  # fmt: skip
     d.box("err2", "<b>ToolError</b> (what the server raises)<br>client gets: <i>lands must be a list. Example: "
-          "{\"lands\": [\"company_property\"]}.</i><br>the D38 helpful errors survive the transport", 470, 545, 450,
-          76, fill="#FFFFFF", stroke=GOOD, extra="strokeWidth=2;")  # fmt: skip
-    d.add("errnote", "Found by a test before any spend: every deliberate error is now a ToolError.", NOTE, 20, 630,
+          "{\"lands\": [\"company_property\"]}.</i><br>the D38 helpful errors survive the transport", 470, 522, 450,
+          60, fill="#FFFFFF", stroke=GOOD, extra="strokeWidth=2;")  # fmt: skip
+    d.add("errnote", "Found by a test before any spend: every deliberate error is now a ToolError.", NOTE, 20, 590,
           900, 24)  # fmt: skip
-    d.write(out / "article-5-figure-03.drawio", "Article 5: two clients, one server", 1320, 670)
+    d.write(out / "article-5-figure-03.drawio", "Article 5: two clients, one server", 1320, 625)
 
 
 if __name__ == "__main__":

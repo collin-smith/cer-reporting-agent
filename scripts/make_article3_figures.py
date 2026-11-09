@@ -45,9 +45,9 @@ def figure1(out: pathlib.Path) -> None:
           50)  # fmt: skip
     rows = [  # (key, y, lane text, metrics)
         ("wf", 100, "<b>A. Fixed workflow</b><br>the code sets every step", "$0.56 per 1,000 reports · p95 1.8 s"),
-        ("ag", 300, "<b>B. One reviewing agent</b><br>the model chooses its next tool, up to 10 turns",
+        ("ag", 250, "<b>B. One reviewing agent</b><br>the model chooses its next tool, up to 10 turns",
          "$0.85 per 1,000 reports · p95 13 s"),
-        ("sv", 520, "<b>C. Supervisor + two specialists</b><br>a model directs two others, each with its own tools",
+        ("sv", 440, "<b>C. Supervisor + two specialists</b><br>a model directs two others, each with its own tools",
          "$1.43 per 1,000 reports · p95 16 s"),
     ]  # fmt: skip
     for key, y, lane, metrics in rows:
@@ -66,37 +66,37 @@ def figure1(out: pathlib.Path) -> None:
         d.edge(f"{key}e9", f"{key}packet", f"{key}approver")
     d.edge("wfe3", "wfrules", "wfpacket")
     # B: one agent with four tools; a patch goes back through the rules engine
-    d.box("agent", "<b>Reviewing agent</b> (Strands)<br>checks the reading against the report", 680, 300, 200, 70,
+    d.box("agent", "<b>Reviewing agent</b> (Strands)<br>checks the reading against the report", 680, 250, 200, 70,
           **AGENT, extra=CENTER)  # fmt: skip
     d.box("agtools", "<b>Tools</b>: patch_facts (stricter only; a loosening change is held for the approver) · "
-          "confirm_missing · rule_text · finish", 680, 390, 340, 54, fill="#FFFFFF", stroke=AGENT_STROKE,
+          "confirm_missing · rule_text · finish", 680, 340, 340, 38, fill="#FFFFFF", stroke=AGENT_STROKE,
           extra="fontSize=10;")  # fmt: skip
     d.edge("age3", "agrules", "agent")
     d.edge("age4", "agent", "agrules", "a patch is re-decided", dashed=True,
-           extra="exitX=0.25;exitY=0;entryX=0.75;entryY=0;", points=[(730, 285), (600, 285)])  # fmt: skip
+           extra="exitX=0.25;exitY=0;entryX=0.75;entryY=0;", points=[(730, 235), (600, 235)])  # fmt: skip
     d.edge("age5", "agent", "agpacket", "finish")
     d.edge("age6", "agent", "agtools", dashed=True, extra="endArrow=none;")
     # C: supervisor, two specialists
-    d.box("sup", "<b>Supervisor</b><br>asks, then finishes<br>≤ 2 calls per specialist", 680, 515, 180, 70, **AGENT,
+    d.box("sup", "<b>Supervisor</b><br>asks, then finishes<br>≤ 2 calls per specialist", 680, 440, 180, 70, **AGENT,
           extra=CENTER)  # fmt: skip
-    d.box("comp", "<b>Completeness specialist</b><br>patch_facts · confirm_missing", 660, 630, 190, 54, **AGENT,
+    d.box("comp", "<b>Completeness specialist</b><br>patch_facts · confirm_missing", 660, 550, 190, 54, **AGENT,
           extra=CENTER + "fontSize=10;")  # fmt: skip
-    d.box("pol", "<b>Policy specialist</b><br>rule_text (read-only)", 870, 630, 170, 54, **AGENT,
+    d.box("pol", "<b>Policy specialist</b><br>rule_text (read-only)", 870, 550, 170, 54, **AGENT,
           extra=CENTER + "fontSize=10;")  # fmt: skip
     d.edge("sve3", "svrules", "sup")
     d.edge("sve4", "sup", "comp", "short handoff", extra="exitX=0.3;exitY=1;entryX=0.5;entryY=0;")
     d.edge("sve5", "sup", "pol", extra="exitX=0.8;exitY=1;entryX=0.5;entryY=0;")
     d.edge("sve6", "sup", "svpacket", "finish")
     # where the models run
-    d.group("cloud", "AWS Cloud", "group_aws_cloud_alt", CLOUD, 1100, 620, 250, 175)
-    d.group("region", "Canada (Central) ca-central-1", "group_region", REGION, 1115, 655, 220, 125)
-    d.icon("bedrock", "Amazon Bedrock: Nova Lite<br>tagged inference profile", AI, "bedrock", 1201, 692, 48)
+    d.group("cloud", "AWS Cloud", "group_aws_cloud_alt", CLOUD, 1100, 540, 250, 175)
+    d.group("region", "Canada (Central) ca-central-1", "group_region", REGION, 1115, 575, 220, 125)
+    d.icon("bedrock", "Amazon Bedrock: Nova Lite<br>tagged inference profile", AI, "bedrock", 1201, 612, 48)
     # legend
-    d.box("lg1", "our Python code", 210, 720, 130, 30, **CODE, extra=CENTER)
-    d.box("lg2", "a model chooses the next step", 360, 720, 200, 30, **AGENT, extra=CENTER)
+    d.box("lg1", "our Python code", 210, 640, 130, 30, **CODE, extra=CENTER)
+    d.box("lg2", "a model chooses the next step", 360, 640, 200, 30, **AGENT, extra=CENTER)
     d.add("lg3", "Every model call (reading, agent, supervisor, specialists) goes to Nova Lite on Bedrock in Canada, "
-          "through one tagged profile.", NOTE, 580, 720, 470, 40)  # fmt: skip
-    d.write(out / "article-3-figure-01.drawio", "Article 3: three designs", 1370, 810)
+          "through one tagged profile.", NOTE, 580, 640, 470, 40)  # fmt: skip
+    d.write(out / "article-3-figure-01.drawio", "Article 3: three designs", 1370, 730)
 
 
 def figure3(out: pathlib.Path) -> None:
