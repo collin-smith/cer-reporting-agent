@@ -43,13 +43,18 @@ def auto_widths(headers, rows, total=TABLE_WIDTH):
     # Header text doesn't wrap, so a column never shrinks below its (bold) header.
     floor = [max(MIN_COL, len(h) * CHAR_WIDTH * 1.1 + 2 * CELL_PAD_X) for h in headers]
     widths = [max(f, w) for f, w in zip(floor, natural, strict=True)]
-    while sum(widths) > total:
-        shrinkable = [i for i, w in enumerate(widths) if w > floor[i]]
-        if not shrinkable:
-            break
-        i = max(shrinkable, key=lambda k: widths[k])
-        widths[i] = max(floor[i], widths[i] - (sum(widths) - total))
-    return [int(w) for w in widths]
+    if sum(widths) <= total:
+        return [int(w) for w in widths]
+    # Too wide: cap every column at one shared width (never below its floor), the largest cap that fits, so the
+    # widest columns shrink together instead of one collapsing to its floor.
+    lo, hi = 0.0, max(widths)
+    for _ in range(40):
+        cap = (lo + hi) / 2
+        if sum(max(f, min(w, cap)) for f, w in zip(floor, widths, strict=True)) > total:
+            hi = cap
+        else:
+            lo = cap
+    return [int(max(f, min(w, lo))) for f, w in zip(floor, widths, strict=True)]
 
 
 def render_table(out_stem, headers, rows, col_widths=None, font_family="Helvetica, Arial, sans-serif"):
