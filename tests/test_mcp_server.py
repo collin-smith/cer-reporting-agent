@@ -35,6 +35,17 @@ def test_public_scope_hides_the_review_tools():
     assert set(mcp_server.AGENT_TOOLS) <= set(review) and "open_case" in review
 
 
+def test_agent_tool_order_is_pinned_per_path():
+    """D48: the order the agent's model sees changed its redundant calls (D47: 0.88 no-op patches a case in-process,
+    0.16 through MCP), with the same answers, so the CI gate wouldn't notice. Each path keeps the order it was
+    measured with; change one only with a re-measure."""
+    served = [n for n in names(mcp_server.build(review=True)) if n in mcp_server.AGENT_TOOLS]
+    assert served == ["rule_text", "patch_facts", "confirm_missing", "finish"]  # MCP: the server's order
+    in_process = [t.tool_name for t in Case.tools(Case.__new__(Case))]
+    assert in_process == ["patch_facts", "confirm_missing", "rule_text", "finish"]  # articles 2-3
+    assert list(mcp_server.AGENT_TOOLS) == in_process  # what the -inorder arm sorts by
+
+
 def test_agent_tools_have_the_in_process_descriptions():
     tools = {t.name: t for t in asyncio.run(mcp_server.build(review=True).list_tools())}
     for name in mcp_server.AGENT_TOOLS:
