@@ -25,6 +25,9 @@ Arms:
   against the report and can escalate; the rules engine computes the packet from its last reading;
 - workflow-nova-strict: the strictest-of-layouts check (D33): each report read as written and in each layout variant,
   decisions combined on the stricter side (workflow.combine); about 3 calls a case, in parallel;
+- agent-nova-lg (article 4): the single agent with its loop built in LangGraph (cer_agent.agent_lg); the same
+  prompt, tools, gate and model, so only the framework differs; agent-nova-stop is the Strands agent with its loop
+  ending at `finish`, as the graph's does, to separate the framework from that choice;
 - workflow-nova-strict-mcp, agent-nova-mcp (article 5): the same two, run through the MCP server (cer_agent.mcp_client,
   one server process per run); each row also records the seconds MCP added (mcp_overhead_s);
 - oracle: the case's own facts go straight to the rules. $0. Checks the harness and that labels match the rules.
@@ -533,6 +536,8 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     elif arm.startswith(("agent-", "supervisor-")):
         if arm.startswith("supervisor-"):
             from cer_agent.supervisor import run as run_agent
+        elif arm.endswith("-lg"):  # article 4: the same agent, its loop built in LangGraph
+            from cer_agent.agent_lg import run as run_agent
         else:
             from cer_agent.agent import run as run_agent
 
@@ -542,6 +547,9 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
 
             x = mcp_client.run_agent(mcp_client.shared(), os.environ[model["env"]], case["report"], received,
                                      model.get("region", "ca-central-1"), arm.endswith("-inorder"))  # fmt: skip
+        elif arm.endswith("-stop"):  # article 4: the Strands agent ending its loop at finish, as the graph does
+            x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"),
+                          stop_at_finish=True)  # fmt: skip
         else:
             x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
         got, pk = x["facts"], x["packet"]
@@ -588,6 +596,8 @@ ARMS = {
     "workflow-nova-strict-mcp": "nova-lite",  # article 5: the strict check through the MCP server
     "agent-nova-mcp": "nova-lite",  # article 5: the single agent with its tools on the MCP server
     "agent-nova-mcp-inorder": "nova-lite",  # the same, tools in the in-process order (what tool order changes)
+    "agent-nova-stop": "nova-lite",  # article 4: the Strands agent, its loop ending at finish (as agent-nova-lg)
+    "agent-nova-lg": "nova-lite",  # article 4: the single agent built again in LangGraph (same prompt and tools)
 }
 
 

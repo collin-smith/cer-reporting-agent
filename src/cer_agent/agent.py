@@ -278,9 +278,10 @@ class Case:
         self.finished = {"escalate": escalate, "reason": reason}
         return "Done. Stop now."
 
-    def tools(self) -> list:
-        """The four tools as Strands tools, for the in-process agent."""
-        from strands import tool
+    def tools(self, stop_at_finish: bool = False) -> list:
+        """The four tools as Strands tools, for the in-process agent. stop_at_finish (article 4): `finish` also ends
+        the loop, as the LangGraph build's graph does, instead of sending "Done. Stop now." back for one more turn."""
+        from strands import ToolContext, tool
 
         def patch_facts(field: str, value: str, quote: str) -> str:
             return self.patch_facts(field, value, quote)
@@ -294,10 +295,20 @@ class Case:
         def finish(escalate: bool, reason: str) -> str:
             return self.finish(escalate, reason)
 
+        def finish_and_stop(escalate: bool, reason: str, tool_context: ToolContext) -> str:
+            tool_context.agent.cancel(after_current_tools=True)  # no model call after this tool batch
+            return self.finish(escalate, reason)
+
         fns = [patch_facts, confirm_missing, rule_text, finish]
         for f in fns:
             f.__doc__ = getattr(Case, f.__name__).__doc__
-        return [tool(f) for f in fns]
+        tools = [tool(f) for f in fns]
+        if stop_at_finish:
+            finish_and_stop.__doc__ = Case.finish.__doc__
+            finish_and_stop.__annotations__["tool_context"] = ToolContext  # the class, not the string this module's
+            # `from __future__ import annotations` leaves, so Strands recognises the context parameter
+            tools[-1] = tool(name="finish", context=True)(finish_and_stop)
+        return tools
 
     def result(self, workflow_status: str, trace: dict) -> dict:
         """The packet the case ends with: the rules engine's, from the reviewed facts, with the agent's trace. A
@@ -323,7 +334,7 @@ def _session(region: str):
 
 
 def run(model_id: str, report: str, received: dt.date | None = None, region: str = "ca-central-1",
-        client=None) -> dict:  # fmt: skip
+        client=None, stop_at_finish: bool = False) -> dict:  # fmt: skip
     """The workflow's reading first (one extraction), then the agent's review. Returns the rules engine's packet
     from the reviewed facts, the agent's trace (patches, confirmations, escalation), tokens and latency. A malformed
     model reply in the review is retried warmer; if every attempt fails, the workflow's packet stands, marked."""
@@ -341,7 +352,7 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
         )
         model = BedrockModel(model_id=model_id, boto_session=_session(region), temperature=temp, max_tokens=1000,
                              streaming=False)  # fmt: skip
-        agent = Agent(model=model, tools=case.tools(), system_prompt=SYSTEM, callback_handler=None)
+        agent = Agent(model=model, tools=case.tools(stop_at_finish), system_prompt=SYSTEM, callback_handler=None)
         try:
             result = agent(prompt, limits={"turns": MAX_TURNS})
         except Exception as e:  # noqa: BLE001 - a model error ends this attempt; usage so far still counts
@@ -351,7 +362,8 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
             continue
         usage = result.metrics.accumulated_usage
         tin, tout = tin + usage.get("inputTokens", 0), tout + usage.get("outputTokens", 0)
-        trace = {"stop_reason": str(result.stop_reason), "turns": result.metrics.cycle_count}
+        trace = {"stop_reason": str(result.stop_reason), "turns": result.metrics.cycle_count,
+                 **({"stop_at_finish": True} if stop_at_finish else {})}  # fmt: skip
         break
     else:  # every review attempt failed: the workflow's own packet stands
         case, trace = Case(report, received, x["raw"]), {"error": f"{type(last).__name__}: {last}"[:200]}

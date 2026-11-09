@@ -18,6 +18,10 @@ dev = [
     "pytest>=8.0",
     "cairosvg>=2.7",
 ]
+langgraph = [  # article 4: the reviewing agent built a second time, in LangGraph
+    "langgraph>=1.0",
+    "langchain-aws>=1.0",
+]
 render = [
     "pillow>=11",
     "reportlab>=4.2",
