@@ -1,7 +1,7 @@
 """Article 6 (D50): measure a Bedrock Guardrail on the field reports, and test whether an injected line moves a reading.
 
 Usage (from code/, with src on PYTHONPATH):
-  python -m cer_agent.guard scan              # ApplyGuardrail over every report (GUARDRAIL_ID; ~$0.07)
+  python -m cer_agent.guard scan              # ApplyGuardrail over every report (GUARDRAIL_ID; ~$0.05 without PII)
   python -m cer_agent.guard ablate            # instruction cases read with and without the injected line
                                               # (NOVA_LITE_ARN; ~$0.05)
   python -m cer_agent.guard summary RUN_DIR   # re-summarise a saved run ($0)

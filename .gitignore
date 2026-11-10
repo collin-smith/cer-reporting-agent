@@ -17,3 +17,6 @@ infra/terraform.tfvars
 # Rendered documents (D24): regenerate with scripts/render_docs.py; manifest.json and ocr/ are committed
 evals/renders/*.pdf
 evals/renders/*.jpg
+
+# Lambda package, built by scripts/build_lambda.py
+infra/build/

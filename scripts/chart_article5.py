@@ -81,7 +81,7 @@ def figure2(out: pathlib.Path) -> None:
                   "changed through MCP was the order of the tool list.", size=12.5, fill=TEXT_2),
              text(24, 78, "Status right 91 of 99 and 3 missed, in-process and through MCP alike. Bars: mean over all "
                   "runs. Ticks: each pass's mean.", size=12.5, fill=TEXT_2)]  # fmt: skip
-    for i, (label, sub, m) in enumerate(data):
+    for i, (label, sub, _m) in enumerate(data):
         y = TOP + i * ROW
         parts.append(text(LEFT - 14, y + 10, label, size=13, anchor="end", weight="bold"))
         parts.append(text(LEFT - 14, y + 27, sub, size=11.5, fill=TEXT_2, anchor="end"))
@@ -106,9 +106,9 @@ def figure2(out: pathlib.Path) -> None:
                                  f'stroke="{TEXT}" stroke-width="2"/>')  # fmt: skip
             right = max([mean, *passes])
             parts.append(text(sx(right) + 8, y + BAR_H / 2 + 4.5, fmt.format(mean), size=12.5, weight="bold"))
-    parts.append(text(24, H - 46, "A no-op patch re-sends a value the case already holds; the tool answers \"nothing to "
-                      "change\". Restoring the in-process order through MCP brought it back to 0.61,", size=12,
-                      fill=TEXT_2))  # fmt: skip
+    parts.append(text(24, H - 46, "A no-op patch re-sends a value the case already holds; the tool answers "
+                      "\"nothing to change\". Restoring the in-process order through MCP brought it back to 0.61,",
+                      size=12, fill=TEXT_2))  # fmt: skip
     parts.append(text(24, H - 28, "inside the in-process range (0.45–1.18 by pass), so the order explains most of the "
                       "gap. One pass: a direction, not a precise split.", size=12, fill=TEXT_2))  # fmt: skip
     save(parts, W, H, out / "article-5-figure-02")

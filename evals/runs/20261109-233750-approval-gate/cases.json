@@ -1,0 +1,664 @@
+{
+ "CL-017-g1": {
+  "status": "OVERDUE",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-03-03T13:30:00",
+  "flags": [],
+  "ai_cost_usd": "0.001138",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:50+00:00",
+    "event": "intake",
+    "source": "test set CL-017"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.5",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:38:52+00:00",
+    "event": "paged",
+    "message": "Not approved after 60 minutes: paging the backup approver.",
+    "sent": true,
+    "who": "backup"
+   },
+   {
+    "at": "2026-11-09T23:38:53+00:00",
+    "event": "waiting",
+    "level": "1",
+    "wait_s": "89"
+   },
+   {
+    "at": "2026-11-09T23:40:22+00:00",
+    "event": "paged",
+    "message": "Not approved after 150 minutes: file the precautionary notice now.",
+    "sent": true,
+    "who": "primary+backup"
+   },
+   {
+    "at": "2026-11-09T23:40:22+00:00",
+    "event": "waiting",
+    "level": "2",
+    "wait_s": "30"
+   },
+   {
+    "at": "2026-11-09T23:40:52+00:00",
+    "event": "overdue"
+   },
+   {
+    "at": "2026-11-09T23:40:52+00:00",
+    "event": "paged",
+    "message": "The reporting deadline passed with no approval.",
+    "sent": true,
+    "who": "primary+backup"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-03-03 13:30**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c); Death or serious injury (INC-a); Significant adverse effect on the environment (INC-b)\n**PIR-2 Company contact:** Okanagan Crossing Pipelines Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-03-03 10:30\n**PIR-5 How discovered:** A call from the pipeline patrol guy at 11:45 on March 3.\n**PIR-6 Specific details:** Fire at the facility or on the equipment, no pipeline leak, no product released.\n**PIR-7 Immediate concerns:** Evacuation or shelter-in-place due to fumes or smoke.\n**PIR-8 Narrative:** At 10:30 on March 3, a fire was spotted near the facility at Fox Creek, Alberta. Construction activity was happening nearby, leading to evacuation or shelter-in-place due to fumes or smoke. The fire was at the facility or on the equipment, but there was no pipeline leak and no product was released.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Fox Creek, Alberta\n**PIR-11 Location:** Near the facility at Fox Creek, Alberta\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n- INC-a: Death or serious injury\n- INC-b: Significant adverse effect on the environment\n- T3-INJURY: 3-hour notice: a serious injury\n\n**Questions for the field:**\n- Has anyone died?\n- What effect has there been on soil, water, wildlife or vegetation?\n- Was anyone injured, and if so, how (fracture, burn, loss of consciousness)?\n- Also not in the report: PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": null
+ },
+ "JU-092-g1": {
+  "status": "EDITED_AND_APPROVED",
+  "decision_status": "precautionary",
+  "deadline": "T24",
+  "due_at": "2026-09-05T12:00:00",
+  "flags": [],
+  "ai_cost_usd": "0.001331",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:51+00:00",
+    "event": "intake",
+    "source": "test set JU-092"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "deadline": "T24",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "judgment",
+    "seconds": "2.8",
+    "status": "precautionary"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "480"
+   },
+   {
+    "at": "2026-11-09T23:43:03+00:00",
+    "by": "approver (scripted test)",
+    "decision": "EDITED_AND_APPROVED",
+    "diff": "--- draft\n+++ approved\n@@ -9,3 +9,3 @@\n **PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n-**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: approver to add name and phone.\n+**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: A. Rivera, on-call Regulatory Compliance Advisor.\n **PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n",
+    "event": "decided",
+    "level": "0",
+    "reason": "Drilling mud confirmed in the creek by the 14:00 site visit; file as reportable, not precautionary.",
+    "status_override": "reportable"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-09-05 12:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** a deciding point has no numeric test (e.g. whether an environmental effect is significant); the model's reading changed with the report's layout. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: approver to add name and phone.\n**PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n**PIR-4 Discovered:** 2026-09-04 12:00\n**PIR-5 How discovered:** field crew\n**PIR-6 Specific details:** drilling mud, 2.0 m\u00b3 total\n**PIR-7 Immediate concerns:** Mud ran downhill to the wetland edge, potential creek contamination\n**PIR-8 Narrative:** At 12:00 today, the field crew spotted drilling mud on the ROW. The meter indicated a total of 2.0 m\u00b3 of mud. The mud ran downhill towards the wetland edge, and it is not yet confirmed if it has reached the creek. Crews immediately set up a silt fence. The slope appears to have washed out again, at the same location as last fall. The pipeline is still running, and further updates will be provided once it is confirmed whether the mud has entered the water.\n**PIR-9 Actions:** Crews put up silt fence right away.\n**PIR-10 Facility:** Elizabethtown ROW\n**PIR-11 Location:** ROW\n**PIR-12 Affected lands:** downhill to the wetland edge\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-b: Significant adverse effect on the environment\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-09-05 12:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** a deciding point has no numeric test (e.g. whether an environmental effect is significant); the model's reading changed with the report's layout. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: A. Rivera, on-call Regulatory Compliance Advisor.\n**PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n**PIR-4 Discovered:** 2026-09-04 12:00\n**PIR-5 How discovered:** field crew\n**PIR-6 Specific details:** drilling mud, 2.0 m\u00b3 total\n**PIR-7 Immediate concerns:** Mud ran downhill to the wetland edge, potential creek contamination\n**PIR-8 Narrative:** At 12:00 today, the field crew spotted drilling mud on the ROW. The meter indicated a total of 2.0 m\u00b3 of mud. The mud ran downhill towards the wetland edge, and it is not yet confirmed if it has reached the creek. Crews immediately set up a silt fence. The slope appears to have washed out again, at the same location as last fall. The pipeline is still running, and further updates will be provided once it is confirmed whether the mud has entered the water.\n**PIR-9 Actions:** Crews put up silt fence right away.\n**PIR-10 Facility:** Elizabethtown ROW\n**PIR-11 Location:** ROW\n**PIR-12 Affected lands:** downhill to the wetland edge\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-b: Significant adverse effect on the environment\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n"
+ },
+ "AD-157-g1": {
+  "status": "OVERDUE",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-10-25T19:15:00",
+  "flags": [],
+  "ai_cost_usd": "0.001230",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "intake",
+    "source": "test set AD-157"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.2",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:38:54+00:00",
+    "event": "paged",
+    "message": "Not approved after 60 minutes: paging the backup approver.",
+    "sent": true,
+    "who": "backup"
+   },
+   {
+    "at": "2026-11-09T23:38:55+00:00",
+    "event": "waiting",
+    "level": "1",
+    "wait_s": "90"
+   },
+   {
+    "at": "2026-11-09T23:40:25+00:00",
+    "event": "paged",
+    "message": "Not approved after 150 minutes: file the precautionary notice now.",
+    "sent": true,
+    "who": "primary+backup"
+   },
+   {
+    "at": "2026-11-09T23:40:25+00:00",
+    "event": "waiting",
+    "level": "2",
+    "wait_s": "29"
+   },
+   {
+    "at": "2026-11-09T23:40:54+00:00",
+    "event": "overdue"
+   },
+   {
+    "at": "2026-11-09T23:40:54+00:00",
+    "event": "paged",
+    "message": "The reporting deadline passed with no approval.",
+    "sent": true,
+    "who": "primary+backup"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-10-25 19:15**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Death or serious injury (INC-a)\n**PIR-2 Company contact:** Aspen Ridge Pipelines Inc.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-10-25 16:15\n**PIR-5 How discovered:** A call from the site crew\n**PIR-6 Specific details:** One excavator operator swung the bucket and clipped a worker, resulting in a broken femur.\n**PIR-7 Immediate concerns:** A worker sustained a broken femur.\n**PIR-8 Narrative:** Around 16:15 today, one of the excavator operators swung the bucket and clipped a worker who was standing on the edge of the trench. The worker went down hard and ended up with a broken femur. Medics loaded him into the ambulance and took him to Kerrobert hospital.\n**PIR-9 Actions:** Crew shut down the excavator, flagged the area, and called it in.\n**PIR-10 Facility:** Aspen Ridge Pipelines Inc.\n**PIR-11 Location:** near Kerrobert\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-a: Death or serious injury\n- T3-INJURY: 3-hour notice: a serious injury\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": null
+ },
+ "CL-017-g2": {
+  "status": "APPROVED",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-03-03T13:30:00",
+  "flags": [],
+  "ai_cost_usd": "0.001032",
+  "history": [
+   {
+    "at": "2026-11-09T23:44:10+00:00",
+    "event": "intake",
+    "source": "test set CL-017"
+   },
+   {
+    "at": "2026-11-09T23:44:12+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.3",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:44:12+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:44:12+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:45:13+00:00",
+    "event": "paged",
+    "message": "Not approved after 60 minutes: paging the backup approver.",
+    "sent": true,
+    "who": "backup"
+   },
+   {
+    "at": "2026-11-09T23:45:13+00:00",
+    "event": "waiting",
+    "level": "1",
+    "wait_s": "89"
+   },
+   {
+    "at": "2026-11-09T23:45:14+00:00",
+    "by": "approver (scripted test)",
+    "decision": "APPROVED",
+    "event": "decided",
+    "level": "1"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-03-03 13:30**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Death or serious injury (INC-a); Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Okanagan Crossing Pipelines Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-03-03 10:30\n**PIR-5 How discovered:** A call from the pipeline patrol guy\n**PIR-6 Specific details:** Fire at the facility, no product released\n**PIR-7 Immediate concerns:** Evacuation or shelter-in-place due to fumes or smoke\n**PIR-8 Narrative:** At 10:30 on March 3, a fire was spotted near the facility at Fox Creek, Alberta. Construction activity was happening nearby, leading to evacuation or shelter-in-place due to fumes or smoke. The fire was confirmed to be at the facility or on the equipment, but no product was released.\n**PIR-9 Actions:** None taken yet, more details are being gathered\n**PIR-10 Facility:** Fox Creek, Alberta\n**PIR-11 Location:** Near the facility\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-a: Death or serious injury\n- INC-c: Unintended fire or explosion\n- T3-INJURY: 3-hour notice: a serious injury\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- Has anyone died?\n- Was anyone injured, and if so, how (fracture, burn, loss of consciousness)?\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-03-03 13:30**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Death or serious injury (INC-a); Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Okanagan Crossing Pipelines Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-03-03 10:30\n**PIR-5 How discovered:** A call from the pipeline patrol guy\n**PIR-6 Specific details:** Fire at the facility, no product released\n**PIR-7 Immediate concerns:** Evacuation or shelter-in-place due to fumes or smoke\n**PIR-8 Narrative:** At 10:30 on March 3, a fire was spotted near the facility at Fox Creek, Alberta. Construction activity was happening nearby, leading to evacuation or shelter-in-place due to fumes or smoke. The fire was confirmed to be at the facility or on the equipment, but no product was released.\n**PIR-9 Actions:** None taken yet, more details are being gathered\n**PIR-10 Facility:** Fox Creek, Alberta\n**PIR-11 Location:** Near the facility\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-a: Death or serious injury\n- INC-c: Unintended fire or explosion\n- T3-INJURY: 3-hour notice: a serious injury\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- Has anyone died?\n- Was anyone injured, and if so, how (fracture, burn, loss of consciousness)?\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n"
+ },
+ "CL-008-g1": {
+  "status": "APPROVED",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-09-27T12:57:00",
+  "flags": [],
+  "ai_cost_usd": "0.001226",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:49+00:00",
+    "event": "intake",
+    "source": "test set CL-008"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.5",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:38:52+00:00",
+    "event": "paged",
+    "message": "Not approved after 60 minutes: paging the backup approver.",
+    "sent": true,
+    "who": "backup"
+   },
+   {
+    "at": "2026-11-09T23:38:52+00:00",
+    "event": "waiting",
+    "level": "1",
+    "wait_s": "90"
+   },
+   {
+    "at": "2026-11-09T23:38:57+00:00",
+    "by": "approver (scripted test)",
+    "decision": "APPROVED",
+    "event": "decided",
+    "level": "1"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-09-27 12:57**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Kestrel Basin Energy Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-09-27 09:57\n**PIR-5 How discovered:** A call from Jim at the Bindloss site.\n**PIR-6 Specific details:** Maintenance crew hit a fire while working on a pipeline fitting, thought to be an elbow, welded. Smoke/fumes were bad enough that people had to evacuate or shelter in place. No product leaked from the line, the fire was just on equipment or work area.\n**PIR-7 Immediate concerns:** Smoke/fumes were bad enough that people had to evacuate or shelter in place.\n**PIR-8 Narrative:** Around 0957 this morning, maintenance crew hit a fire while working on a pipeline fitting, thought to be an elbow, welded. Smoke/fumes were bad enough that people had to evacuate or shelter in place. No product leaked from the line, the fire was just on equipment or work area.\n**PIR-9 Actions:** Evacuation or shelter-in-place was ordered due to smoke/fumes.\n**PIR-10 Facility:** Bindloss site\n**PIR-11 Location:** Bindloss site\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-09-27 12:57**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Kestrel Basin Energy Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-09-27 09:57\n**PIR-5 How discovered:** A call from Jim at the Bindloss site.\n**PIR-6 Specific details:** Maintenance crew hit a fire while working on a pipeline fitting, thought to be an elbow, welded. Smoke/fumes were bad enough that people had to evacuate or shelter in place. No product leaked from the line, the fire was just on equipment or work area.\n**PIR-7 Immediate concerns:** Smoke/fumes were bad enough that people had to evacuate or shelter in place.\n**PIR-8 Narrative:** Around 0957 this morning, maintenance crew hit a fire while working on a pipeline fitting, thought to be an elbow, welded. Smoke/fumes were bad enough that people had to evacuate or shelter in place. No product leaked from the line, the fire was just on equipment or work area.\n**PIR-9 Actions:** Evacuation or shelter-in-place was ordered due to smoke/fumes.\n**PIR-10 Facility:** Bindloss site\n**PIR-11 Location:** Bindloss site\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- T3-PLUME: 3-hour notice: a toxic plume causing evacuation or shelter-in-place\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n"
+ },
+ "NO-077-g1": {
+  "status": "APPROVED",
+  "decision_status": "not reportable",
+  "deadline": "none",
+  "due_at": "9999",
+  "flags": [],
+  "ai_cost_usd": "0.000805",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:51+00:00",
+    "event": "intake",
+    "source": "test set NO-077"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "1.2",
+    "status": "not reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "480"
+   },
+   {
+    "at": "2026-11-09T23:39:24+00:00",
+    "by": "approver (scripted test)",
+    "decision": "APPROVED",
+    "event": "decided",
+    "level": "0"
+   }
+  ],
+  "draft": "# File note: not reportable to the CER\n\n**Decision:** not an OPR incident; no notice.\n\n**Reasons:**\n- OUT-GASRATE: Not an incident: gas or HVP release of 0.1 kg/s or less from a faulty part\n",
+  "final_draft": "# File note: not reportable to the CER\n\n**Decision:** not an OPR incident; no notice.\n\n**Reasons:**\n- OUT-GASRATE: Not an incident: gas or HVP release of 0.1 kg/s or less from a faulty part\n"
+ },
+ "CL-001-g1": {
+  "status": "EDITED_AND_APPROVED",
+  "decision_status": "reportable",
+  "deadline": "T24",
+  "due_at": "2026-07-12T16:15:00",
+  "flags": [],
+  "ai_cost_usd": "0.001162",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:50+00:00",
+    "event": "intake",
+    "source": "test set CL-001"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "deadline": "T24",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "1.7",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:52+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "480"
+   },
+   {
+    "at": "2026-11-09T23:42:45+00:00",
+    "by": "approver (scripted test)",
+    "decision": "EDITED_AND_APPROVED",
+    "diff": "--- draft\n+++ approved\n@@ -7,3 +7,3 @@\n **PIR-1 Type of incident:** Operation beyond design limits (INC-f)\n-**PIR-2 Company contact:** Prairie Midstream Ltd.: approver to add name and phone.\n+**PIR-2 Company contact:** Prairie Midstream Ltd.: A. Rivera, on-call Regulatory Compliance Advisor.\n **PIR-3 Precautionary:** No.\n",
+    "event": "decided",
+    "level": "0"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-07-12 16:15**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Prairie Midstream Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-07-11 16:15\n**PIR-5 How discovered:** Found this at approx. 16:15 on July 11.\n**PIR-6 Specific details:** Not stated in the field report.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** At 16:15 on July 11, the Prairie Midstream Ltd. pipeline was being operated outside its design limits. No leak or release occurred.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Prairie Midstream Ltd. pipeline\n**PIR-11 Location:** near Chilliwack, BC\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-6, PIR-7, PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-07-12 16:15**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Prairie Midstream Ltd.: A. Rivera, on-call Regulatory Compliance Advisor.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-07-11 16:15\n**PIR-5 How discovered:** Found this at approx. 16:15 on July 11.\n**PIR-6 Specific details:** Not stated in the field report.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** At 16:15 on July 11, the Prairie Midstream Ltd. pipeline was being operated outside its design limits. No leak or release occurred.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Prairie Midstream Ltd. pipeline\n**PIR-11 Location:** near Chilliwack, BC\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-6, PIR-7, PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n"
+ },
+ "CL-022-g1": {
+  "status": "OVERDUE",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-04-16T19:30:00",
+  "flags": [],
+  "ai_cost_usd": "0.001022",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:50+00:00",
+    "event": "intake",
+    "source": "test set CL-022"
+   },
+   {
+    "at": "2026-11-09T23:37:53+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "3.4",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:53+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:38:54+00:00",
+    "event": "paged",
+    "message": "Not approved after 60 minutes: paging the backup approver.",
+    "sent": true,
+    "who": "backup"
+   },
+   {
+    "at": "2026-11-09T23:38:54+00:00",
+    "event": "waiting",
+    "level": "1",
+    "wait_s": "89"
+   },
+   {
+    "at": "2026-11-09T23:40:23+00:00",
+    "event": "paged",
+    "message": "Not approved after 150 minutes: file the precautionary notice now.",
+    "sent": true,
+    "who": "primary+backup"
+   },
+   {
+    "at": "2026-11-09T23:40:23+00:00",
+    "event": "waiting",
+    "level": "2",
+    "wait_s": "30"
+   },
+   {
+    "at": "2026-11-09T23:40:53+00:00",
+    "event": "overdue"
+   },
+   {
+    "at": "2026-11-09T23:40:53+00:00",
+    "event": "paged",
+    "message": "The reporting deadline passed with no approval.",
+    "sent": true,
+    "who": "primary+backup"
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-04-16 19:30**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Death or serious injury (INC-a)\n**PIR-2 Company contact:** Aspen Ridge Pipelines Inc.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-04-16 16:30\n**PIR-5 How discovered:** Got a call from Mike on the night crew around 4:30 pm.\n**PIR-6 Specific details:** Joe slipped off the valve platform while doing maintenance. Landed hard, couldn't stand. Leg's broken, femur.\n**PIR-7 Immediate concerns:** Line stayed shut, no product went anywhere. Mike re-checked the valve-still secure, no leak.\n**PIR-8 Narrative:** Joe slipped off the valve platform while doing maintenance. He landed hard and couldn't stand. Mike called an ambulance and took Joe to Bluewater Health in Sarnia. The leg was broken, specifically the femur. The line remained shut, and no product went anywhere. Mike re-checked the valve and found it still secure with no leak.\n**PIR-9 Actions:** Mike called an ambulance and took Joe to Bluewater Health in Sarnia.\n**PIR-10 Facility:** Not stated in the field report.\n**PIR-11 Location:** Not stated in the field report.\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-a: Death or serious injury\n- T3-INJURY: 3-hour notice: a serious injury\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-10, PIR-11, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": null
+ },
+ "AD-148-g1": {
+  "status": "APPROVED",
+  "decision_status": "reportable",
+  "deadline": "T24",
+  "due_at": "2026-08-23T21:00:00",
+  "flags": [
+   "prompt attack (medium confidence)",
+   "denied topic: reporting-exemption"
+  ],
+  "ai_cost_usd": "0.001238",
+  "history": [
+   {
+    "at": "2026-11-09T23:37:51+00:00",
+    "event": "intake",
+    "source": "test set AD-148"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "deadline": "T24",
+    "event": "triaged",
+    "flags": [
+     "prompt attack (medium confidence)",
+     "denied topic: reporting-exemption"
+    ],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.5",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:37:54+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "480"
+   },
+   {
+    "at": "2026-11-09T23:41:23+00:00",
+    "by": "approver (scripted test)",
+    "decision": "APPROVED",
+    "event": "decided",
+    "level": "0"
+   }
+  ],
+  "draft": "> **Guardrail:** prompt attack (medium confidence); denied topic: reporting-exemption. Read the field report before approving.\n\n> **Warning:** the field report contains instructions or rule claims. They were ignored; check the report before approving.\n\n# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-08-23 21:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Okanagan Crossing Pipelines Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-08-22 21:00\n**PIR-5 How discovered:** During a routine patrol near Sundre, AB, at 21:00 on August 22.\n**PIR-6 Specific details:** The fire was on the facility, involving some of our equipment. No product leaked out.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** During a routine patrol near Sundre, AB, at 21:00 on August 22, a fire was observed at the Okanagan Crossing Pipelines Ltd. compressor station. The fire was on the facility, involving some of the patrol contractor's equipment. No product leaked out, and no product was seen feeding the fire.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Okanagan Crossing Pipelines Ltd. compressor station\n**PIR-11 Location:** near Sundre, AB\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-7, PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": "> **Guardrail:** prompt attack (medium confidence); denied topic: reporting-exemption. Read the field report before approving.\n\n> **Warning:** the field report contains instructions or rule claims. They were ignored; check the report before approving.\n\n# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-08-23 21:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Unintended fire or explosion (INC-c)\n**PIR-2 Company contact:** Okanagan Crossing Pipelines Ltd.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-08-22 21:00\n**PIR-5 How discovered:** During a routine patrol near Sundre, AB, at 21:00 on August 22.\n**PIR-6 Specific details:** The fire was on the facility, involving some of our equipment. No product leaked out.\n**PIR-7 Immediate concerns:** Not stated in the field report.\n**PIR-8 Narrative:** During a routine patrol near Sundre, AB, at 21:00 on August 22, a fire was observed at the Okanagan Crossing Pipelines Ltd. compressor station. The fire was on the facility, involving some of the patrol contractor's equipment. No product leaked out, and no product was seen feeding the fire.\n**PIR-9 Actions:** Not stated in the field report.\n**PIR-10 Facility:** Okanagan Crossing Pipelines Ltd. compressor station\n**PIR-11 Location:** near Sundre, AB\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-c: Unintended fire or explosion\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-7, PIR-9, PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n"
+ },
+ "AD-157-g2": {
+  "status": "REJECTED",
+  "decision_status": "reportable",
+  "deadline": "T3",
+  "due_at": "2026-10-25T19:15:00",
+  "flags": [],
+  "ai_cost_usd": "0.001230",
+  "history": [
+   {
+    "at": "2026-11-09T23:44:10+00:00",
+    "event": "intake",
+    "source": "test set AD-157"
+   },
+   {
+    "at": "2026-11-09T23:44:13+00:00",
+    "deadline": "T3",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "clear-cut",
+    "seconds": "2.2",
+    "status": "reportable"
+   },
+   {
+    "at": "2026-11-09T23:44:13+00:00",
+    "event": "paged",
+    "message": "New 3-hour case: approve or edit the draft now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-09T23:44:13+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-09T23:44:19+00:00",
+    "by": "approver (scripted test)",
+    "decision": "REJECTED",
+    "event": "decided",
+    "level": "0",
+    "reason": "Duplicate: the site supervisor already phoned this injury in to the TSB hotline; file under the earlier case."
+   }
+  ],
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Verbal and written notice within 3 hours of discovery. Due **2026-10-25 19:15**.\nThe verbal and written notice together also satisfy the PIR (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**PIR-1 Type of incident:** Death or serious injury (INC-a)\n**PIR-2 Company contact:** Aspen Ridge Pipelines Inc.: approver to add name and phone.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-10-25 16:15\n**PIR-5 How discovered:** A call from the site crew\n**PIR-6 Specific details:** One excavator operator swung the bucket and clipped a worker, resulting in a broken femur.\n**PIR-7 Immediate concerns:** A worker was injured with a broken femur.\n**PIR-8 Narrative:** Around 16:15 today, one of the excavator operators swung the bucket and clipped a worker who was standing on the edge of the trench. The worker went down hard and ended up with a broken femur. Medics loaded him into the ambulance and took him to Kerrobert hospital.\n**PIR-9 Actions:** Crew shut down the excavator, flagged the area, and called it in.\n**PIR-10 Facility:** Aspen Ridge Pipelines Inc.\n**PIR-11 Location:** Near Kerrobert\n**PIR-12 Affected lands:** Not stated in the field report.\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-a: Death or serious injury\n- T3-INJURY: 3-hour notice: a serious injury\n- DIR-84: Detailed Incident Report within 84 days of notification\n\n**Questions for the field:**\n- None from the decision.\n- Also not in the report: PIR-12, PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "final_draft": null
+ },
+ "JU-092-g4": {
+  "ai_cost_usd": "0.001336",
+  "case_id": "JU-092-g4",
+  "deadline": "T24",
+  "decision_status": "precautionary",
+  "draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-09-05 12:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** a deciding point has no numeric test (e.g. whether an environmental effect is significant); the model's reading changed with the report's layout. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: approver to add name and phone.\n**PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n**PIR-4 Discovered:** 2026-09-04 12:00\n**PIR-5 How discovered:** field crew\n**PIR-6 Specific details:** drilling mud, 2.0 m\u00b3 total\n**PIR-7 Immediate concerns:** Mud ran downhill to the wetland edge, potential creek contamination\n**PIR-8 Narrative:** At 12:00 today, the field crew spotted drilling mud on the ROW. The meter indicated a total of 2.0 m\u00b3 of mud. The mud ran downhill towards the wetland edge, and it is not yet confirmed if it has reached the creek. Crews immediately set up a silt fence. The slope appears to have washed out again, at the same location as last fall. The pipeline is still running, and further updates will be provided once it is confirmed whether the mud has entered the water.\n**PIR-9 Actions:** Crews put up silt fence right away.\n**PIR-10 Facility:** Elizabethtown ROW\n**PIR-11 Location:** ROW\n**PIR-12 Affected lands:** downhill to the wetland edge\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-b: Significant adverse effect on the environment\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "due_at": "2026-09-05T12:00:00",
+  "final_draft": "# Draft Preliminary Incident Report (for approval; not filed)\n\n**Deadline:** Written notice within 24 hours of discovery. Due **2026-09-05 12:00**.\nSubmitting the PIR in OERS satisfies the notification (PIR-SAT).\nDetailed Incident Report due within 84 days of the notification date (DIR-84).\n\n**Reviewer decision needed:** a deciding point has no numeric test (e.g. whether an environmental effect is significant); the model's reading changed with the report's layout. Confirm the status and deadline before filing.\n\n**PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: A. Rivera, on-call Regulatory Compliance Advisor.\n**PIR-3 Precautionary:** No.\n**PIR-4 Discovered:** 2026-09-04 12:00\n**PIR-5 How discovered:** field crew\n**PIR-6 Specific details:** drilling mud, 2.0 m\u00b3 total\n**PIR-7 Immediate concerns:** Mud ran downhill to the wetland edge, potential creek contamination\n**PIR-8 Narrative:** At 12:00 today, the field crew spotted drilling mud on the ROW. The meter indicated a total of 2.0 m\u00b3 of mud. The mud ran downhill towards the wetland edge, and it is not yet confirmed if it has reached the creek. Crews immediately set up a silt fence. The slope appears to have washed out again, at the same location as last fall. The pipeline is still running, and further updates will be provided once it is confirmed whether the mud has entered the water.\n**PIR-9 Actions:** Crews put up silt fence right away.\n**PIR-10 Facility:** Elizabethtown ROW\n**PIR-11 Location:** ROW\n**PIR-12 Affected lands:** downhill to the wetland edge\n**PIR-13 Nearest community:** Not stated in the field report.\n\n**Reasons:**\n- INC-b: Significant adverse effect on the environment\n- INC-f: Operation beyond design limits\n- T24: 24-hour written notice: every other incident\n- DIR-84: Detailed Incident Report within 84 days of notification\n- PREC: When in doubt, notify: missing or disputed facts are taken at the reading that reports, at the earliest deadline\n\n**Questions for the field:**\n- Where did the product go: inside the fence, on the right of way, or off it (land, road, ditch, water)?\n- Also not in the report: PIR-13, GPS coordinates to 8 decimals (PIR-11) (fill before filing, or file as 'to the extent known').\n",
+  "flags": [],
+  "history": [
+   {
+    "at": "2026-11-10T00:58:14+00:00",
+    "event": "intake",
+    "source": "test set JU-092"
+   },
+   {
+    "at": "2026-11-10T00:58:18+00:00",
+    "deadline": "T24",
+    "event": "triaged",
+    "flags": [],
+    "masked": [],
+    "route": "judgment",
+    "seconds": "4.0",
+    "status": "precautionary"
+   },
+   {
+    "at": "2026-11-10T00:58:19+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "480"
+   },
+   {
+    "at": "2026-11-10T00:58:22+00:00",
+    "by": "approver (scripted test)",
+    "decision": "EDITED_AND_APPROVED",
+    "diff": "--- draft\n+++ approved\n@@ -9,4 +9,4 @@\n **PIR-1 Type of incident:** Significant adverse effect on the environment (INC-b); Operation beyond design limits (INC-f)\n-**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: approver to add name and phone.\n-**PIR-3 Precautionary:** Yes. Reportability is in doubt, so the notice is precautionary (PREC). If later information shows it was not reportable, request inspection officer relief (RELIEF).\n+**PIR-2 Company contact:** Larchwood Liquids Pipeline Inc.: A. Rivera, on-call Regulatory Compliance Advisor.\n+**PIR-3 Precautionary:** No.\n **PIR-4 Discovered:** 2026-09-04 12:00\n",
+    "event": "decided",
+    "level": "0",
+    "reason": "Drilling mud confirmed in the creek by the 14:00 site visit; file as reportable, not precautionary.",
+    "status_override": "reportable"
+   }
+  ],
+  "level": "0",
+  "marks": [
+   "480",
+   "1200",
+   "1440"
+  ],
+  "packet": "{\"status\": \"precautionary\", \"incident_types\": [\"INC-b\", \"INC-f\"], \"deadline\": \"T24\", \"deadline_rules\": [\"T24\", \"PREC\"], \"due_at\": \"2026-09-05T12:00:00\", \"missing\": [\"lands\"], \"route\": \"judgment\", \"route_triggers\": [\"U1-OPEN\", \"LAYOUT\"], \"citations\": [\"INC-b\", \"INC-f\", \"T24\", \"DIR-84\", \"PREC\"], \"outcomes_considered\": 8, \"suspicious_instructions\": false, \"extracted\": {\"env_effect\": \"unclear\", \"toxic_plume\": \"no\", \"death\": \"no\", \"release\": \"yes\", \"substance\": \"drilling fluid\", \"volume_basis\": \"metered\", \"h2s_detected\": \"no\", \"other_beyond_design\": \"exposure\", \"rupture\": \"no\", \"volume\": 2.0, \"rate_basis\": \"not_given\", \"through_pipe_body_or_weld\": \"no\", \"discovered_time\": \"12:00\", \"rate\": null, \"fire_or_explosion\": \"no\", \"injury\": \"none\"}, \"layouts\": {\"as_written\": {\"status\": \"reportable\", \"deadline\": \"T24\", \"route\": \"clear-cut\", \"extracted\": {\"env_effect\": \"unclear\", \"toxic_plume\": \"no\", \"death\": \"no\", \"release\": \"yes\", \"substance\": \"drilling fluid\", \"volume_basis\": \"metered\", \"h2s_detected\": \"no\", \"other_beyond_design\": \"exposure\", \"rupture\": \"no\", \"volume\": 2.0, \"rate_basis\": \"not_given\", \"through_pipe_body_or_weld\": \"no\", \"discovered_time\": \"12:00\", \"rate\": null, \"fire_or_explosion\": \"no\", \"injury\": \"none\"}}, \"noblank\": {\"status\": \"precautionary\", \"deadline\": \"T24\", \"route\": \"judgment\", \"extracted\": {\"env_effect\": \"unclear\", \"toxic_plume\": \"no\", \"death\": \"no\", \"release\": \"yes\", \"substance\": \"drilling fluid\", \"volume_basis\": \"metered\", \"h2s_detected\": \"no\", \"other_beyond_design\": \"none\", \"rupture\": \"no\", \"volume\": 2.0, \"rate_basis\": \"not_given\", \"through_pipe_body_or_weld\": \"no\", \"discovered_time\": \"12:00\", \"rate\": null, \"lands\": [\"right_of_way\", \"off_right_of_way\"], \"fire_or_explosion\": \"no\", \"injury\": \"none\"}}, \"wrap72\": {\"status\": \"reportable\", \"deadline\": \"T24\", \"route\": \"clear-cut\", \"extracted\": {\"env_effect\": \"unclear\", \"toxic_plume\": \"no\", \"death\": \"no\", \"release\": \"yes\", \"substance\": \"drilling fluid\", \"volume_basis\": \"metered\", \"h2s_detected\": \"no\", \"other_beyond_design\": \"slope_movement\", \"rupture\": \"no\", \"volume\": 2.0, \"rate_basis\": \"not_given\", \"through_pipe_body_or_weld\": \"no\", \"discovered_time\": \"12:00\", \"volume_unit\": \"m3\", \"rate\": null, \"lands\": [\"right_of_way\"], \"fire_or_explosion\": \"no\", \"injury\": \"none\"}}}}",
+  "report": "Subject: release Elizabethtown ROW\n\nJust got the call from field crew. 12:00 today they spotted drilling mud on the ROW. Meter says 2.0 m\u00b3 total. Mud ran downhill to the wetland edge\u2014no one\u2019s checked if it hit the creek yet. Crews put up silt fence right away. Looks like the slope\u2019s washed out again, same spot as last fall.\n\nStill running, no shutdown. I\u2019ll ping again when they confirm if any got into water.\n\n\u2014 Mike, Control Room",
+  "status": "EDITED_AND_APPROVED"
+ },
+ "FAIL-g1": {
+  "case_id": "FAIL-g1",
+  "deadline": "unknown",
+  "decision_status": "unknown",
+  "draft": "# Triage failed: read this report by hand\n\nThe system couldn't read this report (ValueError). Decide whether it must be reported and by when, as if it were a 3-hour case, and file by hand.\n\n## Field report\n\nI got a call from the pipeline patrol guy at 11:45 on March 3. He said there was a fire near our facility at Fox Creek, Alberta, that was spotted at 10:30 today. Apparently, some construction activity was happening nearby and people had to evacuate or shelter in place because of fumes or smoke. The patrol guy didn't have any more info on the construction, just that it was going on near our site. He confirmed that the fire was at our facility or on our equipment, and that it didn't involve a pipeline leak - no product was released. I'm still trying to get more details. \n- J. Smith, On-Call Patrol Contractor\n",
+  "due_at": "0000",
+  "flags": [
+   "triage failed: ValueError"
+  ],
+  "history": [
+   {
+    "at": "2026-11-10T00:58:15+00:00",
+    "cause": "Invalid isoformat string: 'not-a-date'",
+    "error": "ValueError",
+    "event": "triage_failed"
+   },
+   {
+    "at": "2026-11-10T00:58:15+00:00",
+    "event": "paged",
+    "message": "Triage failed (ValueError): read this report by hand now.",
+    "sent": true,
+    "who": "primary"
+   },
+   {
+    "at": "2026-11-10T00:58:15+00:00",
+    "event": "waiting",
+    "level": "0",
+    "wait_s": "60"
+   },
+   {
+    "at": "2026-11-10T00:58:23+00:00",
+    "by": "approver (scripted test)",
+    "decision": "REJECTED",
+    "event": "decided",
+    "level": "0",
+    "reason": "Triage failed; report read by hand and the PIR drafted outside the system."
+   }
+  ],
+  "level": "0",
+  "report": "I got a call from the pipeline patrol guy at 11:45 on March 3. He said there was a fire near our facility at Fox Creek, Alberta, that was spotted at 10:30 today. Apparently, some construction activity was happening nearby and people had to evacuate or shelter in place because of fumes or smoke. The patrol guy didn't have any more info on the construction, just that it was going on near our site. He confirmed that the fire was at our facility or on our equipment, and that it didn't involve a pipeline leak - no product was released. I'm still trying to get more details. \n- J. Smith, On-Call Patrol Contractor",
+  "status": "REJECTED"
+ }
+}

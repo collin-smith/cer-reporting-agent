@@ -115,8 +115,9 @@ def figure1(out: pathlib.Path) -> None:
 def tools(d: Diagram, prefix: str, names: list[tuple[str, str]], x: int, y: int, w: int) -> None:
     """A tool list as the model sees it, top to bottom: one row per tool, numbered."""
     for i, (name, note) in enumerate(names):
+        stroke = AGENT_STROKE if prefix != "cc" else CODE_STROKE
         d.box(f"{prefix}{i}", f"<b>{i + 1}. {name}</b>  {note}", x, y + i * 34, w, 28, fill="#FFFFFF",
-              stroke=AGENT_STROKE if prefix != "cc" else CODE_STROKE, extra="verticalAlign=middle;spacingTop=0;")
+              stroke=stroke, extra="verticalAlign=middle;spacingTop=0;")  # fmt: skip
 
 
 def figure3(out: pathlib.Path) -> None:
