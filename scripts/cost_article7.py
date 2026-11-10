@@ -10,6 +10,8 @@ Three things, all from evals/runs/*/results.jsonl:
    - cold: one report at 2 a.m., nothing cached. Only calls made one after another inside the case can hit:
      the agent's later turns. The strict check's three readings run in parallel, and a request sent before an
      identical one has started its response writes its own entry instead of reading one (Bedrock user guide).
+     Measured on 2026-11-10 (D53), that assumption was wrong: cold, one reading wrote and the other two read
+     (`evals/runs/20261110-084348-cache-cold`). The estimate below is kept as it was made, for comparison.
    Nova Lite takes cache points in `system` and `messages` only (not `tools`), needs a 1K-token prefix, and caches
    at most 20K tokens. Prefix sizes below are estimates from the prompt lengths and the 2026-11-07 traces; the
    live run measures cacheReadInputTokens instead.
@@ -104,19 +106,40 @@ def main() -> None:
         else:
             warm = st.mean(cost(r["input_tokens"], r["output_tokens"], cached_tokens(arm, r, True)) for r in R)
             cold = st.mean(cost(r["input_tokens"], r["output_tokens"], cached_tokens(arm, r, False)) for r in R)
-        rows.append([
-            arm, f"{tin:,.0f}", f"{tout:,.0f}", per_1000(recorded), per_1000(listed),
-            saving(warm, listed), saving(cold, listed),
-        ])
+        rows.append(
+            [
+                arm,
+                f"{tin:,.0f}",
+                f"{tout:,.0f}",
+                per_1000(recorded),
+                per_1000(listed),
+                saving(warm, listed),
+                saving(cold, listed),
+            ]
+        )
     print("## Cost per 1,000 reports, held-out (168 case-runs per arm)\n")
-    print(table(rows, ["arm", "input tok/case", "output tok/case", "recorded (config rates)",
-                       "Price List (ca-central-1)", "cached, warm (est.)", "cached, cold 2 a.m. (est.)"]))
+    print(
+        table(
+            rows,
+            [
+                "arm",
+                "input tok/case",
+                "output tok/case",
+                "recorded (config rates)",
+                "Price List (ca-central-1)",
+                "cached, warm (est.)",
+                "cached, cold 2 a.m. (est.)",
+            ],
+        )
+    )
 
     label, run = SHIPPED
     R = load(run)
     tin, tout = st.mean(r["input_tokens"] for r in R), st.mean(r["output_tokens"] for r in R)
-    print(f"\nShipped design, {label}: {per_1000(cost(tin, tout))} per 1,000 reports at Price List rates "
-          f"({len(R)} case-runs, recorded {per_1000(st.mean(r['cost_usd'] for r in R))}).")
+    print(
+        f"\nShipped design, {label}: {per_1000(cost(tin, tout))} per 1,000 reports at Price List rates "
+        f"({len(R)} case-runs, recorded {per_1000(st.mean(r['cost_usd'] for r in R))})."
+    )
 
     # 3: the Nova-only cascade, replayed per (case, pass).
     def key(r: dict) -> tuple:
@@ -141,10 +164,24 @@ def main() -> None:
     rows = []
     for arm in ("strict", "agent"):
         R = [x for x in runs[arm] if key(x) in both]
-        rows.append([arm, f"{sum(scored(x)['right'] for x in R)}/{len(R)}", sum(scored(x)["missed"] for x in R),
-                     sum(scored(x)["late"] for x in R), per_1000(st.mean(x["cost_usd"] for x in R))])
-    rows.append([f"cascade (agent on {tally['agent']}/{len(both)})", f"{tally['right']}/{len(both)}",
-                 tally["missed"], tally["late"], per_1000(spend / len(both))])
+        rows.append(
+            [
+                arm,
+                f"{sum(scored(x)['right'] for x in R)}/{len(R)}",
+                sum(scored(x)["missed"] for x in R),
+                sum(scored(x)["late"] for x in R),
+                per_1000(st.mean(x["cost_usd"] for x in R)),
+            ]
+        )
+    rows.append(
+        [
+            f"cascade (agent on {tally['agent']}/{len(both)})",
+            f"{tally['right']}/{len(both)}",
+            tally["missed"],
+            tally["late"],
+            per_1000(spend / len(both)),
+        ]
+    )
     print("\n## Nova-only cascade, replayed on held-out (recorded rates)\n")
     print(table(rows, ["arm", "status right", "missed", "late", "cost / 1,000"]))
 

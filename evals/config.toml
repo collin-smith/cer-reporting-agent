@@ -12,9 +12,11 @@ perturb = ["noblank", "wrap72"]  # stability variants per live pass (evals.PERTU
 [models.nova-lite]
 env = "NOVA_LITE_ARN"     # terraform output nova_lite_profile_arn (tagged profile)
 region = "ca-central-1"
-# USD per 1M tokens. Nova Lite on-demand list price; check against the AWS Price List before quoting costs.
-price_in = 0.06
-price_out = 0.24
+# USD per 1M tokens: AWS Price List, AmazonBedrock, ca-central-1, CAN1-NovaLite-*, checked 2026-11-10 (D53).
+# Runs before 2026-11-10 recorded costs at 0.06 / 0.24 (about 6.5% low); their results.jsonl keep those figures.
+price_in = 0.064
+price_out = 0.256
+price_cache_read = 0.016   # 75% off input; cache writes are free on Nova Lite (D53)
 
 [models.nova-pro]
 env = "NOVA_PRO_ARN"      # terraform output nova_pro_profile_arn (tagged; US cross-region profile, no Canada one)

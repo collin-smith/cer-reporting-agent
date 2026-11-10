@@ -37,7 +37,7 @@ import sys
 import time
 
 from cer_agent import drafter
-from cer_agent.extract import RETRY_TEMPERATURES, extract, normalise, to_facts
+from cer_agent.extract import CACHE_POINT, RETRY_TEMPERATURES, caching, extract, normalise, to_facts
 from cer_agent.extract import TOOL as RECORD_TOOL
 from cer_agent.judge import in_report
 from cer_agent.workflow import make_client, packet
@@ -344,6 +344,10 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
     t0 = time.perf_counter()
     x = extract(client or make_client(region), model_id, report, received)
     tin, tout, last = x["input_tokens"], x["output_tokens"], None
+    cread, cwrite = x["cache_read_tokens"], x["cache_write_tokens"]
+    # Caching (D53): the system prompt and tools are likely under Nova's 1K minimum on their own, so the point that
+    # matters is after the case prompt: every later turn re-sends tools + system + case, and reads it back.
+    cache = [CACHE_POINT] if caching() else []
     for temp in (0, *RETRY_TEMPERATURES):
         case = Case(report, received, x["raw"])
         prompt = (
@@ -352,16 +356,19 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
         )
         model = BedrockModel(model_id=model_id, boto_session=_session(region), temperature=temp, max_tokens=1000,
                              streaming=False)  # fmt: skip
-        agent = Agent(model=model, tools=case.tools(stop_at_finish), system_prompt=SYSTEM, callback_handler=None)
+        agent = Agent(model=model, tools=case.tools(stop_at_finish), system_prompt=[{"text": SYSTEM}, *cache],
+                      callback_handler=None)  # fmt: skip
         try:
-            result = agent(prompt, limits={"turns": MAX_TURNS})
+            result = agent([{"text": prompt}, *cache], limits={"turns": MAX_TURNS})
         except Exception as e:  # noqa: BLE001 - a model error ends this attempt; usage so far still counts
             last = e
             usage = agent.event_loop_metrics.accumulated_usage
             tin, tout = tin + usage.get("inputTokens", 0), tout + usage.get("outputTokens", 0)
+            cread, cwrite = cread + usage.get("cacheReadInputTokens", 0), cwrite + usage.get("cacheWriteInputTokens", 0)
             continue
         usage = result.metrics.accumulated_usage
         tin, tout = tin + usage.get("inputTokens", 0), tout + usage.get("outputTokens", 0)
+        cread, cwrite = cread + usage.get("cacheReadInputTokens", 0), cwrite + usage.get("cacheWriteInputTokens", 0)
         trace = {"stop_reason": str(result.stop_reason), "turns": result.metrics.cycle_count,
                  **({"stop_at_finish": True} if stop_at_finish else {})}  # fmt: skip
         break
@@ -369,6 +376,7 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
         case, trace = Case(report, received, x["raw"]), {"error": f"{type(last).__name__}: {last}"[:200]}
     pk = case.result(Case(report, received, x["raw"]).packet["status"], trace)
     return {"packet": pk, "facts": to_facts(case.raw, received), "input_tokens": tin, "output_tokens": tout,
+            "cache_read_tokens": cread, "cache_write_tokens": cwrite,
             "latency_s": time.perf_counter() - t0, "retries": x.get("retries", 0)}  # fmt: skip
 
 

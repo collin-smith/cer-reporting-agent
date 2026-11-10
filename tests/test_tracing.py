@@ -18,7 +18,7 @@ def test_spans_nest_under_the_case_and_the_summary_counts_tokens(tmp_path):
     assert spans["extract"]["parent_id"] == spans["case"]["span_id"] == spans["decide"]["parent_id"]
     assert spans["case"]["attributes"]["cer.id"] == "CL-001"
     rows = {r["stage"]: r for r in tracing.summary(list(spans.values()))}
-    assert rows["extract"]["input_tokens"] == 2000 and rows["extract"]["cost_usd"] == (2000 * 0.06 + 300 * 0.24) / 1e6
+    assert rows["extract"]["input_tokens"] == 2000 and rows["extract"]["cost_usd"] == (2000 * 0.064 + 300 * 0.256) / 1e6
     assert list(rows)[:3] == ["case", "extract", "decide"]
     assert "| extract | 1 | 1 |" in tracing.render(list(rows.values()))
 

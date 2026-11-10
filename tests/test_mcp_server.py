@@ -96,7 +96,7 @@ def test_triage_report_returns_the_strict_packet(monkeypatch):
     monkeypatch.setattr(mcp_server, "run_strict", lambda *a: fake)
     got = call(mcp_server.build(), "triage_report", {"report": "text"})
     assert got["packet"]["due_at"] == "2026-07-11 12:00:00" and got["model_calls"] == 3
-    assert got["cost_usd"] == pytest.approx((3000 * 0.06 + 600 * 0.24) / 1e6)
+    assert got["cost_usd"] == pytest.approx((3000 * 0.064 + 600 * 0.256) / 1e6)
 
 
 def test_triage_report_without_a_profile_says_what_to_set(monkeypatch):

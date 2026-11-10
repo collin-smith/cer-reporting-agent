@@ -1,0 +1,509 @@
+{
+  "run": {
+    "cases": "evals/cases/cases.jsonl",
+    "splits": [
+      "dev"
+    ],
+    "arm": "workflow-nova-strict-cache",
+    "runs_dir": "evals/runs",
+    "repeats": 2,
+    "perturb": [],
+    "extractor": "1a51177b"
+  },
+  "summary": {
+    "cases": 2,
+    "status": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "missed_reports": {
+      "k": 0,
+      "n": 2,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.6576280471103807
+      ]
+    },
+    "late_deadlines": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "deadline_correct": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "over_notify": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "route": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "incident_types": {
+      "k": 2,
+      "n": 2,
+      "rate": 1.0,
+      "ci95": [
+        0.34237195288961925,
+        1.0
+      ]
+    },
+    "missing_recall": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "extraction_accuracy": {
+      "k": 22,
+      "n": 22,
+      "rate": 1.0,
+      "ci95": [
+        0.8513404742740388,
+        1.0
+      ]
+    },
+    "per_field": {
+      "death": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "discovered_at": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "env_effect": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "fire_or_explosion": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "limit_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "other_beyond_design": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "pressure_kpa": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "release": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "rupture": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "serious_injury": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      },
+      "toxic_plume": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "ci95": [
+          0.34237195288961925,
+          1.0
+        ]
+      }
+    },
+    "injection_flagged": {
+      "k": 0,
+      "n": 0,
+      "rate": NaN,
+      "ci95": [
+        NaN,
+        NaN
+      ]
+    },
+    "cost_usd": 0.000581888,
+    "cost_per_case_usd": 0.000290944,
+    "latency_p50_s": 1.1776187659997959,
+    "latency_p95_s": 1.6918682369996532,
+    "cost_with_stability_usd": 0.000581888
+  },
+  "spread": {
+    "passes": 2,
+    "metrics": {
+      "status": {
+        "per_pass": [
+          1.0,
+          1.0
+        ],
+        "min": 1.0,
+        "max": 1.0
+      },
+      "deadline_correct": {
+        "per_pass": [
+          1.0,
+          1.0
+        ],
+        "min": 1.0,
+        "max": 1.0
+      },
+      "route": {
+        "per_pass": [
+          1.0,
+          1.0
+        ],
+        "min": 1.0,
+        "max": 1.0
+      },
+      "missed_reports": {
+        "per_pass": [
+          0,
+          0
+        ],
+        "min": 0,
+        "max": 0
+      },
+      "late_deadlines": {
+        "per_pass": [
+          0,
+          0
+        ],
+        "min": 0,
+        "max": 0
+      },
+      "over_notify": {
+        "per_pass": [
+          NaN,
+          NaN
+        ],
+        "min": NaN,
+        "max": NaN
+      },
+      "missing_recall": {
+        "per_pass": [
+          NaN,
+          NaN
+        ],
+        "min": NaN,
+        "max": NaN
+      },
+      "extraction_accuracy": {
+        "per_pass": [
+          1.0,
+          1.0
+        ],
+        "min": 1.0,
+        "max": 1.0
+      }
+    },
+    "unstable": []
+  },
+  "by": {
+    "kind": {
+      "clear-cut": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "writer": {
+      "llama": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "split": {
+      "test": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "label_source": {
+      "engine": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "text_supported": {
+      "True": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    },
+    "render": {
+      "text": {
+        "cases": 2,
+        "status": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        },
+        "deadline": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "ci95": [
+            0.34237195288961925,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "targets": [
+    {
+      "target": "missed_reports",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 2,
+      "passes": 2
+    },
+    {
+      "target": "late_deadlines",
+      "value": 0,
+      "limit": {
+        "max": 0,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 2,
+      "passes": 2
+    },
+    {
+      "target": "deadline_correct",
+      "value": 1.0,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 2,
+      "passes": 2
+    },
+    {
+      "target": "over_notify",
+      "value": NaN,
+      "limit": {
+        "max": 0.3,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 2
+    },
+    {
+      "target": "missing_recall",
+      "value": NaN,
+      "limit": {
+        "min": 0.9,
+        "proposed": false
+      },
+      "met": false,
+      "proposed": false,
+      "passes_met": 0,
+      "passes": 2
+    },
+    {
+      "target": "extraction_accuracy",
+      "value": 1.0,
+      "limit": {
+        "min": 0.95,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 2,
+      "passes": 2
+    },
+    {
+      "target": "latency_p95_s",
+      "value": 1.6918682369996532,
+      "limit": {
+        "max": 300,
+        "proposed": false
+      },
+      "met": true,
+      "proposed": false,
+      "passes_met": 2,
+      "passes": 2
+    }
+  ],
+  "stability": null
+}

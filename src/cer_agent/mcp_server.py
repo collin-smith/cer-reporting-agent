@@ -37,7 +37,7 @@ from cer_agent.extract import extract, to_facts
 from cer_agent.workflow import make_client, packet, run_strict
 
 # USD per 1M tokens (input, output), Nova Lite, ca-central-1 (config.toml [models.nova-lite]).
-PRICE_IN, PRICE_OUT = 0.06, 0.24
+PRICE_IN, PRICE_OUT = 0.064, 0.256  # Price List 2026-11-10 (D53)
 INSTRUCTIONS = """Tools for triaging pipeline field reports against the Canada Energy Regulator's incident-reporting
 rules. A rules engine makes every decision; the model only reads the report. Nothing is filed: a person approves
 and submits. Start with triage_report on the report's text; use decide to test facts, rule_text to look up a cited
@@ -77,7 +77,7 @@ def _json(obj) -> dict:
 
 
 def _cost(tin: int, tout: int) -> float:
-    return round((tin * PRICE_IN + tout * PRICE_OUT) / 1e6, 6)
+    return round((tin * PRICE_IN + tout * PRICE_OUT) / 1e6, 8)
 
 
 def _reading(facts: dict) -> dict:

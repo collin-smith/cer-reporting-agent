@@ -116,3 +116,29 @@ def test_a_malformed_tool_call_is_retried_then_raised():
     assert [kw["inferenceConfig"]["temperature"] for kw in c.seen] == [0, 0.3]
     with pytest.raises(ModelError):
         extract(Client(fails=MODEL_ERROR_RETRIES + 1), "m", "report")
+
+
+def test_prompt_cache_point_only_when_switched_on(monkeypatch):
+    """D53: CER_PROMPT_CACHE=1 adds a cache point after the system prompt (Nova takes none in tools), and the
+    reading carries Bedrock's cache counts."""
+    from cer_agent.extract import CACHE_POINT, extract
+
+    reply = {"output": {"message": {"content": [{"toolUse": {"input": {"release": "no"}}}]}},
+             "usage": {"inputTokens": 200, "outputTokens": 5, "cacheReadInputTokens": 2600}}  # fmt: skip
+
+    class Client:
+        def __init__(self):
+            self.seen = []
+
+        def converse(self, **kw):
+            self.seen.append(kw)
+            return reply
+
+    monkeypatch.delenv("CER_PROMPT_CACHE", raising=False)
+    c = Client()
+    extract(c, "m", "report")
+    assert CACHE_POINT not in c.seen[0]["system"]
+    monkeypatch.setenv("CER_PROMPT_CACHE", "1")
+    x = extract(c, "m", "report")
+    assert c.seen[1]["system"][-1] == CACHE_POINT and "cachePoint" not in str(c.seen[1]["toolConfig"])
+    assert (x["input_tokens"], x["cache_read_tokens"], x["cache_write_tokens"]) == (200, 2600, 0)

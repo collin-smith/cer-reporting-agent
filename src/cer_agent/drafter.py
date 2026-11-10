@@ -333,8 +333,8 @@ def main(argv=None) -> int:
     ap.add_argument("run", type=pathlib.Path, help="eval run directory (results.jsonl)")
     ap.add_argument("--rep", type=int, default=1, help="which pass's packets to draft from (1-based)")
     ap.add_argument("--only", nargs="*", help="case IDs")
-    ap.add_argument("--price-in", type=float, default=0.06)
-    ap.add_argument("--price-out", type=float, default=0.24)
+    ap.add_argument("--price-in", type=float, default=0.064)
+    ap.add_argument("--price-out", type=float, default=0.256)
     args = ap.parse_args(argv)
     arn = os.environ.get("NOVA_LITE_ARN")
     if not arn:

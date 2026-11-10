@@ -530,6 +530,7 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     from cer_agent.workflow import packet
 
     retries = 0
+    x: dict = {}
     if arm == "oracle":
         got = facts_from_json(case["facts"])
         pk, tin, tout, lat = packet(got), 0, 0, 0.0
@@ -574,13 +575,19 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
         got, pk = x["facts"], packet(x["facts"], x)
         tin, tout, lat = x["input_tokens"], x["output_tokens"], x["latency_s"]
         retries = x.get("retries", 0)
-    cost = (tin * model["price_in"] + tout * model["price_out"]) / 1e6 if model else 0.0
+    # With caching on, Bedrock's input count is only the uncached input; reads and writes are counted apart (D53).
+    # Writes are costed at the full input price: the Price List says $0, not yet checked against a bill.
+    cread, cwrite = x.get("cache_read_tokens", 0), x.get("cache_write_tokens", 0)
+    cost = ((tin + cwrite) * model["price_in"] + cread * model.get("price_cache_read", model["price_in"])
+            + tout * model["price_out"]) / 1e6 if model else 0.0  # fmt: skip
+    extra_cache = {"cache_read_tokens": cread, "cache_write_tokens": cwrite} if "-cache" in arm else {}
     keep = ("id", "kind", "variant", "writer", "split", "label_source", "expected")
     extra = {"mcp_overhead_s": x["mcp_overhead_s"]} if "-mcp" in arm else {}
     return {**extra, **{k: case[k] for k in keep}, **({"perturb": case["perturb"]} if "perturb" in case else {}),
             "render": case.get("render", "text"), "text_supported": text_supported(case),
             "packet": pk,
-            "score": score_case(case, pk, got), "input_tokens": tin, "output_tokens": tout, "cost_usd": cost,
+            "score": score_case(case, pk, got), "input_tokens": tin, "output_tokens": tout, **extra_cache,
+            "cost_usd": cost,
             "latency_s": lat, "retries": retries}  # fmt: skip
 
 
@@ -598,6 +605,10 @@ ARMS = {
     "agent-nova-mcp-inorder": "nova-lite",  # the same, tools in the in-process order (what tool order changes)
     "agent-nova-stop": "nova-lite",  # article 4: the Strands agent, its loop ending at finish (as agent-nova-lg)
     "agent-nova-lg": "nova-lite",  # article 4: the single agent built again in LangGraph (same prompt and tools)
+    # Article 7 (D53): the same arms with prompt caching on (CER_PROMPT_CACHE=1, set by main for "-cache" arms).
+    "workflow-nova-cache": "nova-lite",
+    "workflow-nova-strict-cache": "nova-lite",
+    "agent-nova-cache": "nova-lite",
 }
 
 
@@ -621,6 +632,8 @@ def main(argv=None) -> int:
         run_cfg["splits"] = sorted({c["split"] for c in cases})
     else:
         cases = load_cases(cfg, run_cfg["splits"], args.only)
+    if "-cache" in run_cfg["arm"]:
+        os.environ["CER_PROMPT_CACHE"] = "1"
     model_key = ARMS.get(run_cfg["arm"])
     model = cfg["models"][model_key] if model_key else None
     repeats = run_cfg["repeats"] = (args.repeats or run_cfg.get("repeats", 1)) if model else 1

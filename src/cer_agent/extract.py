@@ -12,6 +12,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import re
 import time
 
@@ -343,6 +344,23 @@ def to_facts(x: dict, received: dt.date | None = None) -> Facts:
 # 0.3 and 5/5 at 0.7 (2026-11-04). So a retry steps the temperature up; the row records it ("retries"). Not a
 # throttle, so botocore's own retries don't cover it.
 RETRY_TEMPERATURES = (0.3, 0.7)
+
+# Prompt caching (D53, article 7). On Nova, a cache point goes in `system` or `messages` (not `tools`) and covers the
+# whole prefix before it: here the tool schema and the system prompt, ~2,600 tokens, over Nova's 1K minimum. The
+# report comes after it, so every report shares the entry for 5 minutes. Off unless CER_PROMPT_CACHE=1.
+CACHE_POINT = {"cachePoint": {"type": "default"}}
+
+
+def caching() -> bool:
+    return os.environ.get("CER_PROMPT_CACHE") == "1"
+
+
+def cache_usage(usage: dict) -> dict:
+    """Bedrock's cache counts. With caching on, inputTokens counts only the uncached input."""
+    return {"cache_read_tokens": usage.get("cacheReadInputTokens", 0),
+            "cache_write_tokens": usage.get("cacheWriteInputTokens", 0)}  # fmt: skip
+
+
 MODEL_ERROR_RETRIES = len(RETRY_TEMPERATURES)
 
 
@@ -357,7 +375,7 @@ def _extract(client, model_id: str, report: str, received: dt.date | None = None
         try:
             r = client.converse(
                 modelId=model_id,
-                system=[{"text": SYSTEM}],
+                system=[{"text": SYSTEM}, *([CACHE_POINT] if caching() else [])],
                 messages=[{"role": "user", "content": [{"text": f"<report>\n{normalise(report)}\n</report>"}]}],
                 toolConfig={"tools": [{"toolSpec": TOOL}], "toolChoice": {"tool": {"name": TOOL["name"]}}},
                 inferenceConfig={"maxTokens": 1000, "temperature": temps[attempt]},
@@ -374,6 +392,7 @@ def _extract(client, model_id: str, report: str, received: dt.date | None = None
         "raw": raw,
         "input_tokens": r["usage"]["inputTokens"],
         "output_tokens": r["usage"]["outputTokens"],
+        **cache_usage(r["usage"]),
         "latency_s": latency,
         "retries": attempt,
     }
@@ -383,5 +402,6 @@ def extract(client, model_id: str, report: str, received: dt.date | None = None)
     """`_extract` inside a trace span (stage "extract")."""
     with tracing.span("extract") as s:
         x = _extract(client, model_id, report, received)
-        tracing.usage(s, x["input_tokens"], x["output_tokens"], x.get("retries", 0))
+        tracing.usage(s, x["input_tokens"], x["output_tokens"], x.get("retries", 0), x["cache_read_tokens"],
+                      x["cache_write_tokens"])  # fmt: skip
         return x

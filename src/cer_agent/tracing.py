@@ -89,10 +89,14 @@ def span(name: str, **attrs):
         yield s
 
 
-def usage(s, input_tokens: int, output_tokens: int, retries: int = 0) -> None:
+def usage(s, input_tokens: int, output_tokens: int, retries: int = 0, cache_read: int = 0,
+          cache_write: int = 0) -> None:  # fmt: skip
     """Token counts on our model-calling spans, under the same names Strands uses, so the summary adds them up."""
     s.set_attribute("gen_ai.usage.input_tokens", input_tokens)
     s.set_attribute("gen_ai.usage.output_tokens", output_tokens)
+    if cache_read or cache_write:
+        s.set_attribute("gen_ai.usage.cache_read_input_tokens", cache_read)
+        s.set_attribute("gen_ai.usage.cache_write_input_tokens", cache_write)
     if retries:
         s.set_attribute("cer.retries", retries)
 
@@ -114,7 +118,7 @@ def _p(values: list[float], q: float) -> float:
     return v[min(len(v) - 1, math.ceil(q * len(v)) - 1)] if v else 0.0
 
 
-def summary(spans: list[dict], price_in: float = 0.06, price_out: float = 0.24) -> list[dict]:
+def summary(spans: list[dict], price_in: float = 0.064, price_out: float = 0.256) -> list[dict]:
     """Per stage: spans, cases it ran in, p50 / p95 time, tokens, cost (USD per 1M tokens: Nova Lite list price by
     default), and the stage's share of total case time (spans nest, so the shares of nested stages overlap)."""
     cases = [s for s in spans if s["name"] == "case"]

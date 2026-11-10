@@ -69,6 +69,11 @@ NOVA_LITE_ARN=$(terraform -chdir=infra output -raw nova_lite_profile_arn) PYTHON
 PYTHONPATH=src python -m cer_agent.evals --rescore RUN_ID   # re-score saved output after a scorer change, $0
 ```
 
+Prompt caching (D53, article 7) is off unless `CER_PROMPT_CACHE=1`; the `workflow-nova-cache`,
+`workflow-nova-strict-cache` and `agent-nova-cache` arms turn it on and record cache reads and writes.
+`scripts/cache_cold.py` sends reports more than 5 minutes apart (past Nova's cache TTL), and
+`scripts/cost_article7.py` prices saved runs at the AWS Price List rates ($0).
+
 Live runs also score stability: each case is re-run with the same words in another layout (blank lines removed,
 hard-wrapped at 72 columns; config `perturb`, `--no-perturb` to skip) and the report counts answers that flip. Those
 rows stay out of the headline metrics. Every report is normalised first (straight quotes and dashes, tidy spaces).

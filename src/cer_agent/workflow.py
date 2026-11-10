@@ -168,7 +168,10 @@ def run_strict(client, model_id: str, report: str, received: dt.date | None = No
         "facts": xs["as_written"]["facts"],
         "latency_s": latency,
         "calls": len(xs),
-        **{k: sum(x.get(k, 0) for x in by["primary"]) for k in ("input_tokens", "output_tokens")},
+        **{
+            k: sum(x.get(k, 0) for x in by["primary"])
+            for k in ("input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens")
+        },
         "retries": sum(x.get("retries", 0) for x in xs.values()),
         "fallback": {
             "readings": len(by["fallback"]),

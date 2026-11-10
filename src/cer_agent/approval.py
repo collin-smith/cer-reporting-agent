@@ -51,8 +51,9 @@ SCHEDULE = {
 }  # fmt: skip
 DEADLINE_MIN = {"T3": 180, "T24": 1440}
 
-# Prices (USD): Nova Lite per 1M tokens; guardrails per 1K text units (Price List, ca-central-1, 2026-11-09).
-PRICE_IN, PRICE_OUT = 0.06, 0.24
+# Prices (USD): Nova Lite per 1M tokens (Price List, ca-central-1, 2026-11-10, D53); guardrails per 1K text units
+# (Price List, ca-central-1, 2026-11-09).
+PRICE_IN, PRICE_OUT = 0.064, 0.256
 # The fallback model (D52): Claude Haiku 5.5 through the Canada profile, per 1M tokens (D19's first-party price).
 FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 0.10, 0.50
 GUARD_PRICE = {"contentPolicyUnits": 0.15, "topicPolicyUnits": 0.15, "sensitiveInformationPolicyUnits": 0.10}
