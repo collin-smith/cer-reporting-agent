@@ -54,6 +54,7 @@ DEADLINE_MIN = {"T3": 180, "T24": 1440}
 # Prices (USD): Nova Lite per 1M tokens (Price List, ca-central-1, 2026-11-10, D53); guardrails per 1K text units
 # (Price List, ca-central-1, 2026-11-09).
 PRICE_IN, PRICE_OUT = 0.064, 0.256
+PRICE_CACHE_READ = 0.016  # cache writes costed at PRICE_IN until a bill confirms they're free (D53)
 # The fallback model (D52): Claude Haiku 5.5 through the Canada profile, per 1M tokens (D19's first-party price).
 FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 0.10, 0.50
 GUARD_PRICE = {"contentPolicyUnits": 0.15, "topicPolicyUnits": 0.15, "sensitiveInformationPolicyUnits": 0.10}
@@ -197,15 +198,18 @@ def triage(event: dict) -> dict:
     fb_out = r["fallback"]["output_tokens"] + (d["output_tokens"] if d["model"] == "fallback" else 0)
     tokens_in = r["input_tokens"] + (d["input_tokens"] if d["model"] == "primary" else 0)
     tokens_out = r["output_tokens"] + (d["output_tokens"] if d["model"] == "primary" else 0)
-    cost = ((tokens_in * PRICE_IN + tokens_out * PRICE_OUT + fb_in * FALLBACK_PRICE_IN + fb_out * FALLBACK_PRICE_OUT)
-            / 1e6 + _guard_cost(u_in, u_out))  # fmt: skip
+    # With CER_PROMPT_CACHE=1 (D53), Nova's input count leaves out the cached prefix; reads and writes come apart.
+    cread, cwrite = r.get("cache_read_tokens", 0), r.get("cache_write_tokens", 0)
+    cost = (((tokens_in + cwrite) * PRICE_IN + cread * PRICE_CACHE_READ + tokens_out * PRICE_OUT
+             + fb_in * FALLBACK_PRICE_IN + fb_out * FALLBACK_PRICE_OUT) / 1e6 + _guard_cost(u_in, u_out))  # fmt: skip
     scale = float(os.environ.get("TIME_SCALE", "60"))
     state = {"case_id": case_id, "deadline": pk["deadline"], "level": 0, "start": int(time.time()),
              "marks": marks(pk["deadline"], float(event.get("elapsed_min", 0)), scale)}  # fmt: skip
     state["wait_s"] = wait_s(state)
     _append(table, case_id, _event("triaged", status=pk["status"], deadline=pk["deadline"], route=pk["route"],
                                    flags=flags, masked=pii, seconds=f"{time.time() - t0:.1f}",
-                                   fallback_readings=r["fallback"]["readings"], drafted_by=d["model"]),
+                                   fallback_readings=r["fallback"]["readings"], drafted_by=d["model"],
+                                   cache_read=cread, cache_write=cwrite),
             report=report, packet=json.dumps(pk, default=str), draft=text, flags=flags,
             due_at=pk["due_at"] or "9999", decision_status=pk["status"], deadline=pk["deadline"] or "none",
             ai_cost_usd=f"{cost:.6f}", marks=state["marks"])  # fmt: skip

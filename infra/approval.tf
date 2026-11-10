@@ -139,6 +139,7 @@ resource "aws_lambda_function" "approval" {
       MODEL_ARN          = aws_bedrock_inference_profile.nova_lite.arn
       FALLBACK_MODEL_ARN = aws_bedrock_inference_profile.haiku.arn
       MODEL_RETRIES      = "3" # botocore retries per model: both chains fit the timeout (D52; 10 took up to 262 s)
+      CER_PROMPT_CACHE   = "1" # cache the readers' tools + system prompt (D53: −32 to −49% a case, same answers)
       REPORTS_GUARDRAIL  = aws_bedrock_guardrail.reports.guardrail_id
       DRAFTS_GUARDRAIL   = aws_bedrock_guardrail.drafts.guardrail_id
       CASES_TABLE        = aws_dynamodb_table.cases.name
