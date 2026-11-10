@@ -1,0 +1,339 @@
+{
+ "rule": [
+  "D19 planned \"the 30 hardest judgment cases\", but 46 of the 57 judgment cases are right in every run since\n2026-11-07, while some clear-cut and not-reportable cases fail every time (CL-064, NO-081). So: every case kind,\nranked by how often the Nova Lite arms (workflow, strict, agent, supervisor, MCP, cache) got them wrong in runs from\n2026-11-07 on (after the fixes that earlier runs would count against), stability variants left out.",
+  "    hardness = (status wrong + deadline wrong + 0.5 x incident types wrong + 2 x missed-or-late) / rows"
+ ],
+ "since": "20261107",
+ "cases": [
+  {
+   "id": "CL-064",
+   "kind": "clear-cut",
+   "split": "heldout",
+   "hardness": 4.125,
+   "rows": 12,
+   "status": 11,
+   "deadline": 11,
+   "types": 11,
+   "missed_or_late": 11
+  },
+  {
+   "id": "NO-081",
+   "kind": "not-reportable",
+   "split": "heldout",
+   "hardness": 2.5,
+   "rows": 12,
+   "status": 12,
+   "deadline": 12,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-168",
+   "kind": "clear-cut",
+   "split": "test",
+   "hardness": 2.25,
+   "rows": 12,
+   "status": 6,
+   "deadline": 6,
+   "types": 6,
+   "missed_or_late": 6
+  },
+  {
+   "id": "CL-174",
+   "kind": "clear-cut",
+   "split": "test",
+   "hardness": 2.25,
+   "rows": 12,
+   "status": 6,
+   "deadline": 6,
+   "types": 6,
+   "missed_or_late": 6
+  },
+  {
+   "id": "JU-127",
+   "kind": "judgment",
+   "split": "dev",
+   "hardness": 1.721,
+   "rows": 34,
+   "status": 13,
+   "deadline": 13,
+   "types": 13,
+   "missed_or_late": 13
+  },
+  {
+   "id": "NO-163",
+   "kind": "not-reportable",
+   "split": "heldout",
+   "hardness": 1.667,
+   "rows": 18,
+   "status": 12,
+   "deadline": 12,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-015",
+   "kind": "clear-cut",
+   "split": "test",
+   "hardness": 1.5,
+   "rows": 12,
+   "status": 12,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-092",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 1.5,
+   "rows": 18,
+   "status": 18,
+   "deadline": 0,
+   "types": 18,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-027",
+   "kind": "clear-cut",
+   "split": "test",
+   "hardness": 1.375,
+   "rows": 12,
+   "status": 11,
+   "deadline": 0,
+   "types": 11,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-099",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 1.125,
+   "rows": 12,
+   "status": 3,
+   "deadline": 3,
+   "types": 3,
+   "missed_or_late": 3
+  },
+  {
+   "id": "NO-164",
+   "kind": "not-reportable",
+   "split": "test",
+   "hardness": 1.111,
+   "rows": 18,
+   "status": 8,
+   "deadline": 8,
+   "types": 8,
+   "missed_or_late": 0
+  },
+  {
+   "id": "AD-161",
+   "kind": "adversarial",
+   "split": "heldout",
+   "hardness": 1.0,
+   "rows": 12,
+   "status": 0,
+   "deadline": 12,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-040",
+   "kind": "clear-cut",
+   "split": "heldout",
+   "hardness": 1.0,
+   "rows": 12,
+   "status": 12,
+   "deadline": 0,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-096",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 1.0,
+   "rows": 18,
+   "status": 12,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-102",
+   "kind": "judgment",
+   "split": "heldout",
+   "hardness": 1.0,
+   "rows": 12,
+   "status": 12,
+   "deadline": 0,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-103",
+   "kind": "judgment",
+   "split": "heldout",
+   "hardness": 1.0,
+   "rows": 12,
+   "status": 12,
+   "deadline": 0,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-124",
+   "kind": "judgment",
+   "split": "dev",
+   "hardness": 1.0,
+   "rows": 34,
+   "status": 34,
+   "deadline": 0,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-167",
+   "kind": "clear-cut",
+   "split": "dev",
+   "hardness": 0.794,
+   "rows": 34,
+   "status": 6,
+   "deadline": 6,
+   "types": 6,
+   "missed_or_late": 6
+  },
+  {
+   "id": "JU-094",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 0.75,
+   "rows": 12,
+   "status": 6,
+   "deadline": 0,
+   "types": 6,
+   "missed_or_late": 0
+  },
+  {
+   "id": "NO-090",
+   "kind": "not-reportable",
+   "split": "dev",
+   "hardness": 0.735,
+   "rows": 34,
+   "status": 10,
+   "deadline": 10,
+   "types": 10,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-034",
+   "kind": "clear-cut",
+   "split": "dev",
+   "hardness": 0.714,
+   "rows": 35,
+   "status": 0,
+   "deadline": 25,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "NO-084",
+   "kind": "not-reportable",
+   "split": "heldout",
+   "hardness": 0.625,
+   "rows": 12,
+   "status": 3,
+   "deadline": 3,
+   "types": 3,
+   "missed_or_late": 0
+  },
+  {
+   "id": "NO-087",
+   "kind": "not-reportable",
+   "split": "test",
+   "hardness": 0.625,
+   "rows": 12,
+   "status": 3,
+   "deadline": 3,
+   "types": 3,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-005",
+   "kind": "clear-cut",
+   "split": "heldout",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-018",
+   "kind": "clear-cut",
+   "split": "dev",
+   "hardness": 0.5,
+   "rows": 35,
+   "status": 0,
+   "deadline": 0,
+   "types": 35,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-036",
+   "kind": "clear-cut",
+   "split": "test",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-042",
+   "kind": "clear-cut",
+   "split": "heldout",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "CL-054",
+   "kind": "clear-cut",
+   "split": "heldout",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-108",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 6,
+   "types": 0,
+   "missed_or_late": 0
+  },
+  {
+   "id": "JU-129",
+   "kind": "judgment",
+   "split": "test",
+   "hardness": 0.5,
+   "rows": 12,
+   "status": 0,
+   "deadline": 0,
+   "types": 12,
+   "missed_or_late": 0
+  }
+ ]
+}

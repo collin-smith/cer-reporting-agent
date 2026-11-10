@@ -551,6 +551,9 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
         elif arm.endswith("-stop"):  # article 4: the Strands agent ending its loop at finish, as the graph does
             x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"),
                           stop_at_finish=True)  # fmt: skip
+        elif "-think" in arm:  # article 7 (D54): Claude extended thinking in the review loop
+            x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"),
+                          thinking=THINKING_BUDGET)  # fmt: skip
         else:
             x = run_agent(os.environ[model["env"]], case["report"], received, model.get("region", "ca-central-1"))
         got, pk = x["facts"], x["packet"]
@@ -591,6 +594,8 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
             "latency_s": lat, "retries": retries}  # fmt: skip
 
 
+THINKING_BUDGET = 2048  # tokens of extended thinking per review turn ("think harder", D54); billed as output
+
 # Live arm -> model key in config.toml [models.*]. Same fixed workflow; only the extractor model changes.
 ARMS = {
     "workflow-nova": "nova-lite",
@@ -609,6 +614,10 @@ ARMS = {
     "workflow-nova-cache": "nova-lite",
     "workflow-nova-strict-cache": "nova-lite",
     "agent-nova-cache": "nova-lite",
+    # Article 7 (D54): think harder or go bigger, on evals/cases/hardest30.json. The whole agent (reading + review)
+    # on Claude Haiku 4.5, without and with extended thinking in the review loop.
+    "agent-haiku45": "haiku-45",
+    "agent-haiku45-think": "haiku-45",
 }
 
 

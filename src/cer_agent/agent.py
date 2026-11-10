@@ -334,10 +334,13 @@ def _session(region: str):
 
 
 def run(model_id: str, report: str, received: dt.date | None = None, region: str = "ca-central-1",
-        client=None, stop_at_finish: bool = False) -> dict:  # fmt: skip
+        client=None, stop_at_finish: bool = False, thinking: int | None = None) -> dict:  # fmt: skip
     """The workflow's reading first (one extraction), then the agent's review. Returns the rules engine's packet
     from the reviewed facts, the agent's trace (patches, confirmations, escalation), tokens and latency. A malformed
-    model reply in the review is retried warmer; if every attempt fails, the workflow's packet stands, marked."""
+    model reply in the review is retried warmer; if every attempt fails, the workflow's packet stands, marked.
+
+    `thinking` (article 7, D54) is a Claude extended-thinking budget in tokens, for the review loop only: the reading
+    forces its tool call, which extended thinking doesn't allow. With thinking on, Claude takes no temperature."""
     from strands import Agent
     from strands.models import BedrockModel
 
@@ -354,8 +357,17 @@ def run(model_id: str, report: str, received: dt.date | None = None, region: str
             f"<report>\n{case.report}\n</report>\n\n<recorded_facts>\n{json.dumps(case.facts_shown())}\n"
             f"</recorded_facts>\n\n<rules_result>\n{case.summary()}\n</rules_result>"
         )
-        model = BedrockModel(model_id=model_id, boto_session=_session(region), temperature=temp, max_tokens=1000,
-                             streaming=False)  # fmt: skip
+        if thinking:  # extended thinking: no temperature, and max_tokens must leave room past the budget
+            model = BedrockModel(
+                model_id=model_id,
+                boto_session=_session(region),
+                max_tokens=thinking + 1000,
+                streaming=False,
+                additional_request_fields={"thinking": {"type": "enabled", "budget_tokens": thinking}},
+            )
+        else:
+            model = BedrockModel(model_id=model_id, boto_session=_session(region), temperature=temp, max_tokens=1000,
+                                 streaming=False)  # fmt: skip
         agent = Agent(model=model, tools=case.tools(stop_at_finish), system_prompt=[{"text": SYSTEM}, *cache],
                       callback_handler=None)  # fmt: skip
         try:
