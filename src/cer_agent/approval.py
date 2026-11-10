@@ -55,8 +55,9 @@ DEADLINE_MIN = {"T3": 180, "T24": 1440}
 # (Price List, ca-central-1, 2026-11-09).
 PRICE_IN, PRICE_OUT = 0.064, 0.256
 PRICE_CACHE_READ = 0.016  # cache writes costed at PRICE_IN until a bill confirms they're free (D53)
-# The fallback model (D52): Claude Haiku 5.5 through the Canada profile, per 1M tokens (D19's first-party price).
-FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 0.10, 0.50
+# The fallback model (D52, D54): Claude Haiku 4.5 through the US profile, per 1M tokens (Anthropic list price; Bedrock
+# bills it through Marketplace). Haiku 5.5 isn't available to this account (AWS Sales, 2026-11-10).
+FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 1.00, 5.00
 GUARD_PRICE = {"contentPolicyUnits": 0.15, "topicPolicyUnits": 0.15, "sensitiveInformationPolicyUnits": 0.10}
 # Step Functions Standard, per state transition; Lambda per GB-second (x86) and per request.
 SFN_TRANSITION, LAMBDA_GB_S, LAMBDA_REQ = 0.000025, 0.0000166667, 0.0000002

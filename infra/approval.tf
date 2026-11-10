@@ -80,15 +80,15 @@ resource "aws_iam_role_policy" "approval_lambda" {
         ]
       },
       {
-        # The fallback (D52): only called when Nova Lite fails. Until Haiku 5.5 is enabled on the account the call is
-        # refused (AccessDeniedException) and the case goes to a person, as it would with no fallback.
+        # The fallback (D52, D54): only called when Nova Lite fails. Claude Haiku 4.5 through the tagged profile; the
+        # US system profile behind it may serve the call from any US region, so its foundation models are listed too.
         Sid    = "FallbackHaikuThroughTheTaggedProfile"
         Effect = "Allow"
         Action = "bedrock:InvokeModel"
         Resource = [
-          aws_bedrock_inference_profile.haiku.arn,
-          "arn:aws:bedrock:*:${local.account_id}:inference-profile/ca.anthropic.claude-haiku-5-5",
-          "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-5-5*",
+          aws_bedrock_inference_profile.haiku45.arn,
+          "arn:aws:bedrock:*:${local.account_id}:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0",
+          "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0",
         ]
       },
       {
@@ -137,7 +137,7 @@ resource "aws_lambda_function" "approval" {
   environment {
     variables = {
       MODEL_ARN          = aws_bedrock_inference_profile.nova_lite.arn
-      FALLBACK_MODEL_ARN = aws_bedrock_inference_profile.haiku.arn
+      FALLBACK_MODEL_ARN = aws_bedrock_inference_profile.haiku45.arn
       MODEL_RETRIES      = "3" # botocore retries per model: both chains fit the timeout (D52; 10 took up to 262 s)
       CER_PROMPT_CACHE   = "1" # cache the readers' tools + system prompt (D53: −32 to −49% a case, same answers)
       REPORTS_GUARDRAIL  = aws_bedrock_guardrail.reports.guardrail_id

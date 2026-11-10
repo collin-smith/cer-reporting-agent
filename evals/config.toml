@@ -26,10 +26,10 @@ price_in = 0.80
 price_out = 3.20
 
 [models.haiku-45]
-env = "HAIKU45_ARN"       # needs a tagged profile on us.anthropic.claude-haiku-4-5 (not deployed; see diary 2026-11-03)
+env = "HAIKU45_ARN"       # terraform output haiku45_profile_arn (tagged; US system profile, D54)
 region = "ca-central-1"
 # USD per 1M tokens: Anthropic list price for Claude Haiku 4.5 (Bedrock bills Anthropic models via Marketplace;
-# check the Bedrock pricing page before quoting). Stand-in while Haiku 5.5 ($0.10 / $0.50) is restricted on the account.
+# check the Bedrock pricing page before quoting). Used because Claude 5.5 isn't available to this account (D54).
 price_in = 1.00
 price_out = 5.00
 

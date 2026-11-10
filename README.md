@@ -106,7 +106,7 @@ NOVA_LITE_ARN=... PYTHONPATH=src python -m cer_agent.evals --arm workflow-nova-s
 ## Planned stack
 
 Strands Agents (supervisor with specialist agents; one specialist also built in LangGraph for comparison), Amazon
-Bedrock (Nova Lite, Claude Haiku 5.5), Step Functions + EventBridge, DynamoDB, a Bedrock Knowledge Base on S3 Vectors
+Bedrock (Nova Lite, Claude Haiku 4.5), Step Functions + EventBridge, DynamoDB, a Bedrock Knowledge Base on S3 Vectors
 holding the reporting rules, one MCP server for all tools, OpenTelemetry tracing, Terraform, and an eval harness that
 runs in GitHub Actions on every pull request.
 

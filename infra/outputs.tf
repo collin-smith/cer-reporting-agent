@@ -16,6 +16,11 @@ output "haiku_profile_arn" {
   value       = aws_bedrock_inference_profile.haiku.arn
 }
 
+output "haiku45_profile_arn" {
+  description = "Call Claude Haiku 4.5 through this ARN so the spend is tagged (D54)."
+  value       = aws_bedrock_inference_profile.haiku45.arn
+}
+
 output "writer_profile_arns" {
   description = "Synthetic-report writers (D27); call them through these ARNs so the spend is tagged."
   value = {

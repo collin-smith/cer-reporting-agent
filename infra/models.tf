@@ -27,6 +27,18 @@ resource "aws_bedrock_inference_profile" "haiku" {
   }
 }
 
+# Claude Haiku 4.5 (D54): AWS Sales said the account's spend is too low for the Claude 5.5 models (2026-11-10), so
+# the approval gate's fallback and article 7's comparison use Haiku 4.5. There is no Canada profile for it: the US
+# system profile routes within US regions. Same tagging, so the spend shows in the project budgets.
+resource "aws_bedrock_inference_profile" "haiku45" {
+  name        = "${local.name}-haiku45"
+  description = "Claude Haiku 4.5 via the US system profile tagged for project cost tracking"
+
+  model_source {
+    copy_from = "arn:aws:bedrock:${var.region}:${local.account_id}:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  }
+}
+
 # Test-set report writers (D27): two model families other than the ones under test (Nova, Claude), about half the
 # reports each. Llama 4 Maverick via its US cross-region profile; Mistral Large 3 on-demand in us-east-1.
 resource "aws_bedrock_inference_profile" "writer_llama" {
