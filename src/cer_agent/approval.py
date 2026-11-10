@@ -53,6 +53,8 @@ DEADLINE_MIN = {"T3": 180, "T24": 1440}
 
 # Prices (USD): Nova Lite per 1M tokens; guardrails per 1K text units (Price List, ca-central-1, 2026-11-09).
 PRICE_IN, PRICE_OUT = 0.06, 0.24
+# The fallback model (D52): Claude Haiku 5.5 through the Canada profile, per 1M tokens (D19's first-party price).
+FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 0.10, 0.50
 GUARD_PRICE = {"contentPolicyUnits": 0.15, "topicPolicyUnits": 0.15, "sensitiveInformationPolicyUnits": 0.10}
 # Step Functions Standard, per state transition; Lambda per GB-second (x86) and per request.
 SFN_TRANSITION, LAMBDA_GB_S, LAMBDA_REQ = 0.000025, 0.0000166667, 0.0000002
@@ -133,10 +135,33 @@ def wait_s(state: dict) -> int:
 # --- Lambda steps ---
 
 
+def draft_with_fallback(primary: tuple, fallback: tuple | None, report: str, pk: dict, operator: str | None) -> dict:
+    """The draft by Nova Lite, else by the fallback model, else rendered from the rules alone (D52). The decision and
+    deadline never need a model to draft; only the narrative does, so a model failure costs the narrative, not the
+    case."""
+    from cer_agent.drafter import draft, render
+    from cer_agent.workflow import FALLBACK_ON, error_code
+
+    errors = []
+    for model, (client, model_id) in (("primary", primary), ("fallback", fallback)):
+        if client is None:
+            continue
+        try:
+            return {**draft(client, model_id, report, pk, operator), "model": model, "errors": errors}
+        except Exception as e:
+            if error_code(e) not in FALLBACK_ON:
+                raise
+            errors.append(error_code(e))
+    banner = (f"> **No model could draft this ({', '.join(errors)}).** The decision, deadline and reasons below come "
+              "from the rules; PIR-5 to PIR-13 are blank because no model wrote them, not because the report is "
+              "silent. Fill them from the field report at the end.\n\n")  # fmt: skip
+    text = banner + render(pk, {}, operator) + "\n\n---\n\n**Field report:**\n\n" + report
+    return {"text": text, "input_tokens": 0, "output_tokens": 0, "model": "rules only", "errors": errors}
+
+
 def triage(event: dict) -> dict:
     import boto3
 
-    from cer_agent.drafter import draft
     from cer_agent.workflow import make_client, run_strict
 
     case_id, report = event["case_id"], event["report"]
@@ -150,21 +175,36 @@ def triage(event: dict) -> dict:
     t0 = time.time()
     bedrock = boto3.client("bedrock-runtime", region_name=REGION)
     flags, u_in = guardrail_flags(bedrock, os.environ["REPORTS_GUARDRAIL"], report)
-    client, model = make_client(), os.environ["MODEL_ARN"]
-    r = run_strict(client, model, report, received)
+    # Few retries per model, so Nova's retries and the fallback's both fit in the Lambda's timeout (D52).
+    retries = int(os.environ.get("MODEL_RETRIES", "3"))
+    client, model = make_client(max_attempts=retries), os.environ["MODEL_ARN"]
+    fb_arn = os.environ.get("FALLBACK_MODEL_ARN")
+    fallback = (make_client(max_attempts=retries), fb_arn) if fb_arn else None
+    r = run_strict(client, model, report, received, fallback)
     pk = r["packet"]
-    d = draft(client, model, report, pk, event.get("operator"))
+    d = draft_with_fallback((client, model), fallback or (None, None), report, pk, event.get("operator"))
+    if r["fallback"]["readings"]:
+        flags = [*flags, f"read by the fallback model ({r['fallback']['readings']} of {r['calls']} readings; "
+                         f"Nova Lite: {', '.join(r['fallback']['errors'])})"]  # fmt: skip
+    if d["model"] != "primary":
+        flags = [*flags, f"drafted by {'the fallback model' if d['model'] == 'fallback' else 'the rules only'}"
+                         f" (Nova Lite: {', '.join(d['errors'])})"]  # fmt: skip
     text, pii, u_out = mask_draft(bedrock, os.environ["DRAFTS_GUARDRAIL"], d["text"])
     if flags:
-        text = f"> **Guardrail:** {'; '.join(flags)}. Read the field report before approving.\n\n" + text
-    tokens_in, tokens_out = r["input_tokens"] + d["input_tokens"], r["output_tokens"] + d["output_tokens"]
-    cost = (tokens_in * PRICE_IN + tokens_out * PRICE_OUT) / 1e6 + _guard_cost(u_in, u_out)
+        text = f"> **Check:** {'; '.join(flags)}. Read the field report before approving.\n\n" + text
+    fb_in = r["fallback"]["input_tokens"] + (d["input_tokens"] if d["model"] == "fallback" else 0)
+    fb_out = r["fallback"]["output_tokens"] + (d["output_tokens"] if d["model"] == "fallback" else 0)
+    tokens_in = r["input_tokens"] + (d["input_tokens"] if d["model"] == "primary" else 0)
+    tokens_out = r["output_tokens"] + (d["output_tokens"] if d["model"] == "primary" else 0)
+    cost = ((tokens_in * PRICE_IN + tokens_out * PRICE_OUT + fb_in * FALLBACK_PRICE_IN + fb_out * FALLBACK_PRICE_OUT)
+            / 1e6 + _guard_cost(u_in, u_out))  # fmt: skip
     scale = float(os.environ.get("TIME_SCALE", "60"))
     state = {"case_id": case_id, "deadline": pk["deadline"], "level": 0, "start": int(time.time()),
              "marks": marks(pk["deadline"], float(event.get("elapsed_min", 0)), scale)}  # fmt: skip
     state["wait_s"] = wait_s(state)
     _append(table, case_id, _event("triaged", status=pk["status"], deadline=pk["deadline"], route=pk["route"],
-                                   flags=flags, masked=pii, seconds=f"{time.time() - t0:.1f}"),
+                                   flags=flags, masked=pii, seconds=f"{time.time() - t0:.1f}",
+                                   fallback_readings=r["fallback"]["readings"], drafted_by=d["model"]),
             report=report, packet=json.dumps(pk, default=str), draft=text, flags=flags,
             due_at=pk["due_at"] or "9999", decision_status=pk["status"], deadline=pk["deadline"] or "none",
             ai_cost_usd=f"{cost:.6f}", marks=state["marks"])  # fmt: skip

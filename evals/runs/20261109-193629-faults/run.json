@@ -1,0 +1,19 @@
+{
+  "source": "20261108-105630-workflow-nova-strict-test",
+  "split": "test",
+  "scenarios": [
+    "clean",
+    "throttled-briefly",
+    "throttled",
+    "malformed-tool-call",
+    "model-timeout",
+    "model-not-ready",
+    "outage",
+    "outage-no-fallback",
+    "outage-fallback-not-enabled"
+  ],
+  "retries": [
+    10,
+    3
+  ]
+}

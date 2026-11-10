@@ -97,3 +97,27 @@ def test_triage_failure_goes_to_a_person(monkeypatch):
     assert "Fire at the station." in values[":n"] and values[":f"] == ["triage failed: ModelErrorException"]
     assert calls[1][:2] == ("paged", "primary")
     assert (state["deadline"], state["marks"]) == ("T3", [60, 150, 180])
+
+
+def test_draft_falls_back_then_renders_from_the_rules(monkeypatch):
+    from botocore.exceptions import ClientError
+
+    from cer_agent import drafter
+
+    down = ClientError({"Error": {"Code": "ServiceUnavailableException", "Message": "x"}}, "Converse")
+
+    def fake_draft(client, model, report, pk, operator):
+        if client == "down":
+            raise down
+        return {"text": f"drafted by {model}", "input_tokens": 10, "output_tokens": 5}
+
+    monkeypatch.setattr(drafter, "draft", fake_draft)
+    pk = {"status": "reportable", "deadline": "T24"}
+    monkeypatch.setattr(drafter, "render", lambda pk, fields, op: f"rules draft {fields}")
+    d = approval.draft_with_fallback(("down", "nova"), ("up", "haiku"), "report", pk, None)
+    assert (d["model"], d["text"], d["errors"]) == ("fallback", "drafted by haiku", ["ServiceUnavailableException"])
+    d = approval.draft_with_fallback(("down", "nova"), ("down", "haiku"), "Fire at the station.", pk, None)
+    assert d["model"] == "rules only" and "rules draft {}" in d["text"] and d["text"].endswith("Fire at the station.")
+    assert "blank because no model wrote them" in d["text"]
+    d = approval.draft_with_fallback(("down", "nova"), (None, None), "r", pk, None)  # no fallback configured
+    assert d["errors"] == ["ServiceUnavailableException"] and d["model"] == "rules only"

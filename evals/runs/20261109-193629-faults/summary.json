@@ -1,0 +1,334 @@
+{
+  "retries=10 clean": {
+    "reports": 83,
+    "answered_by": {
+      "primary": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 2.8,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 throttled-briefly": {
+    "reports": 83,
+    "answered_by": {
+      "primary": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 8.3,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 10.89,
+      "max": 13.01
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 throttled": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 30.5,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 195.61,
+      "max": 262.37
+    },
+    "over_lambda_timeout": 79
+  },
+  "retries=10 malformed-tool-call": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 8.3,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 model-timeout": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 2.8,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 model-not-ready": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 30.5,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 78.41,
+      "max": 103.34
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 outage": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 30.5,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 74.7,
+      "max": 107.2
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 outage-no-fallback": {
+    "reports": 83,
+    "answered_by": {
+      "person": 83
+    },
+    "status_ok": 0,
+    "missed_reportable": 0,
+    "errors_to_person": {
+      "ServiceUnavailableException": 83
+    },
+    "attempts_per_report": {
+      "primary": 27.3,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 78.28,
+      "max": 112.29
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=10 outage-fallback-not-enabled": {
+    "reports": 83,
+    "answered_by": {
+      "person": 83
+    },
+    "status_ok": 0,
+    "missed_reportable": 0,
+    "errors_to_person": {
+      "AccessDeniedException": 83
+    },
+    "attempts_per_report": {
+      "primary": 27.7,
+      "fallback": 2.5
+    },
+    "retry_wait_s": {
+      "p50": 76.57,
+      "max": 111.49
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 clean": {
+    "reports": 83,
+    "answered_by": {
+      "primary": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 2.8,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 throttled-briefly": {
+    "reports": 83,
+    "answered_by": {
+      "primary": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 8.3,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 10.95,
+      "max": 12.94
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 throttled": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 11.1,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 21.98,
+      "max": 26.25
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 malformed-tool-call": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 8.3,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 model-timeout": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 2.8,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 0.0,
+      "max": 0.0
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 model-not-ready": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 11.1,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 4.57,
+      "max": 6.69
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 outage": {
+    "reports": 83,
+    "answered_by": {
+      "fallback": 83
+    },
+    "status_ok": 76,
+    "missed_reportable": 0,
+    "errors_to_person": {},
+    "attempts_per_report": {
+      "primary": 11.1,
+      "fallback": 2.8
+    },
+    "retry_wait_s": {
+      "p50": 4.55,
+      "max": 6.61
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 outage-no-fallback": {
+    "reports": 83,
+    "answered_by": {
+      "person": 83
+    },
+    "status_ok": 0,
+    "missed_reportable": 0,
+    "errors_to_person": {
+      "ServiceUnavailableException": 83
+    },
+    "attempts_per_report": {
+      "primary": 8.7,
+      "fallback": 0.0
+    },
+    "retry_wait_s": {
+      "p50": 4.51,
+      "max": 6.32
+    },
+    "over_lambda_timeout": 0
+  },
+  "retries=3 outage-fallback-not-enabled": {
+    "reports": 83,
+    "answered_by": {
+      "person": 83
+    },
+    "status_ok": 0,
+    "missed_reportable": 0,
+    "errors_to_person": {
+      "AccessDeniedException": 83
+    },
+    "attempts_per_report": {
+      "primary": 8.8,
+      "fallback": 2.2
+    },
+    "retry_wait_s": {
+      "p50": 4.53,
+      "max": 6.48
+    },
+    "over_lambda_timeout": 0
+  }
+}

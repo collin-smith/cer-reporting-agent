@@ -80,6 +80,18 @@ resource "aws_iam_role_policy" "approval_lambda" {
         ]
       },
       {
+        # The fallback (D52): only called when Nova Lite fails. Until Haiku 5.5 is enabled on the account the call is
+        # refused (AccessDeniedException) and the case goes to a person, as it would with no fallback.
+        Sid    = "FallbackHaikuThroughTheTaggedProfile"
+        Effect = "Allow"
+        Action = "bedrock:InvokeModel"
+        Resource = [
+          aws_bedrock_inference_profile.haiku.arn,
+          "arn:aws:bedrock:*:${local.account_id}:inference-profile/ca.anthropic.claude-haiku-5-5",
+          "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-5-5*",
+        ]
+      },
+      {
         Sid      = "Guardrails"
         Effect   = "Allow"
         Action   = "bedrock:ApplyGuardrail"
@@ -120,17 +132,19 @@ resource "aws_lambda_function" "approval" {
   filename         = local.lambda_zip
   source_code_hash = fileexists(local.lambda_zip) ? filebase64sha256(local.lambda_zip) : null
   memory_size      = 512
-  timeout          = 120 # triage: three readings in parallel, the draft and two guardrail calls
+  timeout          = 120 # triage: three readings in parallel, the draft and two guardrail calls, with retries
 
   environment {
     variables = {
-      MODEL_ARN         = aws_bedrock_inference_profile.nova_lite.arn
-      REPORTS_GUARDRAIL = aws_bedrock_guardrail.reports.guardrail_id
-      DRAFTS_GUARDRAIL  = aws_bedrock_guardrail.drafts.guardrail_id
-      CASES_TABLE       = aws_dynamodb_table.cases.name
-      TOPIC_ARN         = aws_sns_topic.alerts.arn
-      TIME_SCALE        = tostring(var.approval_time_scale)
-      NOTIFY            = var.approval_notify
+      MODEL_ARN          = aws_bedrock_inference_profile.nova_lite.arn
+      FALLBACK_MODEL_ARN = aws_bedrock_inference_profile.haiku.arn
+      MODEL_RETRIES      = "3" # botocore retries per model: both chains fit the timeout (D52; 10 took up to 262 s)
+      REPORTS_GUARDRAIL  = aws_bedrock_guardrail.reports.guardrail_id
+      DRAFTS_GUARDRAIL   = aws_bedrock_guardrail.drafts.guardrail_id
+      CASES_TABLE        = aws_dynamodb_table.cases.name
+      TOPIC_ARN          = aws_sns_topic.alerts.arn
+      TIME_SCALE         = tostring(var.approval_time_scale)
+      NOTIFY             = var.approval_notify
     }
   }
 

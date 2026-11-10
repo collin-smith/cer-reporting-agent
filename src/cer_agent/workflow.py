@@ -30,12 +30,14 @@ from cer_agent.rules import decide
 REGION = "ca-central-1"
 
 
-def make_client(region: str = REGION):
+def make_client(region: str = REGION, max_attempts: int = 10):
+    """`max_attempts` is botocore's retry count (10 means 11 calls). With a fallback model, keep it low enough that
+    both chains fit inside the Lambda's timeout (D52)."""
     import boto3
     from botocore.config import Config
 
     return boto3.client("bedrock-runtime", region_name=region,
-                        config=Config(retries={"max_attempts": 10, "mode": "adaptive"}))  # fmt: skip
+                        config=Config(retries={"max_attempts": max_attempts, "mode": "adaptive"}))  # fmt: skip
 
 
 def _packet(facts, extraction: dict | None = None) -> dict:
@@ -123,21 +125,57 @@ def recombine(layout_raw: dict[str, dict], received: dt.date | None = None) -> d
     return combine({k: packet(to_facts(raw, received), {"raw": raw}) for k, raw in layout_raw.items()})
 
 
-def run_strict(client, model_id: str, report: str, received: dt.date | None = None) -> dict:
+# --- When the model fails (D52) ---
+# Errors that mean "this model can't answer right now", left over after botocore's own retries (throttling, 500, 503,
+# model not ready) and the reader's temperature steps (a malformed tool call). Another model may answer. Anything
+# else (validation, access denied, a bug) is ours to fix, so it fails the triage and the case goes to a person.
+FALLBACK_ON = {"ThrottlingException", "ServiceUnavailableException", "InternalServerException",
+               "ModelNotReadyException", "ModelTimeoutException", "ModelErrorException", "ReadTimeoutError",
+               "ConnectTimeoutError", "EndpointConnectionError"}  # fmt: skip
+
+
+def error_code(e: Exception) -> str:
+    """The AWS error code, or the exception's class name for a network error (a read timeout has no code)."""
+    return getattr(e, "response", {}).get("Error", {}).get("Code") or type(e).__name__
+
+
+def read(client, model_id: str, text: str, received: dt.date | None = None, fallback: tuple | None = None) -> dict:
+    """One reading; on a model failure, the same reading by the fallback (its own client, so the primary's
+    throttling and retry quota don't hold it back). The row says which model answered and why."""
+    try:
+        return {**extract(client, model_id, text, received), "model": "primary"}
+    except Exception as e:
+        if fallback is None or error_code(e) not in FALLBACK_ON:
+            raise
+        fb_client, fb_model = fallback
+        return {**extract(fb_client, fb_model, text, received), "model": "fallback", "primary_error": error_code(e)}
+
+
+def run_strict(client, model_id: str, report: str, received: dt.date | None = None,
+               fallback: tuple | None = None) -> dict:  # fmt: skip
     """The strictest-of-layouts workflow: one extraction per layout, in parallel, then `combine`. Latency is wall
-    time, so about one call's; tokens and cost are the sum."""
+    time, so about one call's; tokens and cost are the sum. `fallback` is (client, model_id) or None."""
     texts = layouts(report)
     t0 = time.perf_counter()
     with ThreadPoolExecutor(len(texts)) as pool:
-        xs = dict(zip(texts, pool.map(lambda t: extract(client, model_id, t, received), texts.values()), strict=True))
+        xs = dict(zip(texts, pool.map(lambda t: read(client, model_id, t, received, fallback), texts.values()),
+                      strict=True))  # fmt: skip
     latency = time.perf_counter() - t0
     pk = combine({k: packet(x["facts"], x) for k, x in xs.items()})
+    by = {m: [x for x in xs.values() if x["model"] == m] for m in ("primary", "fallback")}
     return {
         "packet": pk,
         "facts": xs["as_written"]["facts"],
         "latency_s": latency,
         "calls": len(xs),
-        **{k: sum(x.get(k, 0) for x in xs.values()) for k in ("input_tokens", "output_tokens", "retries")},
+        **{k: sum(x.get(k, 0) for x in by["primary"]) for k in ("input_tokens", "output_tokens")},
+        "retries": sum(x.get("retries", 0) for x in xs.values()),
+        "fallback": {
+            "readings": len(by["fallback"]),
+            "errors": sorted({x["primary_error"] for x in by["fallback"]}),
+            "input_tokens": sum(x["input_tokens"] for x in by["fallback"]),
+            "output_tokens": sum(x["output_tokens"] for x in by["fallback"]),
+        },  # fmt: skip
     }
 
 
