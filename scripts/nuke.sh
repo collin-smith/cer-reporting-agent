@@ -65,16 +65,22 @@ items=$(awsr opensearchserverless list-collections --query 'collectionSummaries[
 for c in $items; do report "OpenSearch Serverless collection $c"; done
 [[ -z "${items// /}" ]] && clean
 
-say "AgentCore runtimes named ${PROJECT}* (deployed only for the Stage 7 window)"
+say "AgentCore runtimes named ${PROJECT}* or ${PROJECT//-/_}* (deployed only for the article 7 window, D55)"
 n=0
 while IFS=$'\t' read -r id name; do
-  [[ -z "${name:-}" || "$name" != ${PROJECT}* ]] && continue
+  [[ -z "${name:-}" || ("$name" != ${PROJECT}* && "$name" != ${PROJECT//-/_}*) ]] && continue
   n=$((n + 1))
   found "AgentCore runtime $name" aws bedrock-agentcore-control delete-agent-runtime \
     --agent-runtime-id "$id" --region "$REGION"
 done < <(awsr bedrock-agentcore-control list-agent-runtimes \
   --query 'agentRuntimes[].[agentRuntimeId,agentRuntimeName]' 2>/dev/null || true)
 ((n == 0)) && clean
+
+say "AgentCore gateways named ${PROJECT}* (article 7 window, D55; remove with terraform)"
+items=$(awsr bedrock-agentcore-control list-gateways --query "items[?starts_with(name, '${PROJECT}')].name" \
+  2>/dev/null || true)
+for g in $items; do report "AgentCore gateway $g (terraform apply with agentcore_window=false)"; done
+[[ -z "${items// /}" ]] && clean
 
 say "Step Functions executions still running (${PROJECT}* state machines)"
 n=0
@@ -126,7 +132,7 @@ for i in $items; do report "$i (remove with terraform: it's part of the VPC stac
 say "Log groups named /aws/*/${PROJECT}* with no retention (logs then bill forever)"
 n=0
 for g in $(awsr logs describe-log-groups --query "logGroups[?retentionInDays==null].logGroupName"); do
-  [[ "$g" == *"${PROJECT}"* ]] || continue
+  [[ "$g" == *"${PROJECT}"* || "$g" == *"${PROJECT//-/_}"* ]] || continue # AgentCore's are agentic_ai_*
   n=$((n + 1))
   found "log group $g: setting 14-day retention" aws logs put-retention-policy --log-group-name "$g" \
     --retention-in-days 14 --region "$REGION"

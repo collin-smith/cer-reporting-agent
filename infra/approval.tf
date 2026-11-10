@@ -149,7 +149,16 @@ resource "aws_lambda_function" "approval" {
     }
   }
 
-  depends_on = [aws_cloudwatch_log_group.approval_lambda]
+  # Inside private subnets only during the VPC hardening window (vpc.tf, D55); outside a VPC otherwise. The block
+  # is always here: a Lambda leaves a VPC when its lists are set to empty, not when the block is removed. The IDs
+  # aren't known until the network exists, so the window goes up in two applies (network, then this change).
+  vpc_config {
+    subnet_ids         = aws_subnet.private[*].id             # [] outside the window
+    security_group_ids = aws_security_group.gate_lambda[*].id # [] outside the window
+  }
+
+  depends_on = [aws_cloudwatch_log_group.approval_lambda, aws_iam_role_policy_attachment.approval_lambda_vpc,
+  aws_vpc_endpoint.interface]
 }
 
 # --- Step Functions: triage -> wait for a person (escalating on timeout) -> close ---

@@ -543,7 +543,11 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
             from cer_agent.agent import run as run_agent
 
         received = dt.date.fromisoformat(case["discovered_at"][:10])
-        if "-mcp" in arm:  # article 5: the same agent, its tools and state on the MCP server
+        if arm.endswith("-agentcore"):  # article 7 (D55): the same agent hosted on AgentCore Runtime, caching on
+            from cer_agent import agentcore_client
+
+            x = agentcore_client.run_agent(os.environ["AGENT_RUNTIME_ARN"], case["report"], received)
+        elif "-mcp" in arm:  # article 5: the same agent, its tools and state on the MCP server
             from cer_agent import mcp_client
 
             x = mcp_client.run_agent(mcp_client.shared(), os.environ[model["env"]], case["report"], received,
@@ -583,9 +587,12 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
     cread, cwrite = x.get("cache_read_tokens", 0), x.get("cache_write_tokens", 0)
     cost = ((tin + cwrite) * model["price_in"] + cread * model.get("price_cache_read", model["price_in"])
             + tout * model["price_out"]) / 1e6 if model else 0.0  # fmt: skip
-    extra_cache = {"cache_read_tokens": cread, "cache_write_tokens": cwrite} if "-cache" in arm else {}
+    cached = "-cache" in arm or "-agentcore" in arm
+    extra_cache = {"cache_read_tokens": cread, "cache_write_tokens": cwrite} if cached else {}
     keep = ("id", "kind", "variant", "writer", "split", "label_source", "expected")
     extra = {"mcp_overhead_s": x["mcp_overhead_s"]} if "-mcp" in arm else {}
+    if arm.endswith("-agentcore"):  # the agent's own time (inside the microVM) vs what hosting adds around it
+        extra = {k: x[k] for k in ("agent_latency_s", "hosting_overhead_s", "session")}
     return {**extra, **{k: case[k] for k in keep}, **({"perturb": case["perturb"]} if "perturb" in case else {}),
             "render": case.get("render", "text"), "text_supported": text_supported(case),
             "packet": pk,
@@ -618,6 +625,9 @@ ARMS = {
     # on Claude Haiku 4.5, without and with extended thinking in the review loop.
     "agent-haiku45": "haiku-45",
     "agent-haiku45-think": "haiku-45",
+    # Article 7 (D55): the single agent hosted on AgentCore Runtime (AGENT_RUNTIME_ARN), prompt caching on there as
+    # in the deployed gate; compare with agent-nova-cache. latency_s is the client's wall time.
+    "agent-nova-agentcore": "nova-lite",
 }
 
 
@@ -659,6 +669,9 @@ def main(argv=None) -> int:
     if model:
         if not os.environ.get(model["env"]):
             print(f"Set {model['env']} (the model's tagged profile ARN; terraform output).")
+            return 2
+        if run_cfg["arm"].endswith("-agentcore") and not os.environ.get("AGENT_RUNTIME_ARN"):
+            print("Set AGENT_RUNTIME_ARN (terraform output agentcore_agent_runtime_arn; the window must be on).")
             return 2
         est = (
             (3 if "-strict" in run_cfg["arm"] else 1)

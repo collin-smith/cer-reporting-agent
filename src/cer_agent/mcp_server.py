@@ -12,10 +12,11 @@ Two scopes:
 
 The server never sets a decision a model chose: every packet is the rules engine's, and patch_facts keeps the
 stricter-only gate (D38). Model calls use the tagged Nova Lite profile in NOVA_LITE_ARN and the caller's AWS
-credentials; nothing is hosted.
+credentials. Hosted only for article 7's AgentCore window (`--http`, D55), behind AgentCore Gateway.
 
 Usage (from code/, src on PYTHONPATH):
     NOVA_LITE_ARN=... python3 -m cer_agent.mcp_server [--review]      # stdio; a client starts it
+    NOVA_LITE_ARN=... python3 -m cer_agent.mcp_server --http          # hosted: AgentCore Runtime (article 7, D55)
 """
 
 from __future__ import annotations
@@ -202,11 +203,32 @@ def build(review: bool = False) -> MCPServer:
     return server
 
 
+def serve_http(server: MCPServer, port: int = 8000) -> None:
+    """Hosted on AgentCore Runtime (article 7, D55): the Runtime's MCP contract is stateless streamable HTTP on
+    0.0.0.0:8000/mcp, with GET /ping for health. The Runtime proxies every request, so the Host header is its own;
+    DNS-rebinding protection is for a server on a person's machine, not one behind a SigV4-checked endpoint."""
+    from mcp.server.transport_security import TransportSecuritySettings
+    from starlette.responses import JSONResponse
+
+    @server.custom_route("/ping", methods=["GET"])
+    async def ping(_request):
+        return JSONResponse({"status": "Healthy", "time_of_last_update": int(time.time())})
+
+    server.run("streamable-http", host="0.0.0.0", port=port, stateless_http=True,
+               transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False))  # fmt: skip
+
+
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="Serve the CER reporting tools over MCP (stdio).")
+    ap = argparse.ArgumentParser(description="Serve the CER reporting tools over MCP (stdio, or HTTP when hosted).")
     ap.add_argument("--review", action="store_true", help="also serve the reviewing agent's case tools")
+    ap.add_argument("--http", action="store_true", help="stateless streamable HTTP on :8000 (AgentCore Runtime)")
     args = ap.parse_args(argv)
-    build(args.review).run("stdio")
+    if args.http and args.review:  # the case tools keep one case in process memory: not for a stateless server
+        ap.error("--review needs one process per client (stdio); a hosted server is stateless, public scope only")
+    if args.http:
+        serve_http(build())
+    else:
+        build(args.review).run("stdio")
     return 0
 
 
