@@ -1,5 +1,6 @@
-"""Build the approval Lambda's zip (article 6, D51): the cer_agent package plus the OpenTelemetry API it imports
-(tracing is a no-op unless set up). boto3 comes with the Lambda runtime.
+"""Build the approval Lambda's zip (article 6, D51): the cer_agent package plus OpenTelemetry. The API is all the
+gate needs outside the observability window (tracing is a no-op unless set up); the SDK and semantic conventions
+are there for the window (article 7, D58), which writes the spans to the log group. boto3 comes with the runtime.
 
 Usage (from code/):  .venv/bin/python scripts/build_lambda.py   ->  infra/build/approval.zip
 
@@ -18,7 +19,7 @@ CODE = pathlib.Path(__file__).resolve().parents[1]
 OUT = CODE / "infra/build/approval.zip"
 MODULES = ["__init__", "approval", "drafter", "extract", "rules", "tracing", "workflow"]
 FIXED = (2026, 1, 1, 0, 0, 0)
-SKIP = {"sdk", "instrumentation", "semconv", "__pycache__"}  # the API only
+SKIP = {"instrumentation", "__pycache__"}  # API, SDK and semantic conventions
 
 
 def _add(zf: zipfile.ZipFile, path: pathlib.Path, arcname: str):
@@ -32,6 +33,7 @@ def main() -> int:
     site = pathlib.Path(sysconfig.get_paths()["purelib"])
     otel = [d for d in sorted((site / "opentelemetry").iterdir()) if d.is_dir() and d.name not in SKIP]
     deps = [*otel, site / "typing_extensions.py", *site.glob("opentelemetry_api-*.dist-info"),
+            *site.glob("opentelemetry_sdk-*.dist-info"), *site.glob("opentelemetry_semantic_conventions-*.dist-info"),
             *site.glob("typing_extensions-*.dist-info")]  # fmt: skip
     OUT.parent.mkdir(parents=True, exist_ok=True)
     files = [(CODE / f"src/cer_agent/{m}.py", f"cer_agent/{m}.py") for m in MODULES]

@@ -43,3 +43,31 @@ def test_a_deadline_disagreement_alone_is_not_precautionary_but_goes_to_a_person
 def test_all_not_reportable_stays_not_reportable():
     out = combine({"as_written": pk("not reportable", None), "noblank": pk("not reportable", None)})
     assert (out["status"], out["deadline"], out["incident_types"]) == ("not reportable", None, [])
+
+
+def test_strict_readings_nest_under_the_callers_span(monkeypatch):
+    import io
+    import json
+
+    from cer_agent import tracing, workflow
+
+    def fake_read(client, model_id, text, received, fallback):
+        with tracing.span("extract", layout=text):
+            return {"facts": {}, "model": "primary", "input_tokens": 1, "output_tokens": 1}
+
+    monkeypatch.setattr(workflow, "read", fake_read)
+    monkeypatch.setattr(workflow, "layouts", lambda report: {"as_written": "A", "b": "B", "c": "C"})
+    monkeypatch.setattr(workflow, "packet", lambda facts, x: {})
+    monkeypatch.setattr(workflow, "combine", lambda pks: {"status": "reportable"})
+    monkeypatch.setattr(tracing, "_provider", None)
+    out = io.StringIO()
+    provider = tracing.setup(None, stream=out)
+    with tracing.span("gate.triage"):
+        r = workflow.run_strict(None, "m", "report")
+    provider.shutdown()
+    monkeypatch.setattr(tracing, "_provider", None)
+    spans = [json.loads(line) for line in out.getvalue().splitlines()]
+    (root,) = [s for s in spans if s["name"] == "gate.triage"]
+    reads = [s for s in spans if s["name"] == "extract"]
+    assert len(reads) == 3 and all(s["parent_id"] == root["span_id"] for s in reads)
+    assert r["input_tokens"] == 3

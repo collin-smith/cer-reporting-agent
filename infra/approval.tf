@@ -146,7 +146,13 @@ resource "aws_lambda_function" "approval" {
       TOPIC_ARN          = aws_sns_topic.alerts.arn
       TIME_SCALE         = tostring(var.approval_time_scale)
       NOTIFY             = var.approval_notify
+      OBSERVABILITY      = var.observability_window ? "on" : "off" # spans and gate metrics to the logs (D58)
     }
+  }
+
+  # X-Ray traces each invocation during the observability window (D58); PassThrough is Lambda's default.
+  tracing_config {
+    mode = var.observability_window ? "Active" : "PassThrough"
   }
 
   # Inside private subnets only during the VPC hardening window (vpc.tf, D55); outside a VPC otherwise. The block
@@ -158,7 +164,7 @@ resource "aws_lambda_function" "approval" {
   }
 
   depends_on = [aws_cloudwatch_log_group.approval_lambda, aws_iam_role_policy_attachment.approval_lambda_vpc,
-  aws_vpc_endpoint.interface]
+  aws_vpc_endpoint.interface, aws_iam_role_policy_attachment.approval_lambda_xray]
 }
 
 # --- Step Functions: triage -> wait for a person (escalating on timeout) -> close ---
@@ -193,6 +199,10 @@ resource "aws_sfn_state_machine" "approval" {
   name     = "${local.name}-approval"
   role_arn = aws_iam_role.approval_sfn.arn
   type     = "STANDARD"
+
+  tracing_configuration {
+    enabled = var.observability_window # X-Ray, observability window (D58)
+  }
 
   definition = jsonencode({
     Comment = "CER triage: draft, then wait for a person; escalate on D25's clock; never file."
@@ -250,6 +260,8 @@ resource "aws_sfn_state_machine" "approval" {
       }
     }
   })
+
+  depends_on = [aws_iam_role_policy.approval_sfn_xray]
 }
 
 output "approval_state_machine_arn" {

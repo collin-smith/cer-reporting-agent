@@ -12,6 +12,7 @@ Usage (from code/, src on PYTHONPATH):
 from __future__ import annotations
 
 import argparse
+import contextvars
 import dataclasses
 import datetime as dt
 import json
@@ -157,9 +158,11 @@ def run_strict(client, model_id: str, report: str, received: dt.date | None = No
     time, so about one call's; tokens and cost are the sum. `fallback` is (client, model_id) or None."""
     texts = layouts(report)
     t0 = time.perf_counter()
+    # Each reading runs in a copy of this thread's context, so its spans nest under the caller's (D58).
+    ctxs = [contextvars.copy_context() for _ in texts]
     with ThreadPoolExecutor(len(texts)) as pool:
-        xs = dict(zip(texts, pool.map(lambda t: read(client, model_id, t, received, fallback), texts.values()),
-                      strict=True))  # fmt: skip
+        xs = dict(zip(texts, pool.map(lambda c, t: c.run(read, client, model_id, t, received, fallback), ctxs,
+                                      texts.values()), strict=True))  # fmt: skip
     latency = time.perf_counter() - t0
     pk = combine({k: packet(x["facts"], x) for k, x in xs.items()})
     by = {m: [x for x in xs.values() if x["model"] == m] for m in ("primary", "fallback")}

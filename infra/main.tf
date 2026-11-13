@@ -16,7 +16,7 @@ resource "aws_sns_topic_subscription" "alerts_email" {
   endpoint  = var.alert_email
 }
 
-# AWS Budgets publishes to the topic, so the topic has to let it.
+# AWS Budgets and CloudWatch alarms (D58) publish to the topic, so the topic has to let them.
 resource "aws_sns_topic_policy" "alerts" {
   arn = aws_sns_topic.alerts.arn
   policy = jsonencode({
@@ -25,6 +25,13 @@ resource "aws_sns_topic_policy" "alerts" {
       Sid       = "AllowBudgetsPublish"
       Effect    = "Allow"
       Principal = { Service = "budgets.amazonaws.com" }
+      Action    = "SNS:Publish"
+      Resource  = aws_sns_topic.alerts.arn
+      Condition = { StringEquals = { "aws:SourceAccount" = local.account_id } }
+      }, {
+      Sid       = "AllowCloudWatchAlarmsPublish"
+      Effect    = "Allow"
+      Principal = { Service = "cloudwatch.amazonaws.com" }
       Action    = "SNS:Publish"
       Resource  = aws_sns_topic.alerts.arn
       Condition = { StringEquals = { "aws:SourceAccount" = local.account_id } }

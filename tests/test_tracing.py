@@ -41,3 +41,19 @@ def test_without_setup_spans_are_free_and_write_nothing(tmp_path, monkeypatch):
     with tracing.span("decide") as s:
         tracing.usage(s, 1, 1)
     assert not list(tmp_path.iterdir())
+
+
+def test_stdout_exporter_marks_each_span_for_logs_insights(monkeypatch):
+    import io
+
+    monkeypatch.setattr(tracing, "_provider", None)
+    out = io.StringIO()
+    provider = tracing.setup(None, stream=out)
+    with tracing.span("gate.triage", case_id="CL-010"), tracing.span("extract"):
+        pass
+    provider.shutdown()
+    monkeypatch.setattr(tracing, "_provider", None)
+    spans = {s["name"]: s for s in map(json.loads, out.getvalue().splitlines())}
+    assert all(s["cer_span"] == 1 for s in spans.values())
+    assert spans["extract"]["parent_id"] == spans["gate.triage"]["span_id"]
+    assert spans["gate.triage"]["attributes"]["cer.case_id"] == "CL-010"

@@ -64,6 +64,37 @@ SFN_TRANSITION, LAMBDA_GB_S, LAMBDA_REQ = 0.000025, 0.0000166667, 0.0000002
 
 DECISIONS = {"approve": "APPROVED", "edit": "EDITED_AND_APPROVED", "reject": "REJECTED"}
 
+# Observability window (article 7, D58): with OBSERVABILITY=on the gate writes its spans and three metrics to its
+# log group. Metrics use CloudWatch's Embedded Metric Format: a JSON log line that CloudWatch turns into a metric,
+# with no API call or permission. Off, nothing extra is written and no metric is published (so none is billed).
+NAMESPACE = "CER/Gate"
+_observing = None  # decided once per Lambda container
+
+
+def observing() -> bool:
+    global _observing
+    if _observing is None:
+        _observing = os.environ.get("OBSERVABILITY") == "on"
+        if _observing:
+            from cer_agent import tracing
+
+            tracing.setup(None)  # spans to stdout, so to the function's log group
+    return _observing
+
+
+def emit(metrics: dict, **props) -> None:
+    """One EMF line: `metrics` become CER/Gate metrics (no dimensions, so one metric each); `props` ride along as
+    fields Logs Insights can query (the case, its status, cost). Nothing outside the observability window."""
+    if not observing():
+        return
+    emf = {
+        "Timestamp": int(time.time() * 1000),
+        "CloudWatchMetrics": [
+            {"Namespace": NAMESPACE, "Dimensions": [[]], "Metrics": [{"Name": k, "Unit": "Count"} for k in metrics]}
+        ],
+    }
+    print(json.dumps({"_aws": emf, **metrics, **props}, default=str), flush=True)
+
 
 def now() -> str:
     return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
@@ -214,6 +245,9 @@ def triage(event: dict) -> dict:
             report=report, packet=json.dumps(pk, default=str), draft=text, flags=flags,
             due_at=pk["due_at"] or "9999", decision_status=pk["status"], deadline=pk["deadline"] or "none",
             ai_cost_usd=f"{cost:.6f}", marks=state["marks"])  # fmt: skip
+    emit({"Fallbacks": r["fallback"]["readings"] + (d["model"] != "primary")}, case_id=case_id,
+         status=pk["status"], deadline=pk["deadline"] or "none", seconds=round(time.time() - t0, 1),
+         cost_usd=round(cost, 6), drafted_by=d["model"])  # fmt: skip
     if pk["deadline"] == "T3":
         notify(table, case_id, "primary", "New 3-hour case: approve or edit the draft now.")
     return state
@@ -232,6 +266,7 @@ def escalate(event: dict) -> dict:
     steps = SCHEDULE[state["deadline"] or "T24"]
     if state["level"] > len(steps):
         _append(table, state["case_id"], _event("overdue"), status="OVERDUE")
+        emit({"Overdue": 1}, case_id=state["case_id"], deadline=state["deadline"] or "none")
         notify(table, state["case_id"], "primary+backup", "The reporting deadline passed with no approval.")
         return {**state, "overdue": True}
     _, who, msg = steps[state["level"] - 1]
@@ -297,6 +332,7 @@ def triage_failed(event: dict) -> dict:
                                                  ":f": [f"triage failed: {kind}"], ":u": "unknown",
                                                  ":r": event.get("report", "")})  # fmt: skip
     notify(table, case_id, "primary", f"Triage failed ({kind}): read this report by hand now.")
+    emit({"TriageFailed": 1}, case_id=case_id, error=kind)
     state = {
         "case_id": case_id,
         "deadline": "T3",
@@ -310,7 +346,16 @@ def triage_failed(event: dict) -> dict:
 
 def handler(event, context=None):
     steps = {"triage": triage, "triage_failed": triage_failed, "park": park, "escalate": escalate, "close": close}
-    return steps[event["step"]](event)
+    if not observing():
+        return steps[event["step"]](event)
+    from cer_agent import tracing
+
+    # One root span per step; extract, decide and draft nest under triage. The X-Ray root ties the log lines to the
+    # trace X-Ray records for this invocation (active tracing, D58).
+    case_id = event.get("case_id") or (event.get("case") or {}).get("case_id")
+    root = os.environ.get("_X_AMZN_TRACE_ID", "").split(";")[0].removeprefix("Root=") or None
+    with tracing.span(f"gate.{event['step']}", case_id=case_id, xray_trace_id=root):
+        return steps[event["step"]](event)
 
 
 # --- Approver CLI ---

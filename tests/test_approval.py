@@ -121,3 +121,57 @@ def test_draft_falls_back_then_renders_from_the_rules(monkeypatch):
     assert "blank because no model wrote them" in d["text"]
     d = approval.draft_with_fallback(("down", "nova"), (None, None), "r", pk, None)  # no fallback configured
     assert d["errors"] == ["ServiceUnavailableException"] and d["model"] == "rules only"
+
+
+def test_emit_writes_nothing_outside_the_observability_window(monkeypatch, capsys):
+    monkeypatch.setattr(approval, "_observing", None)
+    monkeypatch.delenv("OBSERVABILITY", raising=False)
+    approval.emit({"Overdue": 1}, case_id="CL-001")
+    assert capsys.readouterr().out == ""
+    monkeypatch.setattr(approval, "_observing", None)
+
+
+def test_emit_writes_one_emf_line_in_the_window(monkeypatch, capsys):
+    import json
+
+    from cer_agent import tracing
+
+    monkeypatch.setattr(approval, "_observing", None)
+    monkeypatch.setenv("OBSERVABILITY", "on")
+    monkeypatch.setattr(tracing, "setup", lambda path, stream=None: None)
+    approval.emit({"Fallbacks": 2}, case_id="CL-010", cost_usd=0.001)
+    line = json.loads(capsys.readouterr().out)
+    (directive,) = line["_aws"]["CloudWatchMetrics"]
+    assert directive["Namespace"] == "CER/Gate" and directive["Dimensions"] == [[]]
+    assert directive["Metrics"] == [{"Name": "Fallbacks", "Unit": "Count"}]
+    assert line["Fallbacks"] == 2 and line["case_id"] == "CL-010"
+    monkeypatch.setattr(approval, "_observing", None)
+
+
+def test_overdue_emits_its_metric(recorded, monkeypatch):
+    sent = []
+    monkeypatch.setattr(approval, "emit", lambda metrics, **props: sent.append((metrics, props)))
+    state = {"case_id": "CL-007", "deadline": "T3", "level": 2, "start": 0, "marks": [], "wait_s": 1}
+    assert approval.escalate({"case": state})["overdue"] is True
+    assert sent == [({"Overdue": 1}, {"case_id": "CL-007", "deadline": "T3"})]
+
+
+def test_handler_wraps_each_step_in_a_root_span(monkeypatch):
+    import io
+    import json
+
+    from cer_agent import tracing
+
+    monkeypatch.setattr(tracing, "_provider", None)
+    out = io.StringIO()
+    provider = tracing.setup(None, stream=out)
+    monkeypatch.setattr(approval, "_observing", True)
+    monkeypatch.setenv("_X_AMZN_TRACE_ID", "Root=1-abc-def;Parent=123;Sampled=1")
+    monkeypatch.setattr(approval, "park", lambda event: None)
+    approval.handler({"step": "park", "case": {"case_id": "NO-090"}, "token": "t"})
+    provider.shutdown()
+    monkeypatch.setattr(tracing, "_provider", None)
+    monkeypatch.setattr(approval, "_observing", None)
+    (s,) = map(json.loads, out.getvalue().splitlines())
+    assert s["name"] == "gate.park" and s["attributes"]["cer.case_id"] == "NO-090"
+    assert s["attributes"]["cer.xray_trace_id"] == "1-abc-def"

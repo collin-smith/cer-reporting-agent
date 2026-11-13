@@ -5,8 +5,8 @@ which emits OpenTelemetry spans of its own (invoke_agent, each event-loop cycle,
 each tool call) to the same provider. Without `setup()`, OpenTelemetry's default no-op provider makes every span
 free, so tracing costs nothing unless a run asks for it.
 
-Local JSONL first ($0, no AWS); the same spans can go to CloudWatch / X-Ray through an OTLP exporter later
-(article 7) without touching the instrumented code.
+Local JSONL first ($0, no AWS). In the deployed gate (article 7, D58) the same spans go to stdout, so into the
+Lambda's CloudWatch log group, without touching the instrumented code.
 
 Usage:
     python -m cer_agent.tracing summary path/to/traces.jsonl   # per-stage table
@@ -31,9 +31,22 @@ _lock = threading.Lock()
 _provider = None  # ours, once setup() runs; OpenTelemetry allows the global provider to be set only once
 
 
+def record(s) -> dict:
+    """One finished span as a flat dict. Span events (Strands records the prompt and completion text as events) are
+    dropped, except exceptions."""
+    attrs = {k: (v[:MAX_TEXT] if isinstance(v, str) else list(v) if isinstance(v, tuple) else v)
+             for k, v in (s.attributes or {}).items()}  # fmt: skip
+    errors = [e.attributes.get("exception.message", "")[:MAX_TEXT] for e in s.events if e.name == "exception"]
+    return {
+        "trace_id": f"{s.context.trace_id:032x}", "span_id": f"{s.context.span_id:016x}",
+        "parent_id": f"{s.parent.span_id:016x}" if s.parent else None, "name": s.name,
+        "start_ms": s.start_time / 1e6, "duration_ms": (s.end_time - s.start_time) / 1e6,
+        "status": s.status.status_code.name, "attributes": attrs, **({"errors": errors} if errors else {}),
+    }  # fmt: skip
+
+
 class JsonlExporter:
-    """An OpenTelemetry span exporter that appends one JSON line per finished span. Span events (Strands records
-    the prompt and completion text as events) are dropped, except exceptions."""
+    """An OpenTelemetry span exporter that appends one JSON line per finished span to a file."""
 
     def __init__(self, path: pathlib.Path):
         self.path = path
@@ -42,17 +55,7 @@ class JsonlExporter:
     def export(self, spans) -> object:
         from opentelemetry.sdk.trace.export import SpanExportResult
 
-        lines = []
-        for s in spans:
-            attrs = {k: (v[:MAX_TEXT] if isinstance(v, str) else list(v) if isinstance(v, tuple) else v)
-                     for k, v in (s.attributes or {}).items()}  # fmt: skip
-            errors = [e.attributes.get("exception.message", "")[:MAX_TEXT] for e in s.events if e.name == "exception"]
-            lines.append(json.dumps({
-                "trace_id": f"{s.context.trace_id:032x}", "span_id": f"{s.context.span_id:016x}",
-                "parent_id": f"{s.parent.span_id:016x}" if s.parent else None, "name": s.name,
-                "start_ms": s.start_time / 1e6, "duration_ms": (s.end_time - s.start_time) / 1e6,
-                "status": s.status.status_code.name, "attributes": attrs, **({"errors": errors} if errors else {}),
-            }, default=str))  # fmt: skip
+        lines = [json.dumps(record(s), default=str) for s in spans]
         with _lock, self.path.open("a", encoding="utf-8") as fh:
             fh.write("".join(line + "\n" for line in lines))
         return SpanExportResult.SUCCESS
@@ -64,14 +67,33 @@ class JsonlExporter:
         return True
 
 
-def setup(path: pathlib.Path):
-    """Send every span (ours and Strands') to `path`. Returns the provider; call its shutdown() at the end."""
+class StdoutExporter(JsonlExporter):
+    """The same lines on stdout, marked `"cer_span": 1` (article 7, D58). In Lambda, stdout is the function's log
+    group, so the gate's spans land in CloudWatch Logs with no exporter endpoint, agent or extra permission, and Logs
+    Insights queries them (`filter ispresent(cer_span)`)."""
+
+    def __init__(self, stream=None):
+        self.stream = stream
+
+    def export(self, spans) -> object:
+        from opentelemetry.sdk.trace.export import SpanExportResult
+
+        out = self.stream or sys.stdout
+        with _lock:
+            out.write("".join(json.dumps({"cer_span": 1, **record(s)}, default=str) + "\n" for s in spans))
+            out.flush()
+        return SpanExportResult.SUCCESS
+
+
+def setup(path: pathlib.Path | None, stream=None):
+    """Send every span (ours and Strands') to `path`, or to stdout (or `stream`) when `path` is None. Returns the
+    provider; call its shutdown() at the end."""
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
     provider = TracerProvider(resource=Resource.create({"service.name": "cer-reporting-agent"}))
-    provider.add_span_processor(SimpleSpanProcessor(JsonlExporter(path)))
+    provider.add_span_processor(SimpleSpanProcessor(JsonlExporter(path) if path else StdoutExporter(stream)))
     global _provider
     _provider = provider
     trace.set_tracer_provider(provider)  # for Strands' spans (ignored with a warning if already set)
