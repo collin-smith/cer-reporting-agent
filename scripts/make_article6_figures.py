@@ -88,14 +88,14 @@ def figure1(out: pathlib.Path) -> None:
     d.icon("lambda", "AWS Lambda<br>triage · park · escalate · close", COMPUTE, "lambda", 580, 560, 56)
     d.icon("ddb", "Amazon DynamoDB<br>the case record; queue<br>index sorted by deadline", DATABASE, "dynamodb",
            820, 560, 56)  # fmt: skip
-    d.icon("bedrock", "Amazon Bedrock<br>Nova Lite; Haiku 5.5 fallback;<br>two guardrails", AI, "bedrock", 1060, 560,
-           56)  # fmt: skip
+    d.icon("bedrock", "Amazon Bedrock<br>Nova Lite; two guardrails;<br>Haiku 4.5 fallback in US regions", AI,
+           "bedrock", 1060, 560, 56)  # fmt: skip
     d.edge("s1", "lambda", "sns", dashed=True)
     d.edge("s2", "lambda", "ddb", dashed=True)
     d.edge("s3", "lambda", "bedrock", dashed=True, extra="exitX=0.5;exitY=0;entryX=0.5;entryY=0;",
            points=[(608, 547), (1088, 547)])  # fmt: skip
     d.edge("e_page", "sns", "person", "page", extra="exitX=0;exitY=0.5;entryX=1;entryY=0.5;")
-    d.add("cost", "Measured: in the queue within 7 s; pages on schedule; per case $0.0008–0.0013 of AI and "
+    d.add("cost", "Measured: in the queue within 7 s; pages on schedule; per case $0.0008–0.0014 of AI and "
           "$0.0001–0.0003 of workflow. A case that waits 20 hours costs what one approved in 20 seconds does.", NOTE,
           20, 745, 1340, 34)  # fmt: skip
     d.write(out / "article-6-figure-01.drawio", "Article 6: the approval gate", 1380, 790)
@@ -113,8 +113,8 @@ def figure2(out: pathlib.Path) -> None:
           "limiter.<br><b>3 retries</b> (not 10)", xs[1], y, w, h, **CODE, extra=CENTER)  # fmt: skip
     d.box("temp", "<b>2. The reader retries</b><br>a malformed tool call, at temperature 0.3 then 0.7 (the SDK "
           "doesn't retry it)", xs[2], y, w, h, **CODE, extra=CENTER)  # fmt: skip
-    d.box("fb", "<b>3. Fallback model</b><br>Claude Haiku 5.5, Canada profile: another provider, same country, "
-          "its own client", xs[3], y, w, h, **CODE, extra=CENTER + "strokeWidth=2;")  # fmt: skip
+    d.box("fb", "<b>3. Fallback model</b><br>Claude Haiku 4.5, US profile: another provider, but the report leaves "
+          "Canada; its own client", xs[3], y, w, h, **CODE, extra=CENTER + "strokeWidth=2;")  # fmt: skip
     d.box("person", "<b>A person</b><br>triage failed: the raw report at the top of the queue, approver paged",
           xs[4], y, w, h, **PERSON, extra=CENTER)  # fmt: skip
     d.edge("f1", "read", "sdk", "error", extra=RED)
@@ -128,7 +128,7 @@ def figure2(out: pathlib.Path) -> None:
     for i, key in enumerate(("sdk", "temp", "fb")):
         d.edge(f"ok{i}", key, "answer", "answers", extra=GOOD + "exitX=0.5;exitY=1;entryY=0;"
                f"entryX={(xs[i + 1] + w / 2 - 310) / 780:.3f};")  # fmt: skip
-    d.box("draft", "<b>The draft fails the same way:</b> Nova Lite → Haiku 5.5 → a draft rendered from the rules "
+    d.box("draft", "<b>The draft fails the same way:</b> Nova Lite → Haiku 4.5 → a draft rendered from the rules "
           "alone, saying which fields no model wrote. The decision never needs a model.", 310, 400, 780, 46,
           fill=NOTE_FILL, extra=CENTER)  # fmt: skip
     d.add("measured", "<b>Measured with injected errors, $0</b> (a hook inside the SDK; 83 test reports; nine "

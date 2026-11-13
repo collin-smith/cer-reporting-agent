@@ -22,6 +22,9 @@ import sys
 
 CODE = pathlib.Path(__file__).resolve().parents[1]
 RUNS = CODE / "evals" / "runs"
+# The harness recorded cost_usd at Nova Lite $0.06 / $0.24 per 1M tokens (evals/config.toml); the AWS Price List
+# for ca-central-1, as billed, is $0.064 / $0.256: both exactly 16/15 of the recorded rates (D53, D59).
+LIST = 16 / 15
 ARMS = [  # (label, sub-label, run)
     ("In-process", "Strands tools, articles 2–3", "20261108-203420-agent-nova-dev"),
     ("MCP, in-process order", "1 pass", "20261108-212028-agent-nova-mcp-inorder-dev"),
@@ -40,7 +43,7 @@ def measures(rs: list[dict]) -> dict:
     per = {
         "noop": lambda r: sum(1 for p in r["packet"]["agent"]["patches"] if p.get("noop")),
         "turns": lambda r: r["packet"]["agent"]["turns"],
-        "cost": lambda r: 1000 * r["cost_usd"],
+        "cost": lambda r: 1000 * LIST * r["cost_usd"],
     }
     reps = sorted({r["rep"] for r in rs})
     out = {k: (st.mean(f(r) for r in rs), [st.mean(f(r) for r in rs if r["rep"] == p) for p in reps])

@@ -58,8 +58,8 @@ def figure1(out: pathlib.Path) -> pathlib.Path:
     def y(v: float) -> float:
         return top + plot_h - plot_h * (v - lo_y) / (hi_y - lo_y)
 
-    body = _header("A bigger model got 4 more right, at 14 times the cost",
-                   "The 30 hardest reports, status right against cost. Bars: 95% intervals, which overlap.")  # fmt: skip
+    sub = "The 30 hardest reports, status right against cost. Bars: 95% intervals, which overlap."
+    body = _header("A bigger model got 4 more right, at 14 times the cost", sub)
     for t in range(lo_y, hi_y + 1, 5):
         body.append(f'<line x1="{left}" y1="{y(t):.1f}" x2="{WIDTH - right}" y2="{y(t):.1f}" stroke="{GRID}"/>')
         body.append(_text(left - 8, y(t) + 4, str(t), 12, INK_2, anchor="end"))
@@ -105,8 +105,8 @@ def figure2(out: pathlib.Path) -> pathlib.Path:
             w = v * scale
             last = s == len(vals) - 1
             seg_w = w - (0 if last else 2)  # 2px surface gap between segments
-            body.append(_bar(xx, yy, seg_w, bar_h, SERIES[s], "right") if last else
-                        f'<rect x="{xx:.1f}" y="{yy}" width="{seg_w:.1f}" height="{bar_h}" fill="{SERIES[s]}"/>')  # fmt: skip
+            rect = f'<rect x="{xx:.1f}" y="{yy}" width="{seg_w:.1f}" height="{bar_h}" fill="{SERIES[s]}"/>'
+            body.append(_bar(xx, yy, seg_w, bar_h, SERIES[s], "right") if last else rect)
             if seg_w > 64:  # label only segments wide enough to hold it
                 body.append(_text(xx + seg_w / 2, yy + bar_h / 2 + 6, f"${v:.2f}", 16, ON_SERIES[s], 700, "middle"))
             xx += w

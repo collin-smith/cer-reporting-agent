@@ -87,7 +87,7 @@ add(
 )
 add(
     "region",
-    "Region: ca-central-1 (infrastructure, data and inference stay in Canada)",
+    "Region: ca-central-1 (infrastructure, data and Nova Lite inference stay in Canada)",
     GROUP.format(gr="group_region", extra="strokeColor=#00A4A6;fillColor=none;fontColor=#147EBA;dashed=1;"),
     270,
     110,
@@ -96,12 +96,12 @@ add(
 )
 add(
     "us",
-    "Region: us-east-1<br><b>dev time only</b>: test-set writers (D27)",
+    "US Regions<br>test-set writers, dev time (D27);<br>Haiku 4.5 fallback (D54)",
     GROUP.format(gr="group_region", extra="strokeColor=#00A4A6;fillColor=none;fontColor=#147EBA;dashed=1;"),
     1440,
     110,
     250,
-    330,
+    490,
 )
 add(
     "demo",
@@ -225,7 +225,6 @@ icon("bedrock", "Bedrock: Nova Lite (ca.*)<br>+ Guardrails (PII)", AI, "bedrock"
 res("vectors", "Knowledge Base on<br>S3 Vectors (rules corpus)", STORAGE, "s3_vectors", 720, 864)
 icon("acmem", "AgentCore Memory<br>(stretch)", AI, "bedrock_agentcore", 910, 860)
 icon("cw", "CloudWatch + AgentCore<br>Observability (OTel traces)", MGMT, "cloudwatch_2", 1100, 860)
-icon("claude", "Bedrock: Claude Haiku 5.5<br>(ca.*) · Sonnet 5.5 only<br>at checkpoints", AI, "bedrock", 1280, 860)
 
 # ---------- us-east-1, dev time only ----------
 icon("llama", "Llama 4 Maverick<br>(writer profile)", AI, "bedrock", 1477, 180, size=48)
@@ -239,15 +238,24 @@ add(
     230,
     40,
 )
+icon(
+    "claude",
+    "Claude Haiku 4.5 (us.*)<br>fallback reader in an<br>outage; article 7 runs",
+    AI,
+    "bedrock",
+    1537,
+    370,
+    size=48,
+)
 
 # ---------- global (inside the cloud, outside both Regions) ----------
 icon(
-    "budgets", "AWS Budgets (global)<br>$50 / $75 a month alerts,<br>$100 series total", FINANCE, "budgets_2", 1537, 520
+    "budgets", "AWS Budgets (global)<br>$50 / $75 a month alerts,<br>$100 series total", FINANCE, "budgets_2", 1537, 680
 )
 
 # ---------- deployed now ----------
 icon("pnova", "Profile: Nova Lite<br>(ca.amazon.nova-lite)", AI, "bedrock", 330, 1070, size=48)
-icon("phaiku", "Profile: Claude Haiku 5.5<br>(ca.*; awaiting access)", AI, "bedrock", 530, 1070, size=48)
+icon("phaiku", "Profile: Claude Haiku 4.5<br>(copies us.*; fallback)", AI, "bedrock", 530, 1070, size=48)
 icon("sns", "SNS topic<br>agentic-ai-alerts", APPINT, "sns", 760, 1070, size=48)
 icon("state", "S3: Terraform state<br>(versioned, private)", STORAGE, "s3", 960, 1070, size=48)
 add(
@@ -272,7 +280,14 @@ edge("e8", "sfn", "lintake", "1. intake")
 edge("e9", "lintake", "lsup", "2. judgment cases")
 edge("e10", "sfn", "reviewer", "3. approval (task token)", extra="exitX=0.5;exitY=1;entryX=1;entryY=0.5;")
 edge("e11", "lsup", "acgw", "MCP tool calls")
-edge("e12", "lsup", "claude", "checkpoint runs (ca.*)", dashed=True, extra="exitX=1;exitY=1;entryX=0.5;entryY=0;")
+edge(
+    "e12",
+    "lsup",
+    "claude",
+    "fallback / article 7 (leaves Canada)",
+    dashed=True,
+    extra="exitX=1;exitY=0.5;entryX=0;entryY=0.5;",
+)
 edge("e13", "subnet", "bedrock", "model calls + retry / fallback", extra="exitX=0.1;exitY=1;entryX=0.5;entryY=0;")
 edge("e14", "sfn", "ddb", "case state", extra="exitX=0;exitY=1;entryX=0.5;entryY=0;")
 edge("e15", "subnet", "vectors", "rules lookup", extra="exitX=0.3;exitY=1;entryX=0.5;entryY=0;")

@@ -48,7 +48,9 @@ resource "aws_s3_object" "agentcore_zip" {
   bucket = aws_s3_bucket.agentcore_code[0].id
   key    = "agentcore-${filemd5(local.agentcore_zip)}.zip" # a new key per build, so the Runtimes pick it up
   source = local.agentcore_zip
-  etag   = filemd5(local.agentcore_zip)
+  # source_hash, not etag: the 29 MB zip uploads multipart, so its S3 ETag never equals the file MD5 and an etag
+  # makes every plan re-upload it (D56).
+  source_hash = filemd5(local.agentcore_zip)
 }
 
 # --- Runtime execution role (both Runtimes) ---
@@ -255,6 +257,14 @@ resource "aws_bedrockagentcore_gateway" "tools" {
   protocol_type   = "MCP"
 }
 
+# IAM is eventually consistent: the first apply created the target 1 s after the Gateway role's policy and failed
+# with "Authorization error when sending message"; a re-apply passed unchanged (D56). Wait before the target.
+resource "time_sleep" "gateway_policy" {
+  count           = local.ac
+  create_duration = "30s"
+  triggers        = { policy = aws_iam_role_policy.agentcore_gateway[0].policy }
+}
+
 resource "aws_bedrockagentcore_gateway_target" "tools" {
   count              = local.ac
   name               = "cer-tools"
@@ -275,7 +285,7 @@ resource "aws_bedrockagentcore_gateway_target" "tools" {
     }
   }
 
-  depends_on = [aws_iam_role_policy.agentcore_gateway]
+  depends_on = [time_sleep.gateway_policy]
 }
 
 output "agentcore_agent_runtime_arn" {

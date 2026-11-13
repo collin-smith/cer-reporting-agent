@@ -9,14 +9,16 @@
 #   Step Functions                                                          none: only the approver CLI calls it
 # No NAT gateway: with no route out, a report can't leave AWS from the function, whatever text it carries.
 #
-# On:   terraform apply -var vpc_window=true      Off:  terraform apply   (default false removes it all)
+# On:   two applies with -var vpc_window=true (the network first, then the Lambda joins it).
+# Off:  ./scripts/vpc_detach.sh, which must report the Lambda outside any VPC, THEN terraform apply (default false).
 # Cost (Price List, ca-central-1): interface endpoints $0.011 per hour per AZ + $0.01 per GB, so 2 endpoints x 2 AZs
 # = $0.044 an hour ($32 a month if left up: hence the window). VPC, subnets, route table, security groups and the
 # DynamoDB gateway endpoint are free.
 #
-# Teardown is slow because of AWS, not this code: when a Lambda leaves a VPC, its network interfaces take 20-40
-# minutes to be released, and the subnets and security group can't be deleted until they are. The endpoints go
-# first, so most of that wait is free.
+# Why the CLI step (D57): the plan shows vpc_config's lists going to [], but hashicorp/aws 6.71.0 never sends that
+# update (CloudTrail, 2026-11-11). A plain apply then deletes the endpoints while the Lambda is still inside, cutting
+# it off from Bedrock and SNS, and times out after 45 minutes on the subnets its network interfaces still hold.
+# Detached by the CLI, the interfaces were released in under a minute and the apply finished in seconds.
 
 variable "vpc_window" {
   description = "Article 7's VPC hardening window (D55): true moves the approval Lambda into private subnets."

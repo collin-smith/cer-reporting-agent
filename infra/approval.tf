@@ -46,9 +46,15 @@ resource "aws_dynamodb_table" "cases" {
 
   # The review queue: everything in one status, most urgent CER deadline first.
   global_secondary_index {
-    name               = "queue"
-    hash_key           = "status"
-    range_key          = "due_at"
+    name = "queue"
+    key_schema { # hash_key / range_key on an index are deprecated in provider 6.71 (D61)
+      attribute_name = "status"
+      key_type       = "HASH"
+    }
+    key_schema {
+      attribute_name = "due_at"
+      key_type       = "RANGE"
+    }
     projection_type    = "INCLUDE"
     non_key_attributes = ["deadline", "decision_status", "flags"]
   }
@@ -155,9 +161,9 @@ resource "aws_lambda_function" "approval" {
     mode = var.observability_window ? "Active" : "PassThrough"
   }
 
-  # Inside private subnets only during the VPC hardening window (vpc.tf, D55); outside a VPC otherwise. The block
-  # is always here: a Lambda leaves a VPC when its lists are set to empty, not when the block is removed. The IDs
-  # aren't known until the network exists, so the window goes up in two applies (network, then this change).
+  # Inside private subnets only during the VPC hardening window (vpc.tf, D55); outside a VPC otherwise. The IDs
+  # aren't known until the network exists, so the window goes up in two applies (network, then this change). Coming
+  # down, the provider plans the empty lists but never sends them (D57): run scripts/vpc_detach.sh first.
   vpc_config {
     subnet_ids         = aws_subnet.private[*].id             # [] outside the window
     security_group_ids = aws_security_group.gate_lambda[*].id # [] outside the window

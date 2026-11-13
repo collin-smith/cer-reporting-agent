@@ -583,9 +583,10 @@ def run_case(case: dict, arm: str, client=None, model: dict | None = None) -> di
         tin, tout, lat = x["input_tokens"], x["output_tokens"], x["latency_s"]
         retries = x.get("retries", 0)
     # With caching on, Bedrock's input count is only the uncached input; reads and writes are counted apart (D53).
-    # Writes are costed at the full input price: the Price List says $0, not yet checked against a bill.
+    # Writes cost price_cache_write ($0 on Nova Lite, per the bill, D56); a model without one pays the input price.
     cread, cwrite = x.get("cache_read_tokens", 0), x.get("cache_write_tokens", 0)
-    cost = ((tin + cwrite) * model["price_in"] + cread * model.get("price_cache_read", model["price_in"])
+    cost = (tin * model["price_in"] + cwrite * model.get("price_cache_write", model["price_in"])
+            + cread * model.get("price_cache_read", model["price_in"])
             + tout * model["price_out"]) / 1e6 if model else 0.0  # fmt: skip
     cached = "-cache" in arm or "-agentcore" in arm
     extra_cache = {"cache_read_tokens": cread, "cache_write_tokens": cwrite} if cached else {}

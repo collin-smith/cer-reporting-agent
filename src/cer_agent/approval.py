@@ -54,10 +54,11 @@ DEADLINE_MIN = {"T3": 180, "T24": 1440}
 # Prices (USD): Nova Lite per 1M tokens (Price List, ca-central-1, 2026-11-10, D53); guardrails per 1K text units
 # (Price List, ca-central-1, 2026-11-09).
 PRICE_IN, PRICE_OUT = 0.064, 0.256
-PRICE_CACHE_READ = 0.016  # cache writes costed at PRICE_IN until a bill confirms they're free (D53)
-# The fallback model (D52, D54): Claude Haiku 4.5 through the US profile, per 1M tokens (Anthropic list price; Bedrock
-# bills it through Marketplace). Haiku 5.5 isn't available to this account (AWS Sales, 2026-11-10).
-FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 1.00, 5.00
+PRICE_CACHE_READ = 0.016
+PRICE_CACHE_WRITE = 0.0  # free on Nova Lite: the 2026-11-10 bill shows writes at $0 (D56)
+# The fallback model (D52, D54): Claude Haiku 4.5 through the US profile, per 1M tokens, as billed: 10% over
+# Anthropic's $1 / $5 list (Cost Explorer, 2026-11-10, D56). Haiku 5.5 isn't available to this account.
+FALLBACK_PRICE_IN, FALLBACK_PRICE_OUT = 1.10, 5.50
 GUARD_PRICE = {"contentPolicyUnits": 0.15, "topicPolicyUnits": 0.15, "sensitiveInformationPolicyUnits": 0.10}
 # Step Functions Standard, per state transition; Lambda per GB-second (x86) and per request.
 SFN_TRANSITION, LAMBDA_GB_S, LAMBDA_REQ = 0.000025, 0.0000166667, 0.0000002
@@ -232,7 +233,7 @@ def triage(event: dict) -> dict:
     tokens_out = r["output_tokens"] + (d["output_tokens"] if d["model"] == "primary" else 0)
     # With CER_PROMPT_CACHE=1 (D53), Nova's input count leaves out the cached prefix; reads and writes come apart.
     cread, cwrite = r.get("cache_read_tokens", 0), r.get("cache_write_tokens", 0)
-    cost = (((tokens_in + cwrite) * PRICE_IN + cread * PRICE_CACHE_READ + tokens_out * PRICE_OUT
+    cost = ((tokens_in * PRICE_IN + cwrite * PRICE_CACHE_WRITE + cread * PRICE_CACHE_READ + tokens_out * PRICE_OUT
              + fb_in * FALLBACK_PRICE_IN + fb_out * FALLBACK_PRICE_OUT) / 1e6 + _guard_cost(u_in, u_out))  # fmt: skip
     scale = float(os.environ.get("TIME_SCALE", "60"))
     state = {"case_id": case_id, "deadline": pk["deadline"], "level": 0, "start": int(time.time()),

@@ -27,6 +27,9 @@ from cer_agent.gate import counts, strict_replay  # noqa: E402
 
 RUNS = CODE / "evals" / "runs"
 CASES = CODE / "evals" / "cases" / "cases.jsonl"
+# The harness recorded cost_usd at Nova Lite $0.06 / $0.24 per 1M tokens (evals/config.toml); the AWS Price List
+# for ca-central-1, as billed, is $0.064 / $0.256: both exactly 16/15 of the recorded rates (D53, D59).
+LIST = 16 / 15
 D44_CASES = {f"CL-{n}" for n in range(167, 176)}
 
 SURFACE, TEXT, TEXT_2, GRID, AXIS = "#ffffff", "#0b0b0b", "#52514e", "#e6e5e1", "#b9b8b3"
@@ -60,7 +63,7 @@ def rows(run: str) -> list[dict]:
 def point(rs: list[dict]) -> tuple[float, int, int]:
     """Cost per 1,000 reports, harmful errors (missed + late), and the number of runs."""
     c = counts(rs)
-    return 1000 * sum(r["cost_usd"] for r in rs) / len(rs), c["missed"] + c["late"], c["n"]
+    return 1000 * LIST * sum(r["cost_usd"] for r in rs) / len(rs), c["missed"] + c["late"], c["n"]
 
 
 def test_points() -> dict:

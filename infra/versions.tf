@@ -9,6 +9,10 @@ terraform {
       # aws_bedrock_guardrail. Checked against the provider docs on 2026-10-29 (latest release 6.71.0).
       version = "~> 6.71"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.13" # time_sleep: IAM propagation before the AgentCore Gateway target (D56)
+    }
   }
 
   # Remote state in S3, so `terraform destroy` never loses track of what it created. Partial config: the bucket

@@ -44,11 +44,11 @@ def figure1(out: pathlib.Path) -> None:
           "chooses the next step: the code, one model, or a model directing two others.", TITLE, 20, 10, 1340,
           50)  # fmt: skip
     rows = [  # (key, y, lane text, metrics)
-        ("wf", 100, "<b>A. Fixed workflow</b><br>the code sets every step", "$0.56 per 1,000 reports · p95 1.8 s"),
+        ("wf", 100, "<b>A. Fixed workflow</b><br>the code sets every step", "$0.60 per 1,000 reports · p95 1.8 s"),
         ("ag", 250, "<b>B. One reviewing agent</b><br>the model chooses its next tool, up to 10 turns",
-         "$0.85 per 1,000 reports · p95 13 s"),
+         "$0.90 per 1,000 reports · p95 13 s"),
         ("sv", 440, "<b>C. Supervisor + two specialists</b><br>a model directs two others, each with its own tools",
-         "$1.43 per 1,000 reports · p95 16 s"),
+         "$1.52 per 1,000 reports · p95 16 s"),
     ]  # fmt: skip
     for key, y, lane, metrics in rows:
         d.add(f"{key}lane", lane, LANE, 20, y, 180, 60)
@@ -137,7 +137,7 @@ def figure3(out: pathlib.Path) -> None:
           extra=CENTER)  # fmt: skip
     d.edge("e7", "fix", "newcases")
     d.add("note", "Measured on the new reports. Strict check + reader fix on test: 0 missed, 0 late, "
-          "$0.56 per 1,000 reports. CL-064 itself isn't "
+          "$0.60 per 1,000 reports. CL-064 itself isn't "
           "re-scored: the held-out set was already used.", NOTE, 20, 520, 970, 30)  # fmt: skip
     d.write(out / "article-3-figure-03.drawio", "Article 3: where the miss started", 1010, 560)
 

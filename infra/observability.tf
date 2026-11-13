@@ -48,6 +48,7 @@ resource "aws_iam_role_policy" "approval_sfn_xray" {
 }
 
 # --- Alarms: any OVERDUE case, any fallback; both page the alerts topic ---
+# No ok_actions: on every switch-on each alarm emailed an "OK" as it left INSUFFICIENT_DATA (D58).
 
 resource "aws_cloudwatch_metric_alarm" "overdue" {
   count               = local.obs
@@ -62,7 +63,6 @@ resource "aws_cloudwatch_metric_alarm" "overdue" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching" # no metric means no overdue case
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "fallbacks" {
@@ -78,10 +78,10 @@ resource "aws_cloudwatch_metric_alarm" "fallbacks" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
 # --- Dashboard: what the operator's team looks at (12 metrics; the free tier allows 50) ---
+# The cases table shows usd_per_1000 (cost x 1,000, floored to 3 places): raw cost_usd mixed 9.3E-4 with 0.001056 (D58).
 
 resource "aws_cloudwatch_dashboard" "gate" {
   count          = local.obs
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_dashboard" "gate" {
   dashboard_body = jsonencode({
     widgets = [
       {
-        type = "text", x = 0, y = 0, width = 24, height = 2
+        type       = "text", x = 0, y = 0, width = 24, height = 2
         properties = { markdown = "## CER triage gate\nCases in, how long triage takes, what failed or fell back, and what each case cost. Alarms page the alerts topic. Runbook: article 7." }
       },
       {
@@ -130,8 +130,8 @@ resource "aws_cloudwatch_dashboard" "gate" {
       {
         type = "log", x = 0, y = 8, width = 12, height = 7
         properties = {
-          title = "Cases triaged: decision, deadline, time and AI cost", region = var.region, view = "table"
-          query = "SOURCE '${local.obs_log}' | filter ispresent(cost_usd) | fields @timestamp, case_id, status, deadline, seconds, cost_usd, drafted_by, Fallbacks | sort @timestamp desc | limit 50"
+          title = "Cases triaged: decision, deadline, time and AI cost ($ per 1,000 such reports)", region = var.region, view = "table"
+          query = "SOURCE '${local.obs_log}' | filter ispresent(cost_usd) | fields @timestamp, case_id, status, deadline, seconds, floor(cost_usd * 1000000) / 1000 as usd_per_1000, drafted_by, Fallbacks | sort @timestamp desc | limit 50"
         }
       },
       {
