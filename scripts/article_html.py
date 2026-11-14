@@ -66,6 +66,19 @@ def plain(text):
     return re.sub(r"\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`", lambda m: next(g for g in m.groups() if g), text)
 
 
+def table_alt(head, body, limit=900):
+    """Alt text that reads the table: each row as its first cell, then header: value pairs (capped for Medium)."""
+    head = [plain(c) for c in head]
+    rows = []
+    for r in body:
+        cells = [plain(c) for c in r]
+        first, rest = cells[0], [f"{h} {v}".strip() if h else v for h, v in zip(head[1:], cells[1:]) if v]
+        rows.append(f"{first}: {', '.join(rest)}" if first else ", ".join(rest))
+    lead = f"Table with columns: {', '.join(h for h in head if h)}."
+    text = lead + " " + "; ".join(rows) + "."
+    return text if len(text) <= limit else text[: limit - 1].rsplit(" ", 1)[0] + "…"
+
+
 def render_table(lines):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines]
     head, body = rows[0], rows[2:]
@@ -73,11 +86,11 @@ def render_table(lines):
         TABLE_IMAGES["n"] += 1
         stem = ASSETS / f"{TABLE_IMAGES['stem']}-table-{TABLE_IMAGES['n']:02d}"
         img = table_gen.render_table(stem, [plain(c) for c in head], [[plain(c) for c in r] for r in body])
-        alt = html.escape(plain(head[0]))
+        alt = html.escape(table_alt(head, body))
         size = ""
         if img.suffix == ".png":  # PNG is rendered at 2x; show it at its design width
             size = f' width="{struct.unpack(">I", img.read_bytes()[16:20])[0] // 2}"'
-        return [f'<figure><img src="assets/{img.name}" alt="Table: {alt}"{size}></figure>']
+        return [f'<figure><img src="assets/{img.name}" alt="{alt}"{size}></figure>']
     numeric = [all(is_number(r[i]) for r in body if i < len(r)) for i in range(len(head))]
 
     def cls(i):
@@ -188,7 +201,11 @@ def main():
     )
     dst = src.with_suffix(".html")
     dst.write_text(page, encoding="utf-8")
-    print(f"wrote {dst}")
+    # Every image with its alt text, in order, for pasting into Medium (it drops alt text on paste).
+    imgs = re.findall(r'<img src="([^"]+)" alt="([^"]*)"', body)
+    alts = "\n".join(f"{i}. {s.split('/')[-1]}\n   {html.unescape(a)}\n" for i, (s, a) in enumerate(imgs, 1))
+    src.with_name(src.stem + "-alt.txt").write_text(alts, encoding="utf-8")
+    print(f"wrote {dst} and {len(imgs)} alt texts")
 
 
 if __name__ == "__main__":
