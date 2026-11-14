@@ -1,5 +1,10 @@
-<title>CER Pipeline Incidents Map</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canada's Pipeline Incidents, Mapped</title>
+<meta name="description" content="Every incident reported to the Canada Energy Regulator since 2008, on one interactive map. An independent reading of public data; not a CER site.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -36,7 +41,7 @@
   --s-release: #3987e5; --s-fire: #d95926; --s-limits: #199e70; --s-people: #e8eef1; --ring: #152027;
   color-scheme: dark;
 }
-body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 40px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: grid; gap: 16px; }
@@ -69,6 +74,8 @@ svg#map { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; max-
   border-radius: 6px; padding: 8px 10px; font-size: 13px; line-height: 1.4; max-width: 260px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
 .tip .id { font-family: var(--font-data); font-size: 12px; color: var(--ink-3); }
 .tip .t { font-weight: 600; }
+.tip.pinned { pointer-events: auto; user-select: text; border-color: var(--accent); }
+.tip .hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); }
 .legend-note { position: absolute; left: 10px; bottom: 8px; font-size: 12px; color: var(--ink-3); background: var(--surface); padding: 2px 6px; border-radius: 4px; }
 aside { display: grid; gap: 16px; min-width: 0; }
 aside h2 { font-family: var(--font-display); font-weight: 600; font-size: 17px; margin: 0 0 6px; }
@@ -79,6 +86,13 @@ aside h2 { font-family: var(--font-display); font-weight: 600; font-size: 17px; 
 .bar { height: 10px; background: var(--land); border-radius: 0 4px 4px 0; position: relative; overflow: hidden; }
 .bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 0 4px 4px 0; }
 .bar i.sig { background: var(--s-fire); }
+.series { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; }
+.series li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 6px; }
+.series .k { font-family: var(--font-data); font-size: 12px; color: var(--ink-3); }
+.series a { color: var(--accent); text-decoration: none; }
+.series a:hover { text-decoration: underline; }
+.series .soon { color: var(--ink-2); }
+.series .when { display: block; font-family: var(--font-data); font-size: 11px; color: var(--ink-3); }
 .small { font-size: 12px; color: var(--ink-3); margin: 6px 0 0; }
 .notes { font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
 .notes p { margin: 0; }
@@ -87,12 +101,13 @@ footer { font-size: 12px; color: var(--ink-3); max-width: 90ch; }
 footer a { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Draft · Canada Energy Regulator open data · 2008 – 2026</div>
+    <div class="eyebrow">Canada Energy Regulator open data · 2008 – 2026</div>
     <h1>Where federally regulated pipelines report incidents</h1>
-    <p class="lede">Every incident reported to the CER, one dot each. Colour shows the most serious incident type; larger ringed dots were classed as Significant. Drag to pan, scroll or use the buttons to zoom, hover a dot for details.</p>
+    <p class="lede">Every incident reported to the CER, one dot each: on the pipe itself, at the stations and processing plants along it, or during work on it. Colour shows the most serious incident type; larger ringed dots were classed as Significant. Drag to pan, scroll or use the buttons to zoom, hover a dot for details, click (or tap) it to keep them open.</p>
     <div class="stats" id="stats"></div>
   </header>
 
@@ -120,22 +135,28 @@ footer a { color: var(--accent); }
         <div class="ledger" id="ledger"></div>
         <p class="small">Bar = incidents shown. Orange = of those, Significant.</p>
       </section>
+      <section>
+        <h2>Read the series</h2>
+        <ul class="series" id="series"></ul>
+        <p class="small">What the record shows, then a measured build of an AI system that answers the reporting question for one field report. <a id="repo" href="#">Code on GitHub</a>.</p>
+      </section>
       <section class="notes">
         <h2>Read with care</h2>
         <p><b>Federal pipelines only.</b> The CER regulates interprovincial and international lines. Most of Alberta's provincially regulated pipelines report to the AER and are not here.</p>
-        <p><b>More pipe, more dots.</b> Clusters follow where the network is densest (NOVA in Alberta, Westcoast and Trans Mountain in BC), not necessarily where risk is highest.</p>
+        <p><b>More pipe, more dots.</b> Clusters follow where the network is densest, especially the large gas and oil systems in Alberta and BC, not necessarily where risk is highest.</p>
         <p><b>Approximate locations.</b> Coordinates are as reported; treat them as nearby, not exact.</p>
       </section>
     </aside>
   </div>
 
-  <footer>Source: Canada Energy Regulator, Pipeline Incident Data (comprehensive), Open Government Licence – Canada, downloaded 2026-10-28. Province outlines: Code for Germany “click that hood” Canada GeoJSON. Draft for a portfolio series; not affiliated with or endorsed by the CER.</footer>
+  <footer>Source: Canada Energy Regulator, <a href="https://www.cer-rec.gc.ca/open/incident/pipeline-incidents-comprehensive-data.csv">Pipeline Incident Data (comprehensive)</a>, downloaded 2026-10-28; look up any incident by its number there or in the CER's own <a href="https://apps2.cer-rec.gc.ca/pipeline-incidents/">incident dashboard</a>. Contains information licensed under the Open Government Licence – Canada. Province and territory outlines: Natural Earth (public domain). An independent reading of public data; not a CER site, and not affiliated with or endorsed by the CER or any operator.</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
 const DATA = /*__DATA__*/null;
 const GEO = /*__GEO__*/null;
+const SERIES = /*__SERIES__*/null;
 
 const GROUPS = [
   { key: 0, label: "Release or environmental", cssVar: "--s-release" },
@@ -175,6 +196,7 @@ function styleDots() {
 }
 
 function render() {
+  if (typeof unpin === "function" && tip) unpin();  // a filter may hide the pinned dot
   const sigOnly = document.getElementById("sigOnly").checked;
   const y0 = +document.getElementById("y0").value || 2008, y1 = +document.getElementById("y1").value || 2026;
   const keep = d => on.has(d.g) && (!sigOnly || d.sig) && d.year >= y0 && d.year <= y1;
@@ -209,7 +231,7 @@ GROUPS.forEach(g => {
 
 // Zoom
 const zoom = d3.zoom().scaleExtent([1, 14]).translateExtent([[0, 0], [W, H]])
-  .on("zoom", e => { root.attr("transform", e.transform); k = e.transform.k; styleDots(); hideTip(); });
+  .on("zoom", e => { root.attr("transform", e.transform); k = e.transform.k; styleDots(); unpin(); });
 svg.call(zoom);
 document.getElementById("zin").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1.8);
 document.getElementById("zout").onclick = () => svg.transition().duration(250).call(zoom.scaleBy, 1 / 1.8);
@@ -222,31 +244,52 @@ document.getElementById("zwest").onclick = () => {
     d3.zoomIdentity.translate(W / 2, H / 2).scale(s).translate(-(x0 + x1) / 2, -(yA + yB) / 2));
 };
 
-// Tooltip via nearest visible dot
+// Tooltip via nearest visible dot; a click pins it so the number can be copied (and so it works on touch).
 const tip = document.getElementById("tip"), box = document.getElementById("mapbox");
-function hideTip() { tip.hidden = true; }
-svg.on("pointermove", e => {
-  if (!delaunay || !visible.length) return;
+let pinned = false;
+function hideTip() { if (!pinned) tip.hidden = true; }
+function unpin() { pinned = false; tip.classList.remove("pinned"); tip.hidden = true; }
+function showAt(e, pin) {
+  if (!delaunay || !visible.length) return false;
   const [mx, my] = d3.pointer(e, root.node());
   const d = visible[delaunay.find(mx, my)];
   const px = d3.pointer(e, svg.node());
   const scale = svg.node().getBoundingClientRect().width / W;
-  if (Math.hypot(d.x - mx, d.y - my) * k * scale > 14) return hideTip();
+  if (Math.hypot(d.x - mx, d.y - my) * k * scale > 14) { hideTip(); return false; }
   const types = TYPE_NAMES.filter(([b]) => d.bits & b).map(([, n]) => n).join(", ");
   const vol = d.vol != null ? `${d.vol.toLocaleString(undefined, { maximumFractionDigits: 1 })} m³` : "not recorded";
   const subst = d.subst && d.subst !== "Not Applicable" ? `${d.subst}, ${vol}` : "No substance released";
   tip.innerHTML = `<div class="id">${d.id} · reported ${d.date}</div><div class="t">${types}${d.sig ? " · Significant" : ""}</div>
-    <div>${subst}</div><div>Near ${d.centre || "unknown"}, ${d.prov}</div><div style="color:var(--ink-3)">${d.what || "Cause not coded"}</div>`;
+    <div>${subst}</div><div>Near ${d.centre || "unknown"}, ${d.prov}</div><div style="color:var(--ink-3)">${d.what || "Cause not coded"}</div>`
+    + (pin ? `<div class="hint">Look up ${d.id} in the CER data (links below). Click elsewhere to close.</div>` : "");
   tip.hidden = false;
   const r = box.getBoundingClientRect(), sr = svg.node().getBoundingClientRect();
   let left = px[0] * scale + (sr.left - r.left) + 14, top = px[1] * scale + (sr.top - r.top) + 14;
   if (left + 270 > r.width) left -= 290;
   if (top + 130 > r.height) top -= 150;
   tip.style.left = Math.max(4, left) + "px"; tip.style.top = Math.max(4, top) + "px";
-});
+  return true;
+}
+svg.on("pointermove", e => { if (!pinned) showAt(e, false); });
 svg.on("pointerleave", hideTip);
+svg.on("click", e => {
+  unpin();
+  if (showAt(e, true)) { pinned = true; tip.classList.add("pinned"); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") unpin(); });
 
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", styleDots);
 new MutationObserver(styleDots).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 render();
+
+// The series: a link once a piece is live, its date until then.
+const fmt = s => new Date(s + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
+document.getElementById("series").innerHTML = SERIES.pieces.map(p => {
+  const k = p.n === "Companion" ? "Data" : `Part ${p.n}`;
+  const t = p.url ? `<a href="${p.url}">${p.title}</a>` : `<span class="soon">${p.title}</span><span class="when">${fmt(p.date)}</span>`;
+  return `<li><span class="k">${k}</span><span>${t}</span></li>`;
+}).join("");
+document.getElementById("repo").href = SERIES.repo;
 </script>
+</body>
+</html>

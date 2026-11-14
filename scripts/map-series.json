@@ -1,0 +1,13 @@
+{
+  "repo": "https://github.com/collin-smith/cer-reporting-agent",
+  "pieces": [
+    {"n": "Companion", "title": "Before the AI Agent: What 2,034 Pipeline Incidents Tell Us", "date": "2026-11-17", "url": null},
+    {"n": "1", "title": "The 2 a.m. Field Report: Scoping an Agentic AI System on Amazon Bedrock", "date": "2026-11-19", "url": null},
+    {"n": "2", "title": "How Would We Know If It's Wrong? LLM Evals and an LLM-as-Judge Before Any Agent", "date": "2026-11-24", "url": null},
+    {"n": "3", "title": "Does an AI Agent Earn Its Cost? Workflow vs. Single Agent vs. Multi-Agent", "date": "2026-12-01", "url": null},
+    {"n": "4", "title": "Strands Agents or LangGraph? The Same AI Agent Built Twice", "date": "2026-12-08", "url": null},
+    {"n": "5", "title": "Tools Are the Product: Model Context Protocol (MCP) and Agent Tool Design", "date": "2026-12-15", "url": null},
+    {"n": "6", "title": "Can We Trust the Agent? Prompt Injection, Bedrock Guardrails and Human-in-the-Loop", "date": "2026-12-22", "url": null},
+    {"n": "7", "title": "Reasoning or a Bigger Model? Shipping an AI Agent on AWS, Measured", "date": "2027-01-05", "url": null}
+  ]
+}

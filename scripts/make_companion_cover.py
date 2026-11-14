@@ -2,7 +2,9 @@
 orange.
 
 Data drawn: incident latitude and longitude from the CER file (Open Government Licence - Canada) and province and
-territory outlines from Natural Earth (public domain, ne_50m_admin_1_states_provinces). No basemap tiles, no logos.
+territory outlines from Natural Earth (public domain, ne_50m_admin_1_states_provinces, from
+https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_1_states_provinces.geojson).
+No basemap tiles, no logos.
 The province outlines from `input/cer/canada.geojson` are not used: that file's licence isn't confirmed.
 
 Projection: Lambert conformal conic with Statistics Canada's parameters (standard parallels 49° and 77°, origin

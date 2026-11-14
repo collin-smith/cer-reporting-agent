@@ -1,8 +1,11 @@
-"""Build the CER incident overview map (draft) from the raw CSV.
+"""Build the CER incident map, a standalone page for static hosting (S3 + CloudFront, code/infra-map/).
 
 Usage: python3 -I code/scripts/build_map.py
-Reads input/cer/pipeline-incidents-comprehensive-data.csv + input/cer/canada.geojson,
-writes output/cer-incident-map.html (data embedded; no external tiles).
+Reads the CER snapshot (input/cer/pipeline-incidents-2026-10-28.csv), Canada's province and territory outlines from
+Natural Earth (public domain; input/naturalearth/ne_50m_admin_1_states_provinces.geojson, from
+https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_1_states_provinces.geojson)
+and the series links (code/scripts/map-series.json; fill each url as the piece goes live).
+Writes output/cer-incident-map.html (data embedded; no external tiles).
 """
 
 import csv
@@ -12,6 +15,8 @@ import pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
 RAW = PROJECT / "input" / "cer"
+SNAPSHOT = RAW / "pipeline-incidents-2026-10-28.csv"
+OUTLINES = PROJECT / "input" / "naturalearth" / "ne_50m_admin_1_states_provinces.geojson"
 OUT = PROJECT / "output"
 
 TYPE_BITS = {
@@ -49,9 +54,12 @@ class Lookup:
 
 
 def simplify_geo(path):
-    g = json.loads(pathlib.Path(path).read_text())
+    """Canada's provinces and territories from Natural Earth, coordinates rounded to 0.01°."""
+    g = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
     out = []
     for f in g["features"]:
+        if f["properties"].get("adm0_a3") != "CAN":
+            continue
         polys = f["geometry"]["coordinates"]
         if f["geometry"]["type"] == "Polygon":
             polys = [polys]
@@ -80,7 +88,7 @@ def simplify_geo(path):
 
 
 def main():
-    with open(RAW / "pipeline-incidents-comprehensive-data.csv", encoding="latin-1") as f:
+    with open(SNAPSHOT, encoding="latin-1", newline="") as f:  # the CER file isn't valid UTF-8
         rows = list(csv.DictReader(f))
     prov, subst, centre, what, why = Lookup(), Lookup(), Lookup(), Lookup(), Lookup()
     recs = []
@@ -118,13 +126,17 @@ def main():
         "what": what.items,
         "why": why.items,
     }
-    geo = simplify_geo(RAW / "canada.geojson")
-    tpl = (HERE / "map-template.html").read_text()
-    html = tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":"))).replace(
-        "/*__GEO__*/null", json.dumps(geo, separators=(",", ":"))
+    geo = simplify_geo(OUTLINES)
+    series = json.loads((HERE / "map-series.json").read_text(encoding="utf-8"))
+    tpl = (HERE / "map-template.html").read_text(encoding="utf-8")
+    html = (
+        tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
+        .replace("/*__GEO__*/null", json.dumps(geo, separators=(",", ":")))
+        .replace("/*__SERIES__*/null", json.dumps(series, separators=(",", ":")))
     )
-    (OUT / "cer-incident-map.html").write_text(html)
-    print(len(recs), "incidents;", len(html) // 1024, "KB")
+    (OUT / "cer-incident-map.html").write_text(html, encoding="utf-8")
+    print(len(recs), "incidents,", sum(r[4] for r in recs), "Significant;", len(geo["features"]), "provinces;",
+          len(html) // 1024, "KB")
 
 
 if __name__ == "__main__":

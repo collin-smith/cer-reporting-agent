@@ -1,0 +1,6 @@
+# Copy to backend.hcl (git-ignored). Same state bucket as infra/, a different key.
+bucket       = "agentic-ai-tfstate-<account-id>"
+key          = "map/terraform.tfstate"
+region       = "ca-central-1"
+encrypt      = true
+use_lockfile = true
