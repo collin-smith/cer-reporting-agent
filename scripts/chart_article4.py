@@ -1,4 +1,4 @@
-"""Article 4, figure 1, from the saved D49 dev runs ($0, no model calls).
+"""Article 4, figure 2, from the saved D49 dev runs ($0, no model calls).
 
 The same agent built twice: the reviewing agent in Strands as articles 2-3 measured it, in Strands ending its loop at
 `finish`, and in LangGraph (whose graph ends there). Three small multiples on their own axes (never one axis for two
@@ -10,7 +10,7 @@ article 3. SVG, then PNG at 2x through cairosvg.
 
 Usage (from the project root):
     code/.venv/bin/python -I code/scripts/chart_article4.py output/assets
-Writes output/assets/article-4-figure-01.png (and .svg).
+Writes output/assets/article-4-figure-02.png (and .svg).
 """
 
 import html
@@ -111,7 +111,7 @@ def figure1(out: pathlib.Path) -> None:
                       "turn; the graph ends at finish. Stopping Strands there too", size=12, fill=TEXT_2))  # fmt: skip
     parts.append(text(24, H - 28, "closes most of the cost gap; the rest is inside the spread between passes. One "
                       "change in where the loop ends, not the framework.", size=12, fill=TEXT_2))  # fmt: skip
-    save(parts, W, H, out / "article-4-figure-01")
+    save(parts, W, H, out / "article-4-figure-02")
 
 
 if __name__ == "__main__":
