@@ -2,13 +2,13 @@
 1. where the MCP server runs: today a local process over stdio, calling Nova Lite on Bedrock in Canada; next (stage 6,
    not built) a hosted endpoint, AgentCore Gateway in front of a Lambda in a VPC, reaching Bedrock through an
    interface endpoint.
-3. two clients, one server: Claude Code on the public tools, our reviewing agent on the review tools. The order each
+2. two clients, one server: Claude Code on the public tools, our reviewing agent on the review tools. The order each
    model sees, and what an error looks like on the client's side.
 
-Figure 2 is a chart: code/scripts/chart_article5.py.
+Figure 3 is a chart: code/scripts/chart_article5.py.
 
 Usage (from the project root): python3 -I code/scripts/make_article5_figures.py output
-Writes output/article-5-figure-0{1,3}.drawio. PNGs: export each from draw.io at 200%, or with the desktop app's CLI
+Writes output/article-5-figure-0{1,2}.drawio. PNGs: export each from draw.io at 200%, or with the desktop app's CLI
 (from a Windows-aware shell):
     "/mnt/c/Program Files/draw.io/draw.io.exe" -x -f png -s 2 -o <png> <drawio>
 """
@@ -161,7 +161,7 @@ def figure3(out: pathlib.Path) -> None:
           60, fill="#FFFFFF", stroke=GOOD, extra="strokeWidth=2;")  # fmt: skip
     d.add("errnote", "Found by a test before any spend: every deliberate error is now a ToolError.", NOTE, 20, 590,
           900, 24)  # fmt: skip
-    d.write(out / "article-5-figure-03.drawio", "Article 5: two clients, one server", 1320, 625)
+    d.write(out / "article-5-figure-02.drawio", "Article 5: two clients, one server", 1320, 625)
 
 
 if __name__ == "__main__":

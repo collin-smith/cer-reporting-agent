@@ -1,12 +1,12 @@
 """Article 3's diagrams (draw.io, AWS4 style):
 1. three designs on the same front end: the fixed workflow (strict check), one reviewing agent, a supervisor with two
    specialists. The rules engine decides in all three; what differs is who chooses the next step.
-3. where the miss started: CL-064 step by step, the reviewers after the reading, and the fix in the reading.
+4. where the miss started: CL-064 step by step, the reviewers after the reading, and the fix in the reading.
 
-Figures 2 and 4 are charts: code/scripts/chart_article3.py.
+Figures 2 and 3 are charts: code/scripts/chart_article3.py.
 
 Usage (from the project root): python3 -I code/scripts/make_article3_figures.py output
-Writes output/article-3-figure-0{1,3}.drawio. PNGs: export each from draw.io at 200%, or with the desktop app's CLI
+Writes output/article-3-figure-0{1,4}.drawio. PNGs: export each from draw.io at 200%, or with the desktop app's CLI
 (from a Windows-aware shell):
     "/mnt/c/Program Files/draw.io/draw.io.exe" -x -f png -s 2 -o <png> <drawio>
 """
@@ -139,7 +139,7 @@ def figure3(out: pathlib.Path) -> None:
     d.add("note", "Measured on the new reports. Strict check + reader fix on test: 0 missed, 0 late, "
           "$0.60 per 1,000 reports. CL-064 itself isn't "
           "re-scored: the held-out set was already used.", NOTE, 20, 520, 970, 30)  # fmt: skip
-    d.write(out / "article-3-figure-03.drawio", "Article 3: where the miss started", 1010, 560)
+    d.write(out / "article-3-figure-04.drawio", "Article 3: where the miss started", 1010, 560)
 
 
 if __name__ == "__main__":

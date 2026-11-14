@@ -4,7 +4,7 @@ Figure 2: cost against harmful errors. Each design as a dot: cost per 1,000 repo
 reports (y), test and held-out as two panels on the same axes. The strict check with the reader fix (D44) is on test
 only: the held-out set was spent on the comparison (D43), so there's no held-out dot for it.
 
-Figure 4: what the reviewing agents changed. For each agent run, its status against the workflow's own reading of the
+Figure 3: what the reviewing agents changed. For each agent run, its status against the workflow's own reading of the
 same report inside that run (the paired comparison): same answer, fixed an error, or made one. Plus the 88 escalations
 re-scored in D42.
 
@@ -13,7 +13,7 @@ validated (scripts/validate_palette.js); every dot and bar is labelled directly,
 
 Usage (from the project root):
     code/.venv/bin/python -I code/scripts/chart_article3.py output/assets
-Writes output/assets/article-3-figure-02.png and article-3-figure-04.png (and their SVGs).
+Writes output/assets/article-3-figure-02.png and article-3-figure-03.png (and their SVGs).
 """
 
 import html
@@ -232,7 +232,7 @@ def figure4(out: pathlib.Path) -> None:
     parts.append(text(24, H - 28, "Grey: same answer as the workflow · colour: a fix · red: a new error. Routing "
                       "stayed with the rules engine; escalations became a note to the approver (D42).", size=12,
                       fill=TEXT_2))  # fmt: skip
-    save(parts, W, H, out / "article-3-figure-04")
+    save(parts, W, H, out / "article-3-figure-03")
 
 
 if __name__ == "__main__":

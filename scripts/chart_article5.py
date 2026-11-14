@@ -1,4 +1,4 @@
-"""Article 5, figure 2, from the saved D47 dev runs ($0, no model calls).
+"""Article 5, figure 3, from the saved D47 dev runs ($0, no model calls).
 
 Same answers, different behaviour: the reviewing agent in-process, through MCP with the in-process tool order, and
 through MCP with the server's order. Three small multiples on their own axes (never one axis for two measures):
@@ -11,7 +11,7 @@ article 3. SVG, then PNG at 2x through cairosvg.
 
 Usage (from the project root):
     code/.venv/bin/python -I code/scripts/chart_article5.py output/assets
-Writes output/assets/article-5-figure-02.png (and .svg).
+Writes output/assets/article-5-figure-03.png (and .svg).
 """
 
 import html
@@ -114,7 +114,7 @@ def figure2(out: pathlib.Path) -> None:
                       size=12, fill=TEXT_2))  # fmt: skip
     parts.append(text(24, H - 28, "inside the in-process range (0.45–1.18 by pass), so the order explains most of the "
                       "gap. One pass: a direction, not a precise split.", size=12, fill=TEXT_2))  # fmt: skip
-    save(parts, W, H, out / "article-5-figure-02")
+    save(parts, W, H, out / "article-5-figure-03")
 
 
 if __name__ == "__main__":
