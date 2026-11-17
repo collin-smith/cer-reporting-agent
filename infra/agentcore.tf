@@ -24,6 +24,9 @@ locals {
   ac            = var.agentcore_window ? 1 : 0
   agentcore_zip = "${path.module}/build/agentcore.zip"
   ac_name       = replace(local.name, "-", "_") # Runtime names allow letters, digits and underscores only
+  # The zip isn't in the repo (infra/build/ is ignored), so CI's `terraform validate` has none: guard the hash as
+  # approval.tf does. With the window on and no zip, the upload still fails, as it should.
+  agentcore_md5 = fileexists(local.agentcore_zip) ? filemd5(local.agentcore_zip) : "unbuilt"
 }
 
 # --- The code: one zip, two entry files ---
@@ -46,11 +49,11 @@ resource "aws_s3_bucket_public_access_block" "agentcore_code" {
 resource "aws_s3_object" "agentcore_zip" {
   count  = local.ac
   bucket = aws_s3_bucket.agentcore_code[0].id
-  key    = "agentcore-${filemd5(local.agentcore_zip)}.zip" # a new key per build, so the Runtimes pick it up
+  key    = "agentcore-${local.agentcore_md5}.zip" # a new key per build, so the Runtimes pick it up
   source = local.agentcore_zip
   # source_hash, not etag: the 29 MB zip uploads multipart, so its S3 ETag never equals the file MD5 and an etag
   # makes every plan re-upload it (D56).
-  source_hash = filemd5(local.agentcore_zip)
+  source_hash = local.agentcore_md5
 }
 
 # --- Runtime execution role (both Runtimes) ---

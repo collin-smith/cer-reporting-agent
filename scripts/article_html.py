@@ -72,7 +72,7 @@ def table_alt(head, body, limit=900):
     rows = []
     for r in body:
         cells = [plain(c) for c in r]
-        first, rest = cells[0], [f"{h} {v}".strip() if h else v for h, v in zip(head[1:], cells[1:]) if v]
+        first, rest = cells[0], [f"{h} {v}".strip() if h else v for h, v in zip(head[1:], cells[1:], strict=False) if v]
         rows.append(f"{first}: {', '.join(rest)}" if first else ", ".join(rest))
     lead = f"Table with columns: {', '.join(h for h in head if h)}."
     text = lead + " " + "; ".join(rows) + "."

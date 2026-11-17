@@ -135,8 +135,16 @@ def main():
         .replace("/*__SERIES__*/null", json.dumps(series, separators=(",", ":")))
     )
     (OUT / "cer-incident-map.html").write_text(html, encoding="utf-8")
-    print(len(recs), "incidents,", sum(r[4] for r in recs), "Significant;", len(geo["features"]), "provinces;",
-          len(html) // 1024, "KB")
+    print(
+        len(recs),
+        "incidents,",
+        sum(r[4] for r in recs),
+        "Significant;",
+        len(geo["features"]),
+        "provinces;",
+        len(html) // 1024,
+        "KB",
+    )
 
 
 if __name__ == "__main__":

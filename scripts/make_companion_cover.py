@@ -14,7 +14,8 @@ and 2 (orange); validated with validate_palette.js --mode light (all checks pass
 
 Usage (from the project root):
     code/.venv/bin/python -I code/scripts/make_companion_cover.py \
-        input/cer/pipeline-incidents-2026-10-28.csv input/naturalearth/ne_50m_admin_1_states_provinces.geojson output/assets
+        input/cer/pipeline-incidents-2026-10-28.csv \
+        input/naturalearth/ne_50m_admin_1_states_provinces.geojson output/assets
 Writes output/assets/companion-cover.svg and companion-cover.png (1600 x 900, about Medium's 16:9 cover ratio).
 """
 
@@ -37,6 +38,12 @@ LAT0, LON0 = math.radians(63.390675), math.radians(-91.866667)
 N = math.log(math.cos(P1) / math.cos(P2)) / math.log(math.tan(math.pi / 4 + P2 / 2) / math.tan(math.pi / 4 + P1 / 2))
 F = math.cos(P1) * math.tan(math.pi / 4 + P1 / 2) ** N / N
 RHO0 = F / math.tan(math.pi / 4 + LAT0 / 2) ** N
+
+
+CREDIT = (
+    "Each dot is one incident location. Incident data: Canada Energy Regulator, Open Government Licence – "
+    "Canada. Boundaries: Natural Earth."
+)
 
 
 def lcc(lat: float, lon: float) -> tuple[float, float]:
@@ -88,8 +95,9 @@ def build(points: list[tuple[float, float, bool]], provinces: list) -> str:
 
     land = []
     for shape in provinces:
-        d = "".join("M" + "L".join(f"{xy(lat, lon)[0]:.1f},{xy(lat, lon)[1]:.1f}" for lat, lon in ring) + "Z"
-                    for ring in shape)
+        d = "".join(
+            "M" + "L".join(f"{xy(lat, lon)[0]:.1f},{xy(lat, lon)[1]:.1f}" for lat, lon in ring) + "Z" for ring in shape
+        )
         land.append(f'<path d="{d}" fill="{LAND}" stroke="{BORDER}" stroke-width="0.9" stroke-linejoin="round"/>')
     dots = []
     for sig in (False, True):
@@ -97,8 +105,10 @@ def build(points: list[tuple[float, float, bool]], provinces: list) -> str:
         for lat, lon, si in points:
             if si is sig:
                 x, y = xy(lat, lon)
-                dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="{colour}" fill-opacity="{op}" '
-                            f'stroke="{SURFACE}" stroke-width="0.8"/>')
+                dots.append(
+                    f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="{colour}" fill-opacity="{op}" '
+                    f'stroke="{SURFACE}" stroke-width="0.8"/>'
+                )
     n, n_sig = len(points), sum(p[2] for p in points)
     font = 'font-family="Helvetica, Arial, sans-serif"'
     tx, ty = 50, 590
@@ -110,10 +120,12 @@ def build(points: list[tuple[float, float, bool]], provinces: list) -> str:
 <text x="{tx + 34}" y="{ty + 177}" {font} font-size="25" fill="{TEXT}">Significant ({n_sig:,})</text>
 <circle cx="{tx + 14}" cy="{ty + 208}" r="7" fill="{BLUE}" fill-opacity="0.85"/>
 <text x="{tx + 34}" y="{ty + 217}" {font} font-size="25" fill="{TEXT}">Other incidents</text>
-<text x="{W - 40}" y="{H - 14}" text-anchor="end" {font} font-size="15" fill="{MUTED}">Each dot is one incident location. Incident data: Canada Energy Regulator, Open Government Licence – Canada. Boundaries: Natural Earth.</text>
+<text x="{W - 40}" y="{H - 14}" text-anchor="end" {font} font-size="15" fill="{MUTED}">{CREDIT}</text>
 """
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">'
-            f'<rect width="{W}" height="{H}" fill="{SURFACE}"/>{"".join(land)}{"".join(dots)}{text}</svg>')
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">'
+        f'<rect width="{W}" height="{H}" fill="{SURFACE}"/>{"".join(land)}{"".join(dots)}{text}</svg>'
+    )
 
 
 def main() -> None:
