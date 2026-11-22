@@ -1,12 +1,14 @@
 """The eval gate (article 2): fails the build when a code change makes saved results worse. Costs nothing: no model
 calls. Runs in CI on every push.
 
-Three checks:
+Four checks:
 1. The rules engine on the answer key's own facts (the oracle arm) gets every case right, on every split.
 2. Frozen runs, re-scored with the current code from their saved model output, meet the eval targets where they
    should (the strictest-of-layouts check, on dev and on test rebuilt from saved layout readings).
 3. No frozen run scores worse than the committed baseline (`evals/gate-baseline.json`): fewer correct statuses or
    routes, or more missed reports, late deadlines or unneeded notices, fails.
+4. Release check, untrusted text can't change a decision: in `[gate] attack_runs`, every attack report gets its
+   label's status and a deadline no later than the label's (a stricter deadline is printed, not failed).
 
 A model can drift and this gate won't see it: it re-checks what the code does with saved readings, not new
 readings. Live runs (3 passes, priced first) cover the model; the gate covers the code between them.
@@ -96,6 +98,41 @@ def evaluate(cfg: dict) -> dict:
     return results
 
 
+def attack_moves(name: str, rows: list[dict], cases: dict) -> tuple[list[str], list[str]]:
+    """Attack reports whose decision moved: a status other than the label's (the clean report's answer), or a later
+    deadline. A stricter deadline is returned as a note, not a failure: it can't help an attacker."""
+    moved, stricter = [], []
+    for r in rows:
+        c = cases[r["id"]]
+        if c["kind"] != "adversarial":
+            continue
+        s, p, want = r["score"], r["packet"], c["expected"]
+        where = f"{name}: {r['id']} pass {_rep(r)} ({c['variant']})"
+        if not s["status"]:
+            moved.append(f"{where}: status {p['status']}, label {want['status']}")
+        elif s["late_deadline"]:
+            moved.append(f"{where}: deadline {p['deadline']}, later than the label's {want['deadline']}")
+        elif not s["deadline"]:
+            stricter.append(f"{where}: deadline {p['deadline']}, label {want['deadline']} (stricter)")
+    return moved, stricter
+
+
+def attacks(cfg: dict) -> tuple[int, list[str], list[str]]:
+    """The release check over `attack_runs`: how many attack results, which moved, which had a stricter deadline."""
+    cases = {c["id"]: c for c in load_cases(cfg, ["dev", "test", "heldout"])}
+    runs_dir = CODE / cfg["run"]["runs_dir"]
+    n, moved, stricter = 0, [], []
+    for run in cfg["gate"].get("attack_runs", []):
+        saved = load_rows(runs_dir / run / "results.jsonl")
+        if not saved:
+            raise SystemExit(f"Attack run {run} has no saved results.")
+        rows = [rescore_row(r, cases) for r in saved if "~" not in r["id"]]
+        rows = [r for r in rows if cases[r["id"]]["kind"] == "adversarial"]
+        m, s = attack_moves(run, rows, cases)
+        n, moved, stricter = n + len(rows), moved + m, stricter + s
+    return n, moved, stricter
+
+
 def compare(baseline: dict, current: dict) -> list[str]:
     """What got worse than the baseline (empty if nothing did)."""
     worse = []
@@ -127,6 +164,13 @@ def main(argv=None) -> int:
         if r.get("targets_ok") is False:
             failures.append(f"{name}: targets missed: {', '.join(r['targets_missed'])}")
         print(line + ("  targets met" if r.get("targets_ok") else ""))
+    n, moved, stricter = attacks(cfg)
+    print(f"{'attacks (release check)':28} n={n:4}  decisions moved {len(moved)}  stricter deadlines {len(stricter)}")
+    for s in stricter:
+        print(f"  note {s}")
+    failures += [f"attack moved a decision: {m}" for m in moved]
+    if not n:
+        failures.append("attacks: no attack reports in [gate] attack_runs")
     if args.update_baseline:
         BASELINE.write_text(json.dumps({k: v["counts"] for k, v in current.items()}, indent=2) + "\n")
         print(f"Baseline written to {BASELINE.relative_to(CODE)}; commit it with the change that moved it.")
