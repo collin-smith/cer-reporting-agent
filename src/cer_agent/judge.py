@@ -23,6 +23,7 @@ Usage (from code/, src on PYTHONPATH):
     python3 -m cer_agent.judge --set tune --score-only          # $0: score the cached verdicts
     python3 -m cer_agent.judge --freeze                         # record the current prompt as frozen
     NOVA_PRO_ARN=... python3 -m cer_agent.judge --set measure --model nova-pro
+    NOVA_LITE_ARN=... python3 -m cer_agent.judge --set pairs    # paired fixtures (scripts/make_judge_pairs.py)
 """
 
 from __future__ import annotations
@@ -45,6 +46,7 @@ CODE = pathlib.Path(__file__).resolve().parents[2]
 JUDGE_DIR = CODE / "evals" / "judge"
 CALIBRATION = JUDGE_DIR / "calibration.jsonl"
 LABELS = JUDGE_DIR / "collin-labels.jsonl"
+PAIRS = JUDGE_DIR / "pairs.jsonl"
 FROZEN = JUDGE_DIR / "frozen.json"
 VERDICTS = JUDGE_DIR / "verdicts"
 
@@ -404,9 +406,58 @@ def report_lines(items, labels, verdicts, passes, s) -> list[str]:
     return lines
 
 
+def key_outcome(item: dict, judged: dict) -> str:
+    """How the judge handled the statement in the pair's key field (the one resting on the key sentence). Kept
+    apart, as the reader who suggested the pairs asked: a quote the checker can't find is a different failure
+    from a quote that is in the report but describes another incident."""
+    hits = [s for s in judged["statements"] if s.get("field") == item["key_field"] and not _not_stated(s)]
+    if not hits:
+        return "key statement not listed"
+    if any(not s.get("report_words") for s in hits):
+        return "judge found no support"
+    if not all(s.get("quote_ok") for s in hits):
+        return "quote not found in report"
+    if any(not s.get("same_fact") for s in hits):
+        return "quoted, judged unsupported"
+    return "accepted"
+
+
+def told_apart(items: list[dict], got: dict, passes: int) -> list[str]:
+    """The pairs whose key statement the judge accepted on the today side and rejected on the past side, on every
+    pass."""
+    out = []
+    for pair in sorted({it["pair"] for it in items}):
+        side = {it["side"]: it for it in items if it["pair"] == pair}
+        calls = {sd: [key_outcome(side[sd], got[(side[sd]["cal_id"], p)]) for p in range(1, passes + 1)
+                      if (side[sd]["cal_id"], p) in got] for sd in ("today", "past")}  # fmt: skip
+        if all(calls.values()) and all(o == "accepted" for o in calls["today"]) and \
+                all(o != "accepted" for o in calls["past"]):  # fmt: skip
+            out.append(pair)
+    return out
+
+
+def pair_lines(items: list[dict], got: dict, passes: int) -> list[str]:
+    """One line per report: the system verdict and the key-statement outcome on each pass."""
+    lines = []
+    for it in items:
+        calls = []
+        for p in range(1, passes + 1):
+            v = got.get((it["cal_id"], p))
+            if not v:
+                calls.append("-")
+                continue
+            verdict = combine(code_checks(it["packet"], it["draft"], it["report"]), v, sent_fields(it["draft"]))
+            calls.append(f"{verdict['verdict']} ({key_outcome(it, v)})")
+        lines.append(f"  {it['cal_id']:<9} expect {it['expected']}: " + " | ".join(calls))
+    told = told_apart(items, got, passes)
+    lines.append(f"key statement told apart (today accepted, past rejected, every pass): {len(told)} of "
+                 f"{len({it['pair'] for it in items})} pairs ({', '.join(told)})")  # fmt: skip
+    return lines
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run or score the LLM judge on the calibration set.")
-    ap.add_argument("--set", choices=["tune", "measure"], default="tune")
+    ap.add_argument("--set", choices=["tune", "measure", "pairs"], default="tune")
     ap.add_argument("--model", default="nova-lite", help="a [models.*] entry in evals/config.toml")
     ap.add_argument("--passes", type=int, default=3)
     ap.add_argument("--only", nargs="*", help="calibration IDs")
@@ -419,16 +470,20 @@ def main(argv=None) -> int:
         FROZEN.write_text(json.dumps({"version": VERSION, "frozen_at": time.strftime("%Y-%m-%dT%H:%M:%S")}) + "\n")
         print(f"judge prompt {VERSION} frozen -> {FROZEN.relative_to(CODE)}")
         return 0
-    if args.set == "measure" and not args.code_only:
+    if args.set in ("measure", "pairs") and not args.code_only:
         frozen = json.loads(FROZEN.read_text())["version"] if FROZEN.exists() else None
         if frozen != VERSION:
             print(f"Measure set needs the frozen prompt (frozen {frozen}, current {VERSION}). Run --freeze first, "
                   "or restore the frozen prompt.")  # fmt: skip
             return 2
 
-    items = [json.loads(ln) for ln in CALIBRATION.read_text(encoding="utf-8").splitlines()]
+    source = PAIRS if args.set == "pairs" else CALIBRATION
+    items = [json.loads(ln) for ln in source.read_text(encoding="utf-8").splitlines()]
     items = [it for it in items if it["set"] == args.set and (not args.only or it["cal_id"] in args.only)]
-    labels = {r["cal_id"]: r["collin"] for r in map(json.loads, LABELS.read_text(encoding="utf-8").splitlines())}
+    if args.set == "pairs":
+        labels = {it["cal_id"]: it["expected"] for it in items}
+    else:
+        labels = {r["cal_id"]: r["collin"] for r in map(json.loads, LABELS.read_text(encoding="utf-8").splitlines())}
     code = {it["cal_id"]: code_checks(it["packet"], it["draft"], it["report"]) for it in items}
     if args.code_only:
         verdicts = {(cid, 1): combine(c, None) for cid, c in code.items()}
@@ -498,6 +553,9 @@ def main(argv=None) -> int:
         scores[name] = s = score(items, labels, verdicts, args.passes)
         print(f"\n== {name}")
         print("\n".join(report_lines(items, labels, verdicts, args.passes, s)))
+    if args.set == "pairs":
+        print("\n== pairs: the key statement, per pass (today should pass, past should fail)")
+        print("\n".join(pair_lines(items, got, args.passes)))
     if tin:
         cost = (tin * model["price_in"] + tout * model["price_out"]) / 1e6
         print(f"\nthis run: {len(todo)} calls, tokens in/out {tin}/{tout}, ${cost:.4f}")

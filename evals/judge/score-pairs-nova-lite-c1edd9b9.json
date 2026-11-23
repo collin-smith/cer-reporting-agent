@@ -1,0 +1,130 @@
+{
+ "system (code + judge with quote check)": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 2,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 3,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [],
+  "missing": 0,
+  "false_pass_rate": 0.16666666666666666,
+  "false_fail_rate": 0.8333333333333334,
+  "criterion_hit_rate": 0.8333333333333334,
+  "kappa": {
+   "faithful": 0.0,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 1.0
+ },
+ "judge alone, own verdicts": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 2,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 2,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 2,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 3,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 1,
+    "passes": 6,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [
+   "P3-today"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.16666666666666666,
+  "false_fail_rate": 0.2777777777777778,
+  "criterion_hit_rate": 0.8333333333333334,
+  "kappa": {
+   "faithful": 0.5555555555555556,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 0.9166666666666666
+ },
+ "judge alone, with quote check": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 2,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 3,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 5,
+    "passes": 6,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [],
+  "missing": 0,
+  "false_pass_rate": 0.16666666666666666,
+  "false_fail_rate": 0.8333333333333334,
+  "criterion_hit_rate": 0.8333333333333334,
+  "kappa": {
+   "faithful": 0.0,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 1.0
+ }
+}

@@ -107,3 +107,59 @@ def test_missing_faithful_verdict_falls_back_to_the_judges_own_marks():
     del a["faithful_reason"], a["faithful_verdict"]
     r = j.judge(Stub([a]), "arn", REPORT, GOOD)
     assert r["criteria"]["faithful"]["verdict"] == "fail" and r["retries"] == 0
+
+
+def _pairs():
+    import json
+
+    return [json.loads(ln) for ln in j.PAIRS.read_text(encoding="utf-8").splitlines()]
+
+
+def test_pairs_file_is_current():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("make_judge_pairs", j.CODE / "scripts" / "make_judge_pairs.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.build() == _pairs()
+
+
+def test_pairs_only_the_judge_can_tell_them_apart():
+    """Same draft both sides; the key quote is in both reports and every code check passes on both."""
+    items = _pairs()
+    for pair in {it["pair"] for it in items}:
+        today, past = (next(it for it in items if it["pair"] == pair and it["side"] == s) for s in ("today", "past"))
+        assert today["draft"] == past["draft"] and today["report"] != past["report"]
+        assert sorted(today["report"].split()) == sorted(past["report"].split())  # same words, moved
+        for it in (today, past):
+            assert j.in_report(it["key"], it["report"])
+            assert failed(j.code_checks(it["packet"], it["draft"], it["report"])) == set()
+
+
+def test_key_outcome_keeps_not_found_apart_from_wrong_incident():
+    item = {"key": "After power-up, one valve stayed open.", "key_field": "PIR-6"}
+
+    def judged(words, ok, same, field="PIR-6"):
+        return {"statements": [{"field": field, "statement": "x", "report_words": words, "quote_ok": ok,
+                                "same_fact": same}]}  # fmt: skip
+
+    assert j.key_outcome(item, judged("one valve stayed open", True, True)) == "accepted"
+    assert j.key_outcome(item, judged("one valve stayed open", True, False)) == "quoted, judged unsupported"
+    assert j.key_outcome(item, judged("one valve stayed open", False, True)) == "quote not found in report"
+    assert j.key_outcome(item, judged(None, False, False)) == "judge found no support"
+    assert j.key_outcome(item, judged("one valve stayed open", True, True, "PIR-8")) == "key statement not listed"
+
+
+def test_saved_pair_verdicts_frozen_prompt():
+    """$0: the saved Nova Lite verdicts on the pairs (frozen prompt, 3 passes, 2026-11-23). The judge told 5 of 6
+    apart; on P4 it took the 2024 fire's damage as today's on every pass. A change to the quote check or the
+    combine rules that moves this shows up here."""
+    import json
+
+    items = _pairs()
+    rows = map(json.loads, (j.VERDICTS / "nova-lite-c1edd9b9.jsonl").read_text(encoding="utf-8").splitlines())
+    by_hash = {(r["draft_hash"], r["pass"]): r for r in rows}
+    got = {(it["cal_id"], p): by_hash[(j.draft_hash(it), p)] for it in items for p in (1, 2, 3)}
+    assert j.told_apart(items, got, 3) == ["P1", "P2", "P3", "P5", "P6"]
+    p4 = next(it for it in items if it["cal_id"] == "P4-past")
+    assert [j.key_outcome(p4, got[("P4-past", p)]) for p in (1, 2, 3)] == ["accepted"] * 3
