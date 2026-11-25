@@ -1,0 +1,172 @@
+{
+ "system (code + judge with quote check)": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 2,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 3,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   }
+  ],
+  "flipped": [],
+  "missing": 0,
+  "false_pass_rate": 0.0,
+  "false_fail_rate": 0.6666666666666666,
+  "criterion_hit_rate": 1.0,
+  "kappa": {
+   "faithful": 0.33333333333333326,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 1.0
+ },
+ "judge alone, own verdicts": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 0,
+    "passes": 6,
+    "criterion_hit": 5
+   },
+   {
+    "pass": 2,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 0,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 3,
+    "false_pass": 1,
+    "fails": 6,
+    "false_fail": 0,
+    "passes": 6,
+    "criterion_hit": 5
+   }
+  ],
+  "flipped": [
+   "P4-past"
+  ],
+  "missing": 0,
+  "false_pass_rate": 0.1111111111111111,
+  "false_fail_rate": 0.0,
+  "criterion_hit_rate": 0.8888888888888888,
+  "kappa": {
+   "faithful": 0.8888888888888888,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 0.9166666666666666
+ },
+ "judge alone, with quote check": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 2,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 3,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   }
+  ],
+  "flipped": [],
+  "missing": 0,
+  "false_pass_rate": 0.0,
+  "false_fail_rate": 0.6666666666666666,
+  "criterion_hit_rate": 1.0,
+  "kappa": {
+   "faithful": 0.33333333333333326,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 1.0
+ },
+ "system + code fails 'an earlier incident' (D76, not shipped)": {
+  "per_pass": [
+   {
+    "pass": 1,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 2,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   },
+   {
+    "pass": 3,
+    "false_pass": 0,
+    "fails": 6,
+    "false_fail": 4,
+    "passes": 6,
+    "criterion_hit": 6
+   }
+  ],
+  "flipped": [],
+  "missing": 0,
+  "false_pass_rate": 0.0,
+  "false_fail_rate": 0.6666666666666666,
+  "criterion_hit_rate": 1.0,
+  "kappa": {
+   "faithful": 0.33333333333333326,
+   "consistent": null,
+   "complete": null,
+   "cited": null,
+   "precautionary": null,
+   "clean": null
+  },
+  "stability": 1.0
+ }
+}

@@ -163,3 +163,61 @@ def test_saved_pair_verdicts_frozen_prompt():
     assert j.told_apart(items, got, 3) == ["P1", "P2", "P3", "P5", "P6"]
     p4 = next(it for it in items if it["cal_id"] == "P4-past")
     assert [j.key_outcome(p4, got[("P4-past", p)]) for p in (1, 2, 3)] == ["accepted"] * 3
+
+
+def test_attribution_variant_is_the_frozen_prompt_plus_one_field():
+    """D76: same system prompt, same tool except an `incident` field recorded before same_fact; the frozen VERSION
+    is untouched, and the variant runs on the pairs only."""
+    import json
+
+    assert json.loads(j.FROZEN.read_text())["version"] == j.VERSION
+    base = j.TOOL["inputSchema"]["json"]["properties"]["statements"]["items"]
+    attr = j.TOOL_ATTR["inputSchema"]["json"]["properties"]["statements"]["items"]
+    assert list(attr["properties"]) == ["field", "statement", "report_words", "incident", "same_fact"]
+    assert {k: v for k, v in attr["properties"].items() if k != "incident"} == base["properties"]
+    assert attr["properties"]["incident"]["enum"] == list(j.INCIDENTS)
+    rest = lambda t: {k: v for k, v in t["inputSchema"]["json"]["properties"].items() if k != "statements"}  # noqa: E731
+    assert rest(j.TOOL_ATTR) == rest(j.TOOL) and j.VERSION_ATTR != j.VERSION
+    assert j.main(["--set", "measure", "--attribution"]) == 2
+
+    s = Stub([answer()])
+    j.judge(s, "arn", REPORT, GOOD, attribution=True)
+    call = s.calls[0]
+    assert call["toolConfig"]["tools"][0]["toolSpec"] is j.TOOL_ATTR and call["system"][0]["text"] == j.SYSTEM
+
+
+def test_earlier_incident_rule_fails_only_when_asked():
+    code = {c: {"verdict": "pass", "reason": ""} for c in j.CRITERIA}
+    st = {"field": "PIR-6", "statement": "x", "report_words": "y", "quote_ok": True, "same_fact": True,
+          "incident": "an earlier incident"}  # fmt: skip
+    judged = {"statements": [st], "criteria": {"faithful": {"verdict": "pass", "reason": ""},
+                                               "clean": {"verdict": "pass", "reason": ""}}}  # fmt: skip
+    assert j.combine(code, judged)["verdict"] == "pass"
+    assert j.combine(code, judged, earlier_fails=True)["verdict"] == "fail"
+    assert j.key_incident({"key_field": "PIR-6"}, judged) == "an earlier incident"
+
+
+def test_saved_pair_verdicts_attribution_variant():
+    """$0: the saved Nova Lite verdicts with the incident field (D76, 3 passes, 2026-11-25, $0.0093). On P4 the judge
+    still accepted the 2024 fire's damage as the same fact on every pass, but labelled it an earlier incident: the
+    miss is legible. "Earlier" appears only on past-side (wrong) drafts, so a code rule on it adds no false fail."""
+    import json
+
+    items = _pairs()
+    rows = map(json.loads, (j.VERDICTS / f"nova-lite-{j.VERSION_ATTR}.jsonl").read_text(encoding="utf-8").splitlines())
+    by_hash = {(r["draft_hash"], r["pass"]): r for r in rows}
+    got = {(it["cal_id"], p): by_hash[(j.draft_hash(it), p)] for it in items for p in (1, 2, 3)}
+    assert j.told_apart(items, got, 3) == ["P1", "P2", "P3", "P5", "P6"]
+    p4 = next(it for it in items if it["cal_id"] == "P4-past")
+    assert [j.key_outcome(p4, got[("P4-past", p)]) for p in (1, 2, 3)] == ["accepted"] * 3
+    assert [j.key_incident(p4, got[("P4-past", p)]) for p in (1, 2, 3)] == ["an earlier incident"] * 3
+    earlier = {cid for (cid, _), v in got.items() for s in v["statements"] if s.get("incident") == j.INCIDENTS[1]}
+    assert earlier == {"P3-past", "P4-past"}
+    for it in items:
+        code, sent = j.code_checks(it["packet"], it["draft"], it["report"]), j.sent_fields(it["draft"])
+        for p in (1, 2, 3):
+            v = got[(it["cal_id"], p)]
+            if it["side"] == "today":
+                assert j.combine(code, v, sent, True)["verdict"] == j.combine(code, v, sent)["verdict"]
+            else:
+                assert j.combine(code, v, sent, True)["verdict"] == "fail"
